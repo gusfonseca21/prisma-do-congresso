@@ -1,1 +1,4 @@
-- Criar artefatos para os itens baixados
+- Timeout dentro das funções de fetch
+- Cache htmls assiduidade anos anteriores(no momento está sendo criada uma task para cada ano
+ e o resultado dessa task está sendo gravado mas esta sobrescrevendo o resultado anterior)
+- Ajustar timeout das tasks

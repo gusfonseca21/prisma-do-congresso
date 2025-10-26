@@ -27,12 +27,9 @@
 
     // Python (Pylance) - desativa análise de diretórios pesados
     "python.analysis.exclude": [
-        "**/.venv",
-        "**/.env",
         "**/__pycache__",
-        "**/downloads",
+        ".venv/**",
         "data/**",
-        "**/output"
     ],
     "python.analysis.autoImportCompletions": false,
     "python.analysis.memory.keepLibraryAst": false,

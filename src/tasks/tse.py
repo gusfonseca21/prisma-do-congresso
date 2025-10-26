@@ -1,4 +1,6 @@
 from pathlib import Path
+from typing import cast
+from uuid import UUID
 from prefect import task, get_run_logger
 from prefect.artifacts import create_progress_artifact
 from datetime import timedelta
@@ -45,4 +47,5 @@ def extract_tse(name: str, url: str, out_dir: str = "data/tse") -> str:
 
     dest = Path(out_dir) / f"{name}.zip"
     logger.info(f"Fazendo download  do endpoint TSE '{url}' -> {dest}")
-    return download_stream(url, dest, unzip=True, progress_artifact_id=progress_id)
+    dest_path = download_stream(url, dest, unzip=True, progress_artifact_id=cast(UUID, progress_id))
+    return dest_path

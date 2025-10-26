@@ -23,8 +23,9 @@ class TSEConfig(BaseModel):
     CACHE_POLICY: str
     CACHE_EXPIRATION: int
 
-class CongressoConfig(BaseModel):
+class CamaraConfig(BaseModel):
     REST_BASE_URL: str
+    PORTAL_BASE_URL: str
     RETRIES: int
     RETRY_DELAY: int
     TIMEOUT: int
@@ -33,7 +34,7 @@ class CongressoConfig(BaseModel):
 class AppConfig(BaseModel):
     FLOW: FlowConfig
     TSE: TSEConfig
-    CAMARA: CongressoConfig
+    CAMARA: CamaraConfig
 
 CONFIG_PATH = "appsettings.toml"
 

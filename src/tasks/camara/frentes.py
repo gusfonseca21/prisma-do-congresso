@@ -1,5 +1,6 @@
 from pathlib import Path
 from prefect import task, get_run_logger
+from prefect.artifacts import acreate_table_artifact
 from typing import cast
 
 from utils.io import fetch_json_many_async, save_ndjson
@@ -29,9 +30,20 @@ async def extract_frentes(legislatura: dict, out_dir: str | Path = "data/camara"
 
     # Retornando ids das frentes
     frentes_ids = []
+    artifact_data = []
     for json in jsons:
         frentes = json.get("dados", [])
         for frente in frentes:
-            frentes_ids.append(frente["id"])
+            frentes_ids.append(frente.get("id"))
+            artifact_data.append({
+                "id": frente.get("id"),
+                "nome": frente.get("titulo")
+            })
+
+    await acreate_table_artifact(
+        key="frentes",
+        table=artifact_data,
+        description="Frentes"
+    )
 
     return frentes_ids

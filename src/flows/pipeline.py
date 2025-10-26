@@ -9,6 +9,7 @@ from tasks.camara.legislatura import extract_legislatura
 from tasks.camara.deputados import extract_deputados
 from tasks.camara.frentes import extract_frentes
 from tasks.camara.frentes_membros import extract_frentes_membros
+from tasks.camara.assiduidade import extract_assiduidade_deputados
 
 from config.loader import load_config
 
@@ -38,6 +39,15 @@ async def pipeline(
     # CONGRESSO
     legislatura = extract_legislatura(date)
     deputados_f = extract_deputados.submit(legislatura)
+    anos_passados = legislatura.get("dados", [])[0].get("anosPassados", [])
+    # assiduidade_f = extract_assiduidade_deputados.submit(cast(Any, deputados_f), legislatura)
+    assiduidade_f = [
+        extract_assiduidade_deputados.submit(
+            cast(Any, deputados_f),
+            ano
+        )
+        for ano in anos_passados
+    ]
     frentes_f = extract_frentes.submit(legislatura)
     frentes_membros_f = extract_frentes_membros.submit(cast(Any, frentes_f))
 
@@ -45,6 +55,7 @@ async def pipeline(
     return resolve_futures_to_results({
         "tse": tse_fs,
         "congresso_deputados": deputados_f,
+        "congresso_assiduidade": assiduidade_f,
         "congresso_frentes": frentes_f,
         "congresso_frentes_membros": frentes_membros_f,
     })
