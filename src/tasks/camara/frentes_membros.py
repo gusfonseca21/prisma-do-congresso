@@ -6,6 +6,7 @@ from prefect.artifacts import (
     acreate_table_artifact
 )
 from typing import cast
+from datetime import timedelta
 
 from utils.io import fetch_json_many_async, save_ndjson
 from config.loader import load_config
@@ -18,7 +19,7 @@ def frentes_membros_urls(frentes_ids: list[str]) -> list[str]:
 @task(
     retries=APP_SETTINGS.CAMARA.RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TIMEOUT
+    timeout_seconds=1800
 )
 async def extract_frentes_membros(frentes_ids: list[str], out_dir: str | Path = "data/camara") -> str:
     logger = get_run_logger()

@@ -1,4 +1,4 @@
+- Testar baixar anos específicos
 - Timeout dentro das funções de fetch
-- Cache htmls assiduidade anos anteriores(no momento está sendo criada uma task para cada ano
- e o resultado dessa task está sendo gravado mas esta sobrescrevendo o resultado anterior)
+- Na função de fazer o merge de ndjson, apagar os arquivos antigos
 - Ajustar timeout das tasks

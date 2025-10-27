@@ -1,12 +1,7 @@
 from pathlib import Path
 from uuid import UUID
-import httpx
-import json
-import asyncio
-import hashlib
-from datetime import datetime
+import httpx, json, asyncio, hashlib, zipfile, os, shutil
 from typing import Any, cast
-import zipfile
 from prefect import get_run_logger
 from prefect.exceptions import MissingContextError
 from prefect.artifacts import update_progress_artifact, aupdate_progress_artifact
@@ -97,12 +92,45 @@ def save_json(data: Any, dest_path: str | Path, timeout: float = 60.0) -> str:
 
 # Salva uma lista de JSONs em um único NDJson
 def save_ndjson(records: list[dict], dest_path: str | Path) -> str:
+    """
+    Salva arquivos no formato NDJson, que agrupa vários JSONS.
+    Só grava em disco depois dos dados estiverem consolidados
+    """
     dest_path = Path(dest_path)
-    ensure_dir(dest_path.parent)
-    with open(dest_path, "w", encoding="utf-8") as f:
-        for rec in records:
-            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    dest_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = dest_path.with_suffix(dest_path.suffix + ".tmp")
+
+    try:
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            for rec in records:
+                f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+        os.replace(tmp_path, dest_path)
+    finally:
+        if tmp_path.exists():
+            try:
+                tmp_path.unlink()
+            except OSError:
+                pass
     return str(dest_path)
+
+def merge_ndjson(inputs: list[str | Path], dest: str | Path) -> str:
+    """
+    Quando temos vários NDJsons da mesma task, fazemos o merge deles em um único arquivo.
+    """
+    dest = Path(dest)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_suffix(dest.suffix + ".tmp")
+
+    with open(tmp, "w", encoding="utf-8") as out:
+        for p in inputs:
+            p = Path(p)
+            if not p.exists():
+                continue
+            with open(p, "r", encoding="utf-8") as f:
+                shutil.copyfileobj(f, out)
+    os.replace(tmp, dest)
+    return str(dest)
 
 # Armazena em memória ou grava em disco uma lista de JSONs
 async def fetch_json_many_async(

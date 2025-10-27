@@ -30,6 +30,8 @@ class CamaraConfig(BaseModel):
     RETRY_DELAY: int
     TIMEOUT: int
     CONCURRENCY: int
+    ASSIDUIDADE_CACHE_POLICY: str
+    ASSIDUIDADE_CACHE_EXPIRATION: int
 
 class AppConfig(BaseModel):
     FLOW: FlowConfig

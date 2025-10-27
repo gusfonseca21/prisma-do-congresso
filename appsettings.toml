@@ -17,3 +17,6 @@ RETRY_DELAY = 5 # Segundos
 TIMEOUT = 120 # Segundos
 CONCURRENCY = 10 # Número máximo de requisições por segundo
 TYPES_PROPOSICOES = "PL,PLP,PEC,MPV,MP,PDL,PRC" # Tipos de proposições a serem buscadas
+ASSIDUIDADE_CACHE_POLICY = "INPUTS"
+ASSIDUIDADE_CACHE_EXPIRATION = 90 # Dias
+
