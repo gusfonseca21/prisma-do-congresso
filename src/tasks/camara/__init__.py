@@ -1,0 +1,7 @@
+from .assiduidade import extract_assiduidade_deputados
+from .deputados import extract_deputados
+from .detalhes_deputados import extract_detalhes_deputados
+from .frentes_membros import extract_frentes_membros
+from .frentes import extract_frentes
+from .legislatura import extract_legislatura
+from .discursos import extract_discursos_deputados

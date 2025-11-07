@@ -12,24 +12,24 @@ from config.loader import load_config
 
 APP_SETTINGS = load_config()
 
-def frentes_membros_urls(frentes_ids: list[str]) -> list[str]:
-    return [f"{APP_SETTINGS.CAMARA.REST_BASE_URL}frentes/{id}/membros" for id in frentes_ids]
+def detalhes_deputados_urls(deputados_ids: list[int]) -> list[str]:
+    return [f"{APP_SETTINGS.CAMARA.REST_BASE_URL}deputados/{id}" for id in deputados_ids]
 
 @task(
     retries=APP_SETTINGS.CAMARA.RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TIMEOUT
 )
-async def extract_frentes_membros(frentes_ids: list[str], out_dir: str | Path = "data/camara") -> str:
+async def extract_detalhes_deputados(deputados_ids: list[int], out_dir: str | Path = "data/camara") -> str:
     logger = get_run_logger()
 
     progress_id = await acreate_progress_artifact(
         progress=0.0,
-        description="Progresso do download de membros de frentes da Câmara"
+        description="Progresso do download de Detalhes de Deputados"
     )
 
-    urls = frentes_membros_urls(frentes_ids)
-    logger.info(f"Câmara: buscando Membros de {len(urls)} Frentes")
+    urls = detalhes_deputados_urls(deputados_ids)
+    logger.info(f"Câmara: baixando dados de {len(urls)} Deputado")
 
     jsons = await fetch_json_many_async(
         urls=urls,
@@ -49,20 +49,20 @@ async def extract_frentes_membros(frentes_ids: list[str], out_dir: str | Path = 
     artifact_data = []
     for i, json in enumerate(jsons):
         json = cast(dict, json)
-        link_self = next(l["href"] for l in json.get("links", []) if l.get("rel") == "self")
-        id_frente = link_self.split("/")[-2]
-        membros = json.get("dados", []) # type: ignore
+        deputado = json.get("dados", []) # type: ignore
         artifact_data.append({
             "index": i,
-            "id_frente": id_frente,
-            "numero_membros": len(membros)
+            "id": deputado.get("id", None),
+            "nome": deputado.get("ultimoStatus", {}).get("nome", None),
+            "situacao": deputado.get("ultimoStatus", {}).get("situacao", None),
+            "condicao_eleitoral": deputado.get("ultimoStatus", {}).get("condicaoEleitoral", None)
         })
-    
+
     await acreate_table_artifact(
-        key="frentes-membros",
+        key="detalhes-deputados",
         table=artifact_data,
-        description="Total de membros encontrados nas frentes."
+        description="Detalhes de deputados"
     )
-    
-    dest = Path(out_dir) / "frentes_membros.ndjson"
+
+    dest = Path(out_dir) / "detalhes_deputados.ndjson"
     return save_ndjson(cast(list[dict], jsons), dest)

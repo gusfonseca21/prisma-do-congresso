@@ -1,11 +1,13 @@
 [FLOW]
 MAX_RUNNERS = 16 # Num. de threads abertas
+TASKS_RETURN_EXCEPTION = true # Em caso de exceção nas tasks de requisição, retorna algo em caso de erro ou lança a exceçao (parando a aplicação)
+DATE_LOOKBACK = 3 # Dias
 
 [TSE]
 BASE_URL = "https://cdn.tse.jus.br/estatistica/sead/odsele/"
 RETRIES = 5
 RETRY_DELAY = 5 # Segundos
-TIMEOUT = 120 # Segundos
+TIMEOUT = 3600 # Segundos
 CACHE_POLICY = "INPUTS" # Padrão = INPUTS
 CACHE_EXPIRATION = 90 # Dias
 
@@ -14,7 +16,7 @@ REST_BASE_URL = "https://dadosabertos.camara.leg.br/api/v2/"
 PORTAL_BASE_URL = "https://www.camara.leg.br/"
 RETRIES = 0
 RETRY_DELAY = 5 # Segundos
-TIMEOUT = 120 # Segundos
+TIMEOUT = 1800 # Segundos
 CONCURRENCY = 10 # Número máximo de requisições por segundo
 TYPES_PROPOSICOES = "PL,PLP,PEC,MPV,MP,PDL,PRC" # Tipos de proposições a serem buscadas
 ASSIDUIDADE_CACHE_POLICY = "INPUTS"

@@ -35,7 +35,7 @@ def assiduidade_urls(deputados_ids: list[str], year: int) -> list[str]:
     task_run_name="extract_assiduidade_deputados_{year}",
     retries=APP_SETTINGS.CAMARA.RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.RETRY_DELAY,
-    timeout_seconds=1800,
+    timeout_seconds=APP_SETTINGS.CAMARA.TIMEOUT,
     cache_key_fn=assiduidade_cache_key,
     cache_policy=CACHE_POLICY_MAP[APP_SETTINGS.CAMARA.ASSIDUIDADE_CACHE_POLICY],
     cache_expiration=timedelta(days=APP_SETTINGS.CAMARA.ASSIDUIDADE_CACHE_EXPIRATION)
@@ -62,7 +62,6 @@ async def extract_assiduidade_deputados(
     htmls = await fetch_html_many_async(
         urls=urls,
         concurrency=APP_SETTINGS.CAMARA.CONCURRENCY,
-        timeout=APP_SETTINGS.CAMARA.TIMEOUT,
         progress_artifact_id=progress_id
     )
 

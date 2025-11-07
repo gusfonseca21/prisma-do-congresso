@@ -5,6 +5,11 @@ from typing import Any, cast
 from prefect import get_run_logger
 from prefect.exceptions import MissingContextError
 from prefect.artifacts import update_progress_artifact, aupdate_progress_artifact
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+
+from config.loader import load_config
+
+APP_SETTINGS = load_config()
 
 # Garante que o caminho exista
 def ensure_dir(path: str | Path) -> Path:
@@ -129,6 +134,7 @@ def merge_ndjson(inputs: list[str | Path], dest: str | Path) -> str:
                 continue
             with open(p, "r", encoding="utf-8") as f:
                 shutil.copyfileobj(f, out)
+            os.unlink(p)
     os.replace(tmp, dest)
     return str(dest)
 
@@ -160,78 +166,107 @@ async def fetch_json_many_async(
 
     ensure_dir(out_dir) if out_dir else None
     
+    queue = asyncio.Queue()
     processed_urls = set() # Evita processar a mesma URL duas vezes
     results = []
+
+    for u in urls:
+        queue.put_nowait(u)
 
     downloaded_urls = 0
     update_lock = asyncio.Lock() # Evita race conditions ao atualizar o progresso de forma assíncrona
 
-    async def one(u: str):
-        nonlocal downloaded_urls
+    async with httpx.AsyncClient(limits=limits, timeout=timeout_cfg) as client:
+        async def worker():
+            nonlocal downloaded_urls
 
-        if u in processed_urls:
-            return []
-        processed_urls.add(u)
+            while True:
+                try:
+                    u = queue.get_nowait()
+                except asyncio.QueueEmpty:
+                    return
+                
+                if u in processed_urls:
+                    continue
+                processed_urls.add(u)
 
-        async with sem:
-            async with httpx.AsyncClient(limits=limits, timeout=timeout_cfg) as client:
-                log(f"Fazendo download da URL: {u}")
-                r = await client.get(u)
-                r.raise_for_status()
-                data = r.json()
+                async with sem:
+                    log(f"Baixando: {u}")
+                    r = await client.get(u)
+                    r.raise_for_status()
+                    data = r.json()
 
-            # Salvar ou retornar o resultado atual
-            if out_dir:
-                # Nome do arquivo determinado pelo Hash da URL
-                name = hashlib.sha1(u.encode()).hexdigest() + ".json"
-                path = Path(out_dir) / name
-                with open(path, "w", encoding="utf-8") as f:
-                    json.dump(data, f, ensure_ascii=False)
-                current_result = str(path)
-            else:
-                current_result = data
+                    # Salva ou retorna em memória
+                    if out_dir:
+                        name = hashlib.sha1(u.encode()).hexdigest() + ".json"
+                        path = Path(out_dir) / name
+                        with open(path, "w", encoding="utf-8") as f:
+                            json.dump(data, f, ensure_ascii=False)
+                        results.append(str(path))
+                    else:
+                        results.append(data)
 
-            if progress_artifact_id and len(urls) > 0:
-                async with update_lock:
-                    downloaded_urls += 1
-                    await aupdate_progress_artifact(
-                        artifact_id=progress_artifact_id,
-                        progress=(downloaded_urls / len(urls)) * 100
-                    )
+                    # Atualiza progresso
+                    if progress_artifact_id:
+                        async with update_lock:
+                            downloaded_urls += 1
+                            await aupdate_progress_artifact(
+                                artifact_id=progress_artifact_id,
+                                progress=(downloaded_urls / max(len(urls),1)) * 100
+                            )
 
-        # Verifica se deve serguir a paginação
-        additional_results = []
-        if follow_pagination and "links" in data:
-            links = {link["rel"]: link["href"] for link in data["links"]}
+                # Se tiver paginação, adiciona novas URLs à fila
+                if follow_pagination and "links" in data:
+                    links = {l["rel"]: l["href"] for l in data["links"]}
+                    if "self" in links and "last" in links:
+                        for extra in generate_pages_urls(links["self"], links["last"]):
+                            if extra not in processed_urls:
+                                queue.put_nowait(extra)
 
-            if "self" in links and "last" in links:
-                if links["self"] != links["last"] and "next" in links:
-                    next_url = links["next"]
-                    additional_results = await one(next_url)
+        # Inicia os workers
+        workers = [asyncio.create_task(worker()) for _ in range(concurrency)]
+        await asyncio.gather(*workers)
 
-            # Retorna resultado atual + resultados adicionais da paginação
-            if isinstance(additional_results, list):
-                return [current_result] + additional_results
-            else:
-                return [current_result]
-            
-    tasks = [one(u) for u in urls]
-    nested_results = await asyncio.gather(*tasks)
+        valid_results = [
+            r for r in results
+            if not isinstance(r, BaseException)
+        ]
 
-    # Achata a lista de resultados
-    for item in nested_results:
-        if isinstance(item, list):
-            results.extend(item)
-        else:
-            results.append(item)
+        return valid_results
 
-    return results
+                                
+def generate_pages_urls(url_self: str, url_last: str):
+    """
+    Caso a url baixada tenha mais páginas, retorna uma lista com as páginas adicionais a serem baixadas
+    """
+    self_parsed = urlparse(url_self)
+    self_params = parse_qs(self_parsed.query)
+    self_page = int(self_params.get("pagina", ["1"])[0])
+
+    # Se não for a primeira página, retorna pois todas as URLs já foram geradas
+    if self_page > 1:
+        return []
+
+    # Pega o número da última página
+    last_parsed = urlparse(url_last)
+    last_params = parse_qs(last_parsed.query)
+    last_page = int(last_params.get("pagina", ["1"])[0])
+
+    urls = []
+    for page in range(2, (last_page + 1)):
+        params = parse_qs(self_parsed.query)
+        params["pagina"] = [str(page)]
+        new_query = urlencode(params, doseq=True)
+        new_url = urlunparse(self_parsed._replace(query=new_query))
+        urls.append(new_url)
+
+    return urls
 
 async def fetch_html_many_async(
      urls: list[str],
      out_dir: str | Path | None = None,
      concurrency: int = 10,
-     timeout: float = 30.0,
+     timeout: int = 1800,
      logger: Any | None = None,
      progress_artifact_id: Any | None = None   
 ) -> list[str | None] | str:
@@ -257,7 +292,7 @@ async def fetch_html_many_async(
     downloaded_urls = 0
     update_lock = asyncio.Lock() # Evita race conditions ao atualizar o progresso de forma assíncrona
 
-    async def one(u: str):
+    async def one(u: str, client: httpx.AsyncClient):
         nonlocal downloaded_urls
 
         if u in processed_urls:
@@ -265,12 +300,11 @@ async def fetch_html_many_async(
         processed_urls.add(u)
 
         async with sem:
-            async with httpx.AsyncClient(limits=limits, timeout=timeout_cfg) as client:
-                log(f"Fazendo download da URL: {u}")
-                r = await client.get(u)
-                r.raise_for_status()
+            log(f"Fazendo download da URL: {u}")
+            r = await client.get(u)
+            r.raise_for_status()
 
-                html_content = r.text
+            html_content = r.text
 
             # Salvar ou retornar o resultado atual
             if out_dir:
@@ -290,8 +324,14 @@ async def fetch_html_many_async(
                     )
 
             return html_content
-
-    tasks = [one(u) for u in urls]
-    results = await asyncio.gather(*tasks)
+    
+    async with httpx.AsyncClient(limits=limits, timeout=timeout_cfg) as client:
+        tasks = [one(u, client) for u in urls]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        # Elimina os resultados inválidos (erro)
+        valid_results = [
+            result for result in results
+            if not isinstance(result, BaseException)
+        ]
         
-    return results
+    return valid_results

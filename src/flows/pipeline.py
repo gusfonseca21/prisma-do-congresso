@@ -1,16 +1,12 @@
 from prefect import flow, get_run_logger
 from prefect.task_runners import ThreadPoolTaskRunner
 from prefect.futures import resolve_futures_to_results
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Any, cast
 from pathlib import Path
 
 from tasks.tse import TSE_ENDPOINTS, extract_tse
-from tasks.camara.legislatura import extract_legislatura
-from tasks.camara.deputados import extract_deputados
-from tasks.camara.frentes import extract_frentes
-from tasks.camara.frentes_membros import extract_frentes_membros
-from tasks.camara.assiduidade import extract_assiduidade_deputados
+from tasks import camara
 
 from utils.io import merge_ndjson
 from config.loader import load_config
@@ -24,7 +20,7 @@ APP_SETTINGS = load_config()
     log_prints=True
 ) 
 async def pipeline(
-    date: date = datetime.now().date(), 
+    date: date = datetime.now().date() - timedelta(days=APP_SETTINGS.FLOW.DATE_LOOKBACK), 
     refresh_cache: bool = False
 ):
     logger = get_run_logger()
@@ -39,15 +35,21 @@ async def pipeline(
     ]
 
     # CONGRESSO
-    legislatura = extract_legislatura(date)
-    deputados_f = extract_deputados.submit(legislatura)
+    legislatura = camara.extract_legislatura(date)
+    deputados_f = camara.extract_deputados.submit(legislatura)
     anos_passados = legislatura.get("dados", [])[0].get("anosPassados", [])
     assiduidade_fs = [
-        extract_assiduidade_deputados.with_options(refresh_cache=refresh_cache).submit(cast(Any, deputados_f), ano)
+        camara.extract_assiduidade_deputados.with_options(refresh_cache=refresh_cache).submit(cast(Any, deputados_f), ano)
         for ano in anos_passados
     ]
-    frentes_f = extract_frentes.submit(legislatura)
-    frentes_membros_f = extract_frentes_membros.submit(cast(Any, frentes_f))
+    frentes_f = camara.extract_frentes.submit(legislatura)
+    frentes_membros_f = camara.extract_frentes_membros.submit(cast(Any, frentes_f))
+
+    resolve_futures_to_results([frentes_membros_f])
+    detalhes_deputados_fs = camara.extract_detalhes_deputados.submit(cast(list[int], deputados_f))
+
+    resolve_futures_to_results([detalhes_deputados_fs])
+    discursos_deputados_fs = camara.extract_discursos_deputados.submit(cast(list[int], deputados_f), date)
 
     # ASSIDUIDADE
     # As funções de Assiduidade (uma por ano) baixa em paralelo em relação às outras tasks
@@ -62,6 +64,8 @@ async def pipeline(
         "congresso_assiduidade": assiduidade_fs,
         "congresso_frentes": frentes_f,
         "congresso_frentes_membros": frentes_membros_f,
+        "congresso_detalhes_deputados": detalhes_deputados_fs,
+        # "congresso_discurso_deputados": discursos_deputados_fs
     })
 
 if __name__ == "__main__":

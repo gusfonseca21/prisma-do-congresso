@@ -1,4 +1,5 @@
-- Testar baixar anos específicos
-- Timeout dentro das funções de fetch
-- Na função de fazer o merge de ndjson, apagar os arquivos antigos
-- Ajustar timeout das tasks
+- Atualizar funções de requisição para não abrirem nova conexão a cada requisição
+- Parametrizar o limite de requisições em paralelo
+- Tornar as tasks de múltiplas requisições tolerantes a erros
+- Corrigir erro no download da paginação
+- Continuar em discursos fazendo o artefato retornar o numero total de discursos feitos pelo deputado e o num de paginas

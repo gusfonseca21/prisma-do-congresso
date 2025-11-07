@@ -14,6 +14,8 @@ from prefect.cache_policies import (
 
 class FlowConfig(BaseModel):
     MAX_RUNNERS: int
+    TASKS_RETURN_EXCEPTION: bool
+    DATE_LOOKBACK: int
 
 class TSEConfig(BaseModel):
     BASE_URL: str
