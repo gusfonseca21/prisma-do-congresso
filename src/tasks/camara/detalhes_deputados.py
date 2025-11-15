@@ -1,10 +1,6 @@
 from pathlib import Path
 from prefect import task, get_run_logger
-from prefect.artifacts import (
-    acreate_progress_artifact,
-    aupdate_progress_artifact,
-    acreate_table_artifact
-)
+from prefect.artifacts import acreate_table_artifact
 from typing import cast
 
 from utils.io import fetch_json_many_async, save_ndjson
@@ -23,11 +19,6 @@ def detalhes_deputados_urls(deputados_ids: list[int]) -> list[str]:
 async def extract_detalhes_deputados(deputados_ids: list[int], out_dir: str | Path = "data/camara") -> str:
     logger = get_run_logger()
 
-    progress_id = await acreate_progress_artifact(
-        progress=0.0,
-        description="Progresso do download de Detalhes de Deputados"
-    )
-
     urls = detalhes_deputados_urls(deputados_ids)
     logger.info(f"Câmara: baixando dados de {len(urls)} Deputado")
 
@@ -35,14 +26,7 @@ async def extract_detalhes_deputados(deputados_ids: list[int], out_dir: str | Pa
         urls=urls,
         concurrency=APP_SETTINGS.CAMARA.CONCURRENCY,
         timeout=APP_SETTINGS.CAMARA.TIMEOUT,
-        follow_pagination=True,
-        progress_artifact_id=progress_id
-    )
-
-    await aupdate_progress_artifact(
-        artifact_id=progress_id,
-        progress=100.0,
-        description="Downloads concluídos"
+        follow_pagination=True
     )
 
     # Gerando artefato para validação dos dados

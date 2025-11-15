@@ -1,5 +1,4 @@
-- Atualizar funções de requisição para não abrirem nova conexão a cada requisição
-- Parametrizar o limite de requisições em paralelo
-- Tornar as tasks de múltiplas requisições tolerantes a erros
-- Corrigir erro no download da paginação
 - Continuar em discursos fazendo o artefato retornar o numero total de discursos feitos pelo deputado e o num de paginas
+- Loop download de anos em assiduidade
+- No br_data temos ELECTIONS_YEARS, que está chumbado os valores 2018 e 2022. Buscar esses dados dinamicamente
+- Revisar warnings sobre o cache

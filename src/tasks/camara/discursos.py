@@ -1,15 +1,12 @@
 from pathlib import Path
 from prefect import task, get_run_logger
-from prefect.artifacts import (
-    acreate_progress_artifact,
-    aupdate_progress_artifact,
-    acreate_table_artifact
-)
+from prefect.artifacts import acreate_table_artifact
 from typing import cast
 from urllib.parse import urlparse, parse_qs
 from datetime import date
 
 from utils.io import fetch_json_many_async, save_ndjson
+from utils.url import get_path_parameter_value
 from config.loader import load_config
 
 APP_SETTINGS = load_config()
@@ -25,11 +22,6 @@ def urls_discursos(deputados_ids: list[int], date: date) -> list[str]:
 async def extract_discursos_deputados(deputados_ids: list[int], date: date, out_dir: str | Path = "data/camara") -> str:
     logger = get_run_logger()
 
-    progress_id = await acreate_progress_artifact(
-        progress=0.0,
-        description="Progresso do download de Discursos de Deputados"
-    )
-
     urls = urls_discursos(deputados_ids, date)
     logger.info(f"Câmara: buscando discursos de {len(urls)} deputados")
 
@@ -37,41 +29,36 @@ async def extract_discursos_deputados(deputados_ids: list[int], date: date, out_
         urls=urls,
         concurrency=APP_SETTINGS.CAMARA.CONCURRENCY,
         timeout=APP_SETTINGS.CAMARA.TIMEOUT,
-        follow_pagination=True,
-        progress_artifact_id=progress_id
-    )
-
-    await aupdate_progress_artifact(
-        artifact_id=progress_id,
-        progress=100.0,
-        description="Downloads concluídos"
+        follow_pagination=True
     )
 
     # Gerando artefato para validação dos dados
     artifact_data = []
     for i, json in enumerate(jsons):
         json = cast(dict, json)
-        discurso = json.get("dados", []) # type: ignore
+        discursos = json.get("dados", []) # type: ignore
+        links = {l["rel"]: l["href"] for l in json["links"]}
 
         # Pegando o id do deputado
-        link_self = next(l["href"] for l in json.get("links", []) if l.get("rel") == "self")
-        parsed_url = urlparse(link_self)
-        path_parts = [p for p in parsed_url.path.split('/') if p]  # Remove partes vazias
+        deputado_id = get_path_parameter_value(url=links.get("self", ""), param_name="deputados")
 
+        # Aqui next é usado pois não precisa varrer a lista inteira, ele para no primeiro que encontrar
+        row = next((row for row in artifact_data if row["id"] == deputado_id), None)
 
-        # artifact_data.append({
-        #     "index": i,
-        #     "id": deputado.get("id"),
-        #     "nome": deputado.get("nome"),
-        #     "situacao": deputado.get("ultimoStatus", {}).get("situacao"),
-        #     "condicao_eleitoral": deputado.get("ultimoStatus", {}).get("condicaoEleitoral")
-        # })
+        if row: # Se já tiver um registro, atualiza o número de discursos
+            row["num_discursos"] += len(discursos)
+        else: # Se não, cria novo registro
+            artifact_data.append({
+                "index": i,
+                "id": deputado_id,
+                "num_discursos": len(discursos)
+            })
 
-    # await acreate_table_artifact(
-    #     key="discursos-deputados",
-    #     table=artifact_data,
-    #     description="Detalhes de deputados"
-    # )
+    await acreate_table_artifact(
+        key="discursos-deputados",
+        table=artifact_data,
+        description="Discursos de deputados"
+    )
 
     dest = Path(out_dir) / "discursos.ndjson"
     return save_ndjson(cast(list[dict], jsons), dest)

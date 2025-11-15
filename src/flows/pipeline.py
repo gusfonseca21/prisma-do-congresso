@@ -9,6 +9,7 @@ from tasks.tse import TSE_ENDPOINTS, extract_tse
 from tasks import camara
 
 from utils.io import merge_ndjson
+from utils.file import keep_only_files
 from config.loader import load_config
 
 APP_SETTINGS = load_config()
@@ -27,12 +28,15 @@ async def pipeline(
     logger.info("Iniciando pipeline")
 
     # TSE: ~30 endpoints em paralelo
+    tse_data_path = "data/tse"
     tse_fs = [
         cast(Any, extract_tse)
         .with_options(refresh_cache=refresh_cache)
-        .submit(name, url) 
+        .submit(name, url, tse_data_path) 
         for name, url in TSE_ENDPOINTS.items()
     ]
+    resolve_futures_to_results(tse_fs)
+    keep_only_files(path=tse_data_path, file_ext="csv")
 
     # CONGRESSO
     legislatura = camara.extract_legislatura(date)
@@ -53,7 +57,7 @@ async def pipeline(
 
     # ASSIDUIDADE
     # As funções de Assiduidade (uma por ano) baixa em paralelo em relação às outras tasks
-    # Por isso seus arquivos precisam ser juntados em um único NDJson (será)
+    # Por isso seus arquivos precisam ser juntados em um único NDJson
     # Abaixo o código feito após todos os outros processos para não travar o flow
     paths = resolve_futures_to_results(assiduidade_fs)
     final_path = merge_ndjson(paths, Path("data/camara") / "assiduidade.ndjson")
@@ -65,7 +69,7 @@ async def pipeline(
         "congresso_frentes": frentes_f,
         "congresso_frentes_membros": frentes_membros_f,
         "congresso_detalhes_deputados": detalhes_deputados_fs,
-        # "congresso_discurso_deputados": discursos_deputados_fs
+        "congresso_discurso_deputados": discursos_deputados_fs
     })
 
 if __name__ == "__main__":

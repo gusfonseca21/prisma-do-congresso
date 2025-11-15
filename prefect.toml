@@ -1,13 +1,13 @@
-debug_mode="False"
+debug_mode=false
 flush_interval = 5
 
 [results]
-persist_by_default = "True" # Necessário para o cache
+persist_by_default = true # Necessário para o cache
 
 [logging]
 level = "INFO"
-log_prints = "True"
+log_prints = true
 
 [tasks]
-disable_caching = "False"
+disable_caching = false
 

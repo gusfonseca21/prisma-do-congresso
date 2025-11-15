@@ -4,7 +4,6 @@ from uuid import UUID
 from prefect import task, get_run_logger
 from prefect.artifacts import create_progress_artifact
 from datetime import timedelta
-import os
 
 from utils.io import download_stream
 from utils.br_data import BR_STATES, ELECTIONS_YEARS
@@ -36,7 +35,8 @@ TSE_ENDPOINTS = TSE_ENDPOINTS | REDES_SOCIAIS_ENDPOINTS
     retry_delay_seconds=APP_SETTINGS.TSE.RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.TSE.TIMEOUT,
     cache_policy=CACHE_POLICY_MAP[APP_SETTINGS.TSE.CACHE_POLICY],
-    cache_expiration=timedelta(days=APP_SETTINGS.TSE.CACHE_EXPIRATION)
+    cache_expiration=timedelta(days=APP_SETTINGS.TSE.CACHE_EXPIRATION),
+    log_prints=True
 )
 def extract_tse(name: str, url: str, out_dir: str = "data/tse") -> str:
     logger = get_run_logger()
@@ -50,11 +50,4 @@ def extract_tse(name: str, url: str, out_dir: str = "data/tse") -> str:
     logger.info(f"Fazendo download  do endpoint TSE '{url}' -> {dest}")
     dest_path = download_stream(url, dest, unzip=True, progress_artifact_id=cast(UUID, progress_id))
 
-    clean_tse_zip_files(dest_path)
-
     return dest_path
-
-def clean_tse_zip_files(path: str | Path):
-    dest_path = Path(path)
-    for file in dest_path.rglob("*.zip"):
-        os.remove(file)

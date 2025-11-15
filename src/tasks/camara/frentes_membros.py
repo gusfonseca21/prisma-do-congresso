@@ -1,10 +1,6 @@
 from pathlib import Path
 from prefect import task, get_run_logger
-from prefect.artifacts import (
-    acreate_progress_artifact,
-    aupdate_progress_artifact,
-    acreate_table_artifact
-)
+from prefect.artifacts import acreate_table_artifact
 from typing import cast
 
 from utils.io import fetch_json_many_async, save_ndjson
@@ -23,11 +19,6 @@ def frentes_membros_urls(frentes_ids: list[str]) -> list[str]:
 async def extract_frentes_membros(frentes_ids: list[str], out_dir: str | Path = "data/camara") -> str:
     logger = get_run_logger()
 
-    progress_id = await acreate_progress_artifact(
-        progress=0.0,
-        description="Progresso do download de membros de frentes da Câmara"
-    )
-
     urls = frentes_membros_urls(frentes_ids)
     logger.info(f"Câmara: buscando Membros de {len(urls)} Frentes")
 
@@ -35,14 +26,7 @@ async def extract_frentes_membros(frentes_ids: list[str], out_dir: str | Path = 
         urls=urls,
         concurrency=APP_SETTINGS.CAMARA.CONCURRENCY,
         timeout=APP_SETTINGS.CAMARA.TIMEOUT,
-        follow_pagination=True,
-        progress_artifact_id=progress_id
-    )
-
-    await aupdate_progress_artifact(
-        artifact_id=progress_id,
-        progress=100.0,
-        description="Downloads concluídos"
+        follow_pagination=True
     )
 
     # Gerando artefato para validação dos dados

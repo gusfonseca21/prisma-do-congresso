@@ -1,6 +1,6 @@
 [FLOW]
 MAX_RUNNERS = 16 # Num. de threads abertas
-TASKS_RETURN_EXCEPTION = true # Em caso de exceção nas tasks de requisição, retorna algo em caso de erro ou lança a exceçao (parando a aplicação)
+TASKS_RETURN_EXCEPTION = false # Em caso de exceção nas tasks de requisição, retorna algo em caso de erro (true) ou lança a exceçao (parando a aplicação) (false)
 DATE_LOOKBACK = 3 # Dias
 
 [TSE]

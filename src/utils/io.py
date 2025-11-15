@@ -4,8 +4,7 @@ import httpx, json, asyncio, hashlib, zipfile, os, shutil
 from typing import Any, cast
 from prefect import get_run_logger
 from prefect.exceptions import MissingContextError
-from prefect.artifacts import update_progress_artifact, aupdate_progress_artifact
-from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+from utils import url
 
 from config.loader import load_config
 
@@ -47,14 +46,6 @@ def download_stream(
             for chunk in r.iter_bytes():
                 f.write(chunk)
                 downloaded_size += len(chunk)
-                if progress_artifact_id and total_size > 0:
-                    update_progress_artifact(artifact_id=progress_artifact_id, progress=(downloaded_size / total_size) * 100)
-
-        update_progress_artifact(
-            artifact_id=cast(UUID, progress_artifact_id),
-            progress=100.0,
-            description="Download concluído"
-        )
 
         if unzip:
             extracted_files = unzip_file(dest_path)
@@ -146,7 +137,6 @@ async def fetch_json_many_async(
         timeout: float = 30.0,
         follow_pagination: bool = True,
         logger: Any | None = None,
-        progress_artifact_id: Any | None = None,
 ) -> list[str] | list[dict]:
     """
     - Se out_dir for fornecido, salva cada JSON em um arquivo e retorna a lista de caminhos
@@ -206,15 +196,6 @@ async def fetch_json_many_async(
                     else:
                         results.append(data)
 
-                    # Atualiza progresso
-                    if progress_artifact_id:
-                        async with update_lock:
-                            downloaded_urls += 1
-                            await aupdate_progress_artifact(
-                                artifact_id=progress_artifact_id,
-                                progress=(downloaded_urls / max(len(urls),1)) * 100
-                            )
-
                 # Se tiver paginação, adiciona novas URLs à fila
                 if follow_pagination and "links" in data:
                     links = {l["rel"]: l["href"] for l in data["links"]}
@@ -239,25 +220,24 @@ def generate_pages_urls(url_self: str, url_last: str):
     """
     Caso a url baixada tenha mais páginas, retorna uma lista com as páginas adicionais a serem baixadas
     """
-    self_parsed = urlparse(url_self)
-    self_params = parse_qs(self_parsed.query)
-    self_page = int(self_params.get("pagina", ["1"])[0])
+    # Pega o número da primeira página
+    self_page = int(url.get_query_param_value(url_self, "pagina", "1"))
 
     # Se não for a primeira página, retorna pois todas as URLs já foram geradas
     if self_page > 1:
         return []
 
     # Pega o número da última página
-    last_parsed = urlparse(url_last)
-    last_params = parse_qs(last_parsed.query)
-    last_page = int(last_params.get("pagina", ["1"])[0])
+    last_page = int(url.get_query_param_value(
+        url=url_last, param_name="pagina", default_value="1"
+    ))
 
+    # Gera as urls das páginas seguintes
     urls = []
     for page in range(2, (last_page + 1)):
-        params = parse_qs(self_parsed.query)
-        params["pagina"] = [str(page)]
-        new_query = urlencode(params, doseq=True)
-        new_url = urlunparse(self_parsed._replace(query=new_query))
+        new_url = url.alter_query_param_value(
+            base_url=url_self, param_name="pagina", new_value=page
+        )
         urls.append(new_url)
 
     return urls
@@ -267,8 +247,7 @@ async def fetch_html_many_async(
      out_dir: str | Path | None = None,
      concurrency: int = 10,
      timeout: int = 1800,
-     logger: Any | None = None,
-     progress_artifact_id: Any | None = None   
+     logger: Any | None = None
 ) -> list[str | None] | str:
     """
     Faz o download de páginas HTML
@@ -314,14 +293,6 @@ async def fetch_html_many_async(
                 with open(path, "w", encoding="utf-8") as f:
                     f.write(html_content)
                 return str(path) # Se salvar, retorna o caminho
-
-            if progress_artifact_id and len(urls) > 0:
-                async with update_lock:
-                    downloaded_urls += 1
-                    await aupdate_progress_artifact(
-                        artifact_id=progress_artifact_id,
-                        progress=(downloaded_urls / len(urls)) * 100
-                    )
 
             return html_content
     

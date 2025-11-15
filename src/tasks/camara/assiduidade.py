@@ -1,10 +1,6 @@
 from pathlib import Path
 from prefect import task, get_run_logger
-from prefect.artifacts import (
-    acreate_progress_artifact,
-    aupdate_progress_artifact,
-    acreate_table_artifact
-)
+from prefect.artifacts import acreate_table_artifact
 from typing import cast
 import re
 from selectolax.parser import HTMLParser
@@ -51,24 +47,12 @@ async def extract_assiduidade_deputados(
     """
     logger = get_run_logger()
 
-    progress_id = await acreate_progress_artifact(
-        progress=0.0,
-        description="Progresso do download da assiduiadde de deputados"
-    )
-
     urls = assiduidade_urls(deputados_ids, year)
     logger.info(f"Câmara: buscando assiduidade de {len(deputados_ids)} deputados do ano {year}")
 
     htmls = await fetch_html_many_async(
         urls=urls,
-        concurrency=APP_SETTINGS.CAMARA.CONCURRENCY,
-        progress_artifact_id=progress_id
-    )
-
-    await aupdate_progress_artifact(
-        artifact_id=progress_id,
-        progress=100.0,
-        description="Downloads concluídos"
+        concurrency=APP_SETTINGS.CAMARA.CONCURRENCY
     )
     
     href_pattern = re.compile(r'https://www\.camara\.leg\.br/deputados/\d+')
