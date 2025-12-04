@@ -46,32 +46,15 @@ async def extract_despesas_deputados(deputados_ids: list[int], start_date: date,
     )
 
     # Gerando artefato para validação dos dados
-    # artifact_data = []
-    # for i, json in enumerate(jsons):
-    #     json = cast(dict, json)
-    #     discursos = json.get("dados", []) # type: ignore
-    #     links = {l["rel"]: l["href"] for l in json["links"]}
-
-    #     # Pegando o id do deputado
-    #     deputado_id = get_path_parameter_value(url=links.get("self", ""), param_name="deputados")
-
-    #     # Aqui next é usado pois não precisa varrer a lista inteira, ele para no primeiro que encontrar
-    #     row = next((row for row in artifact_data if row["id"] == deputado_id), None)
-
-    #     if row: # Se já tiver um registro, atualiza o número de discursos
-    #         row["num_discursos"] += len(discursos)
-    #     else: # Se não, cria novo registro
-    #         artifact_data.append({
-    #             "index": i,
-    #             "id": deputado_id,
-    #             "num_discursos": len(discursos)
-    #         })
-
-    # await acreate_table_artifact(
-    #     key="despesas-deputados",
-    #     table=artifact_data,
-    #     description="Despesas de deputados"
-    # )
+    artifact_data = [{
+        "Total de registros": len(jsons)
+    }]
+    
+    await acreate_table_artifact(
+        key="despesas-deputados",
+        table=artifact_data,
+        description="Despesas de deputados"
+    )
 
     dest = Path(out_dir) / "despesas.ndjson"
     return save_ndjson(cast(list[dict], jsons), dest)

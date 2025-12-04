@@ -44,12 +44,8 @@ async def pipeline(
     deputados_f = camara.extract_deputados.submit(legislatura)
     id_legislatura = legislatura["dados"][0]["id"]
 
-    # assiduidade_fs = [
-    #     camara.extract_assiduidade_deputados.with_options(refresh_cache=refresh_cache).submit(cast(Any, deputados_f), ano)
-    #     for ano in anos_passados
-    # ]
-
-    assiduidade_fs = camara.extract_assiduidade_deputados.submit(cast(list[int], deputados_f))
+    resolve_futures_to_results([deputados_f])
+    assiduidade_fs = camara.extract_assiduidade_deputados.submit(cast(list[int], deputados_f), start_date, end_date)
 
     frentes_f = camara.extract_frentes.submit(id_legislatura)
     frentes_membros_f = camara.extract_frentes_membros.submit(cast(Any, frentes_f))
@@ -62,15 +58,6 @@ async def pipeline(
 
     resolve_futures_to_results([discursos_deputados_fs])
     despesas_deputados_fs = camara.extract_despesas_deputados.submit(cast(list[int], deputados_f), start_date, legislatura)
-
-
-    # ASSIDUIDADE
-    # As funções de Assiduidade (uma por ano) baixa em paralelo em relação às outras tasks
-    # Por isso seus arquivos precisam ser juntados em um único NDJson
-    # Abaixo o código feito após todos os outros processos para não travar o flow
-    paths = resolve_futures_to_results(assiduidade_fs)
-    final_path = merge_ndjson(paths, Path("data/camara") / "assiduidade.ndjson")
-
 
     return resolve_futures_to_results({
         # "tse": tse_fs,
