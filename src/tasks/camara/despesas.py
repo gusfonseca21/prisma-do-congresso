@@ -22,6 +22,7 @@ def urls_despesas(
             f"{APP_SETTINGS.CAMARA.REST_BASE_URL}deputados/{id}/despesas?idLegislatura={id_legislatura}&itens=1000"
             for id in deputados_ids
         ]
+
     else:
         # O Deputado tem 3 meses para apresentar a nota
         curr_month = today.month
@@ -30,15 +31,16 @@ def urls_despesas(
         for id in deputados_ids:
             for month in range(three_months_back.month, curr_month + 1):
                 three_months_urls.add(
-                    f"{APP_SETTINGS.CAMARA.REST_BASE_URL}deputados/{id}/despesas?ano={today.year}&mes={month}&itens=1000"
+                    f"{APP_SETTINGS.CAMARA.REST_BASE_URL}deputados/{id}/despesas?ano={today.year}&mes={month}&itens=1000&ordem=ASC"
                 )
+
         return list(three_months_urls)
 
 
 @task(
-    retries=APP_SETTINGS.CAMARA.RETRIES,
-    retry_delay_seconds=APP_SETTINGS.CAMARA.RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TIMEOUT,
+    retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
+    retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
+    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_despesas_deputados(
     deputados_ids: list[int],
@@ -49,12 +51,11 @@ async def extract_despesas_deputados(
     logger = get_run_logger()
 
     urls = urls_despesas(deputados_ids, start_date, legislatura)
-    logger.info(f"Câmara: buscando despesas de {len(urls)} deputados")
+    logger.info(f"Câmara: buscando despesas de {len(urls)} URLs")
 
     jsons = await fetch_json_many_async(
         urls=urls,
-        limit=APP_SETTINGS.CAMARA.LIMIT,
-        timeout=APP_SETTINGS.CAMARA.TIMEOUT,
+        limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         follow_pagination=True,
     )
 

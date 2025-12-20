@@ -20,11 +20,16 @@ class FlowConfig(BaseModel):
     DATE_LOOKBACK: int
 
 
+class AllEndpoints(BaseModel):
+    FETCH_MAX_RETRIES: int
+    FETCH_RETRY_DELAY: int
+
+
 class TSEConfig(BaseModel):
     BASE_URL: str
-    RETRIES: int
-    RETRY_DELAY: int
-    TIMEOUT: int
+    TASK_RETRIES: int
+    TASK_RETRY_DELAY: int
+    TASK_TIMEOUT: int
     CACHE_POLICY: str
     CACHE_EXPIRATION: int
 
@@ -32,16 +37,17 @@ class TSEConfig(BaseModel):
 class CamaraConfig(BaseModel):
     REST_BASE_URL: str
     PORTAL_BASE_URL: str
-    RETRIES: int
-    RETRY_DELAY: int
-    TIMEOUT: int
-    LIMIT: int
+    TASK_RETRIES: int
+    TASK_RETRY_DELAY: int
+    TASK_TIMEOUT: int
+    FETCH_LIMIT: int
     ASSIDUIDADE_CACHE_POLICY: str
     ASSIDUIDADE_CACHE_EXPIRATION: int
 
 
 class AppConfig(BaseModel):
     FLOW: FlowConfig
+    ALLENDPOINTS: AllEndpoints
     TSE: TSEConfig
     CAMARA: CamaraConfig
 

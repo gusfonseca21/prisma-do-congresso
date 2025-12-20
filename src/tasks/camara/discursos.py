@@ -7,7 +7,7 @@ from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
 from utils.io import fetch_json_many_async, save_ndjson
-from utils.url import get_path_parameter_value
+from utils.url_utils import get_path_parameter_value
 
 APP_SETTINGS = load_config()
 
@@ -20,9 +20,9 @@ def urls_discursos(deputados_ids: list[int], start_date: date) -> list[str]:
 
 
 @task(
-    retries=APP_SETTINGS.CAMARA.RETRIES,
-    retry_delay_seconds=APP_SETTINGS.CAMARA.RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TIMEOUT,
+    retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
+    retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
+    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_discursos_deputados(
     deputados_ids: list[int], start_date: date, out_dir: str | Path = "data/camara"
@@ -34,8 +34,7 @@ async def extract_discursos_deputados(
 
     jsons = await fetch_json_many_async(
         urls=urls,
-        limit=APP_SETTINGS.CAMARA.LIMIT,
-        timeout=APP_SETTINGS.CAMARA.TIMEOUT,
+        limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         follow_pagination=True,
     )
 

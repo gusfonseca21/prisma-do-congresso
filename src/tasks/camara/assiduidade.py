@@ -27,9 +27,9 @@ def assiduidade_urls(
 
 @task(
     task_run_name="extract_assiduidade_deputados",
-    retries=APP_SETTINGS.CAMARA.RETRIES,
-    retry_delay_seconds=APP_SETTINGS.CAMARA.RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TIMEOUT,
+    retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
+    retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
+    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_assiduidade_deputados(
     deputados_ids: list[int],
@@ -46,7 +46,7 @@ async def extract_assiduidade_deputados(
     logger.info(f"Câmara: buscando assiduidade de {len(deputados_ids)}.")
 
     htmls = await fetch_html_many_async(
-        urls=urls, concurrency=APP_SETTINGS.CAMARA.LIMIT
+        urls=urls, concurrency=APP_SETTINGS.CAMARA.FETCH_LIMIT
     )
 
     href_pattern = re.compile(r"https://www\.camara\.leg\.br/deputados/\d+")

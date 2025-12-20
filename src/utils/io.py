@@ -14,7 +14,7 @@ from prefect import get_run_logger
 from prefect.exceptions import MissingContextError
 
 from config.loader import load_config
-from utils import url
+from utils import url_utils
 
 APP_SETTINGS = load_config()
 
@@ -167,57 +167,86 @@ async def fetch_json_many_async(
 
     out_dir = ensure_dir(out_dir) if out_dir else None
 
-    limits = httpx.Limits(max_connections=limit, max_keepalive_connections=limit)
+    async def worker(
+        queue: asyncio.Queue,
+        results: list[dict],
+        processed_urls: set,
+        semaphore: asyncio.Semaphore,
+        client: httpx.AsyncClient,
+    ):
+        while True:  # Mantém o consumidor da fila vivo para processar outras urls
+            url = await queue.get()
+
+            if url in processed_urls:
+                queue.task_done()
+                continue
+
+            async with semaphore:
+                for attempt in range(APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES):
+                    try:
+                        response = await client.get(url, timeout=timeout)
+
+                        response.raise_for_status()
+                        data = response.json()
+
+                        if out_dir:
+                            raise Exception("O BLOCO out_dir ESTÁ COMENTADO")
+                            # name = hashlib.sha1(url.encode()).hexdigest() + ".json"
+                            # path = Path(out_dir) / name
+
+                            # # to_thread é usado para evitar que a escrita no disco congele o processo na rede
+                            # await asyncio.to_thread(save_json, path, data)
+                            # results.append(str(path))
+                        else:
+                            results.append(data)
+
+                        # Se tiver paginação, adiciona novas URLs à fila
+                        if follow_pagination and "links" in data:
+                            links = {
+                                link["rel"]: link["href"] for link in data["links"]
+                            }
+                            if "self" in links and "last" in links:
+                                for new_url in generate_pages_urls(
+                                    links["self"], links["last"]
+                                ):
+                                    if new_url not in processed_urls:
+                                        await queue.put(new_url)
+
+                        processed_urls.add(url)
+                        queue.task_done()
+                    except Exception as e:
+                        if attempt < APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES - 1:
+                            log(
+                                f"Um erro ocorreu no fetch de dados: {e}. TENTANDO NOVAMENTE. Tentativa: {attempt}"
+                            )
+                            delay = 2**attempt
+                            await asyncio.sleep(delay)
+                        else:
+                            queue.task_done()
+                            raise
 
     queue = asyncio.Queue()
+
     for u in urls:
-        queue.put_nowait(u)
+        await queue.put(u)
 
     processed_urls = set()
     results = []
 
-    async def worker(client: httpx.AsyncClient):
-        while True:  # Mantém o consumidor da fila vivo para processar outras urls
-            try:
-                url = await queue.get()
+    semaphore = asyncio.Semaphore(limit)
 
-                if url in processed_urls:
-                    continue
+    async with httpx.AsyncClient() as client:
+        workers = [
+            asyncio.create_task(
+                worker(queue, results, processed_urls, semaphore, client)
+            )
+            for _ in range(int(limit * 1.5))
+        ]
 
-                processed_urls.add(url)
-
-                response = await client.get(url, timeout=timeout)
-                response.raise_for_status()
-                data = response.json()
-
-                if out_dir:
-                    name = hashlib.sha1(url.encode()).hexdigest() + ".json"
-                    path = Path(out_dir) / name
-
-                    # to_thread é usado para evitar que a escrita no disco congele o processo na rede
-                    await asyncio.to_thread(save_json, path, data)
-                    results.append(str(path))
-                else:
-                    results.append(data)
-
-                # Se tiver paginação, adiciona novas URLs à fila
-                if follow_pagination and "links" in data:
-                    links = {link["rel"]: link["href"] for link in data["links"]}
-                    if "self" in links and "last" in links:
-                        for new_url in generate_pages_urls(
-                            links["self"], links["last"]
-                        ):
-                            if new_url not in processed_urls:
-                                await queue.put(new_url)
-
-            finally:
-                queue.task_done()
-
-    async with httpx.AsyncClient(limits=limits) as client:
-        workers = [asyncio.create_task(worker(client)) for _ in range(limit)]
         await queue.join()
-        for w in workers:
-            w.cancel()
+
+    for w in workers:
+        w.cancel()
 
     return results
 
@@ -227,7 +256,7 @@ def generate_pages_urls(url_self: str, url_last: str):
     Caso a url baixada tenha mais páginas, retorna uma lista com as páginas adicionais a serem baixadas
     """
     # Pega o número da primeira página
-    self_page = int(url.get_query_param_value(url_self, "pagina", "1"))
+    self_page = int(url_utils.get_query_param_value(url_self, "pagina", "1"))
 
     # Se não for a primeira página, retorna pois todas as URLs já foram geradas
     if self_page > 1:
@@ -235,13 +264,15 @@ def generate_pages_urls(url_self: str, url_last: str):
 
     # Pega o número da última página
     last_page = int(
-        url.get_query_param_value(url=url_last, param_name="pagina", default_value="1")
+        url_utils.get_query_param_value(
+            url=url_last, param_name="pagina", default_value="1"
+        )
     )
 
     # Gera as urls das páginas seguintes
     urls = []
     for page in range(2, (last_page + 1)):
-        new_url = url.alter_query_param_value(
+        new_url = url_utils.alter_query_param_value(
             base_url=url_self, param_name="pagina", new_value=page
         )
         urls.append(new_url)

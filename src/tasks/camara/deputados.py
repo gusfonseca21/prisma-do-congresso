@@ -18,9 +18,9 @@ def deputados_url(legislatura: dict) -> str:
 
 
 @task(
-    retries=APP_SETTINGS.CAMARA.RETRIES,
-    retry_delay_seconds=APP_SETTINGS.CAMARA.RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TIMEOUT,
+    retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
+    retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
+    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def extract_deputados(legislatura: dict, out_dir: str = "data/camara") -> list[int]:
     logger = get_run_logger()

@@ -15,9 +15,9 @@ def frentes_url(id_legislatura: int) -> str:
 
 
 @task(
-    retries=APP_SETTINGS.CAMARA.RETRIES,
-    retry_delay_seconds=APP_SETTINGS.CAMARA.RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TIMEOUT,
+    retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
+    retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
+    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_frentes(
     id_legislatura: int, out_dir: str | Path = "data/camara"

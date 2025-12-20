@@ -17,9 +17,9 @@ def frentes_membros_urls(frentes_ids: list[str]) -> list[str]:
 
 
 @task(
-    retries=APP_SETTINGS.CAMARA.RETRIES,
-    retry_delay_seconds=APP_SETTINGS.CAMARA.RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TIMEOUT,
+    retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
+    retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
+    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_frentes_membros(
     frentes_ids: list[str], out_dir: str | Path = "data/camara"
@@ -31,8 +31,7 @@ async def extract_frentes_membros(
 
     jsons = await fetch_json_many_async(
         urls=urls,
-        limit=APP_SETTINGS.CAMARA.LIMIT,
-        timeout=APP_SETTINGS.CAMARA.TIMEOUT,
+        limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         follow_pagination=True,
     )
 

@@ -62,10 +62,11 @@ async def pipeline(
         cast(list[int], deputados_f), start_date
     )
 
-    resolve_futures_to_results([discursos_deputados_fs])
-    despesas_deputados_fs = camara.extract_despesas_deputados.submit(
-        cast(list[int], deputados_f), start_date, legislatura
-    )
+    # # BUGADO ""Parâmetro(s) inválido(s).""
+    # resolve_futures_to_results([discursos_deputados_fs])
+    # despesas_deputados_fs = camara.extract_despesas_deputados.submit(
+    #     cast(list[int], deputados_f), start_date, legislatura
+    # )
 
     return resolve_futures_to_results(
         {
@@ -76,7 +77,7 @@ async def pipeline(
             "congresso_frentes_membros": frentes_membros_f,
             "congresso_detalhes_deputados": detalhes_deputados_fs,
             "congresso_discurso_deputados": discursos_deputados_fs,
-            "congresso_despesas_deputados": despesas_deputados_fs,
+            # "congresso_despesas_deputados": despesas_deputados_fs,
         }
     )
 
