@@ -32,3 +32,12 @@ def get_path_parameter_value(url: str, param_name: str) -> Any:
     param_index = path_parts.index(param_name)
 
     return path_parts[param_index + 1]
+
+
+def is_first_page(url: str) -> bool:
+    """ADICIONAR ESSA FUNÇÃO AQUI NO UTITLS DE URL"""
+    parsed = urlparse(url)
+    params = parse_qs(parsed.query)
+    # Se não tem 'pagina' OU é '1', é primeira página
+    pagina = params.get("pagina", ["1"])[0]
+    return str(pagina) in ["1", ""]

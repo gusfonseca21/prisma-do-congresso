@@ -28,7 +28,13 @@ async def extract_frentes(
     dest = Path(out_dir) / "frentes.ndjson"
     logger.info(f"Congresso: buscando Frentes de {url} -> {dest}")
 
-    jsons = await fetch_many_camara([url])
+    jsons = await fetch_many_camara(
+        urls=[url],
+        limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
+        max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
+        follow_pagination=True,
+        logger=logger,
+    )
     jsons = cast(list[dict], jsons)
 
     save_ndjson(jsons, dest)

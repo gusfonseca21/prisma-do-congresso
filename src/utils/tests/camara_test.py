@@ -101,7 +101,7 @@ def test_get_start_date_success(valid_legislatura_data):
     assert isinstance(result, date)
 
 
-def test_gest_end_date_success(valid_legislatura_data):
+def test_get_end_date_success(valid_legislatura_data):
     """Teste para extração e conversão de Data de Fim de uma Legislatura para um dicionário de data."""
     result = get_legislatura_data(valid_legislatura_data, "dataFim")
     assert isinstance(result, date)

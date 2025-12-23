@@ -37,6 +37,8 @@ async def extract_discursos_deputados(
         urls=urls,
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         follow_pagination=True,
+        max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
+        logger=logger,
     )
 
     # Gerando artefato para validação dos dados

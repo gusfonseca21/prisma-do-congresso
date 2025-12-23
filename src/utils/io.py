@@ -9,12 +9,8 @@ from typing import Any
 from uuid import UUID
 
 import httpx
-from prefect import get_run_logger
-from prefect.exceptions import MissingContextError
 
-from config.loader import load_config
-
-APP_SETTINGS = load_config()
+from utils.log import get_prefect_logger_or_none
 
 
 # Garante que o caminho exista
@@ -22,13 +18,6 @@ def ensure_dir(path: str | Path) -> Path:
     p = Path(path)
     p.mkdir(parents=True, exist_ok=True)
     return p
-
-
-def _get_prefect_logger_or_none() -> Any | None:
-    try:
-        return get_run_logger()
-    except MissingContextError:
-        return None
 
 
 # Download de arquivos zip em streaming por conta dos arquivos pesados
@@ -152,7 +141,7 @@ async def fetch_html_many_async(
     """
     Faz o download de páginas HTML
     """
-    logger = logger or _get_prefect_logger_or_none()
+    logger = logger or get_prefect_logger_or_none()
 
     def log(msg: str):
         if logger:

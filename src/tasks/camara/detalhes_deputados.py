@@ -33,7 +33,8 @@ async def extract_detalhes_deputados(
     jsons = await fetch_many_camara(
         urls=urls,
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
-        follow_pagination=True,
+        max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
+        logger=logger,
     )
 
     # Gerando artefato para validação dos dados

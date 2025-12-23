@@ -4,12 +4,9 @@ from typing import Any
 
 import httpx
 
-from config.loader import load_config
-
-from .io import _get_prefect_logger_or_none, ensure_dir
-from .url_utils import alter_query_param_value, get_query_param_value
-
-APP_SETTINGS = load_config()
+from .io import ensure_dir
+from .log import get_prefect_logger_or_none
+from .url_utils import alter_query_param_value, get_query_param_value, is_first_page
 
 
 # Armazena em memória ou grava em disco uma lista de JSONs
@@ -18,18 +15,19 @@ async def fetch_many_camara(
     out_dir: str | Path | None = None,
     limit: int = 10,
     timeout: float = 30.0,
-    follow_pagination: bool = True,
+    max_retries: int = 10,
+    follow_pagination: bool = False,
     logger: Any | None = None,
 ) -> list[str] | list[dict]:
     """
     - Se out_dir for fornecido, salva cada JSON em um arquivo e retorna a lista de caminhos
     - Caso contrário, retorna a lista de dicionários em memória
     """
-    logger = logger or _get_prefect_logger_or_none()
+    logger = logger or get_prefect_logger_or_none()
 
     def log(msg: str):
         if logger:
-            logger.info(msg)
+            logger.warning(msg)
         else:
             print(msg)
 
@@ -41,7 +39,7 @@ async def fetch_many_camara(
         processed_urls: set,
         semaphore: asyncio.Semaphore,
         client: httpx.AsyncClient,
-        total_items_from_headers: int,
+        stats: dict,
     ):
         while True:  # Mantém o consumidor da fila vivo para processar outras urls
             url = await queue.get()
@@ -50,20 +48,23 @@ async def fetch_many_camara(
                 queue.task_done()
                 continue
 
+            # Adiciona logo em processed_urls para evitar que o queue pegue essa url
+            processed_urls.add(url)
+
             async with semaphore:
-                for attempt in range(APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES):
+                print(f"Baixando URL: {url=}")
+                for attempt in range(max_retries):
                     try:
                         response = await client.get(url, timeout=timeout)
 
                         response.raise_for_status()
                         data = response.json()
 
-                        # Pega o número de items presentes no json
-                        if get_query_param_value(url, "pagina", 0) == 0:
-                            # Só é necessário pegar na primeira página
+                        if is_first_page(url):
                             total_items = response.headers.get("x-total-count", None)
+
                             if total_items:
-                                total_items_from_headers += int(total_items)
+                                stats["total_items_from_headers"] += int(total_items)
 
                         if out_dir:
                             raise Exception("O BLOCO out_dir ESTÁ COMENTADO")
@@ -88,10 +89,10 @@ async def fetch_many_camara(
                                     if new_url not in processed_urls:
                                         await queue.put(new_url)
 
-                        processed_urls.add(url)
                         queue.task_done()
+                        break
                     except Exception as e:
-                        if attempt < APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES - 1:
+                        if attempt < max_retries - 1:
                             log(
                                 f"Um erro ocorreu no fetch de dados: {e}. TENTANDO NOVAMENTE. Tentativa: {attempt}"
                             )
@@ -108,7 +109,7 @@ async def fetch_many_camara(
 
     processed_urls = set()
     results = []
-    total_items_from_headers = 0
+    stats = {"total_items_from_headers": 0}
 
     semaphore = asyncio.Semaphore(limit)
 
@@ -121,11 +122,11 @@ async def fetch_many_camara(
                     processed_urls,
                     semaphore,
                     client,
-                    total_items_from_headers,
+                    stats,
                 )
             )
             for _ in range(
-                int(limit * 1.5)
+                int(limit)
             )  # Cria um pouco mais de workers do que conexões abertas simultâneas
         ]
 
@@ -133,6 +134,29 @@ async def fetch_many_camara(
 
     for w in workers:
         w.cancel()
+
+    # Validação de downloads
+    downloaded_items = 0
+    for page in results:
+        page_items = len(page.get("dados", []))
+        downloaded_items += page_items
+
+    if stats["total_items_from_headers"]:
+        log(
+            f"Total de ítens baixados/headers: {downloaded_items}/{stats['total_items_from_headers']}"
+        )
+    else:
+        log(
+            f"O header do total de items para serem baixados não foi encontrado. Total de downloads: {downloaded_items}"
+        )
+
+    if (
+        stats["total_items_from_headers"]  # Se não possuir header, não valida
+        and stats["total_items_from_headers"] != downloaded_items
+    ):
+        raise Exception(
+            f"ERRO: O NÚMERO DE ITENS BAIXADOS É DIFERENTE DO NÚMERO TOTAL:\n Baixados: {downloaded_items}/{stats['total_items_from_headers']}"
+        )
 
     return results
 
