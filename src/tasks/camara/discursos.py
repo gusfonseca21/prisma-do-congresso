@@ -31,7 +31,7 @@ async def extract_discursos_deputados(
     deputados_ids: list[int],
     start_date: date,
     end_date: date,
-    out_dir: str | Path = "data/camara",
+    out_dir: str | Path = APP_SETTINGS.CAMARA.OUT_DIR,
 ) -> str:
     logger = get_run_logger()
 
@@ -44,6 +44,7 @@ async def extract_discursos_deputados(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         logger=logger,
+        validate_results=True,
     )
 
     await acreate_table_artifact(

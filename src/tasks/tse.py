@@ -40,7 +40,7 @@ TSE_ENDPOINTS = TSE_ENDPOINTS | REDES_SOCIAIS_ENDPOINTS
     cache_expiration=timedelta(days=APP_SETTINGS.TSE.CACHE_EXPIRATION),
     log_prints=True,
 )
-def extract_tse(name: str, url: str, out_dir: str = "data/tse") -> str:
+def extract_tse(name: str, url: str, out_dir: str = APP_SETTINGS.TSE.OUT_DIR) -> str:
     logger = get_run_logger()
 
     progress_id = create_progress_artifact(

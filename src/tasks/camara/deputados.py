@@ -22,7 +22,9 @@ def deputados_url(legislatura: dict) -> str:
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
-def extract_deputados(legislatura: dict, out_dir: str = "data/camara") -> list[int]:
+def extract_deputados(
+    legislatura: dict, out_dir: str = APP_SETTINGS.CAMARA.OUT_DIR
+) -> list[int]:
     logger = get_run_logger()
     url = deputados_url(legislatura)
     dest = Path(out_dir) / "deputados.json"

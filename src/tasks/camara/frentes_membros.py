@@ -23,7 +23,7 @@ def frentes_membros_urls(frentes_ids: list[str]) -> list[str]:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_frentes_membros(
-    frentes_ids: list[str], out_dir: str | Path = "data/camara"
+    frentes_ids: list[str], out_dir: str | Path = APP_SETTINGS.CAMARA.OUT_DIR
 ) -> str:
     logger = get_run_logger()
 
@@ -36,6 +36,7 @@ async def extract_frentes_membros(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         logger=logger,
+        validate_results=True,
     )
 
     await acreate_table_artifact(

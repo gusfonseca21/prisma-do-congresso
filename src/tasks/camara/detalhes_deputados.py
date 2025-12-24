@@ -23,7 +23,7 @@ def detalhes_deputados_urls(deputados_ids: list[int]) -> list[str]:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_detalhes_deputados(
-    deputados_ids: list[int], out_dir: str | Path = "data/camara"
+    deputados_ids: list[int], out_dir: str | Path = APP_SETTINGS.CAMARA.OUT_DIR
 ) -> str:
     logger = get_run_logger()
 
@@ -34,7 +34,9 @@ async def extract_detalhes_deputados(
         urls=urls,
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
+        follow_pagination=False,
         logger=logger,
+        validate_results=True,
     )
 
     await acreate_table_artifact(

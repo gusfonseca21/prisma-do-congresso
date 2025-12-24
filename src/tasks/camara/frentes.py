@@ -21,7 +21,7 @@ def frentes_url(id_legislatura: int) -> str:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_frentes(
-    id_legislatura: int, out_dir: str | Path = "data/camara"
+    id_legislatura: int, out_dir: str | Path = APP_SETTINGS.CAMARA.OUT_DIR
 ) -> list[str]:
     logger = get_run_logger()
     url = frentes_url(id_legislatura)
@@ -34,6 +34,7 @@ async def extract_frentes(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=True,
         logger=logger,
+        validate_results=True,
     )
     jsons = cast(list[dict], jsons)
 

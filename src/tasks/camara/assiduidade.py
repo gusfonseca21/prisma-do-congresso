@@ -35,7 +35,7 @@ async def extract_assiduidade_deputados(
     deputados_ids: list[int],
     start_date: date,
     end_date: date,
-    out_dir: str | Path = "data/camara",
+    out_dir: str | Path = APP_SETTINGS.CAMARA.OUT_DIR,
 ) -> str:
     """
     Baixa páginas HTML com os dados sobre a assiduidade dos Deputados

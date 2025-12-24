@@ -18,7 +18,7 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_proposicoes_camara(
-    start_date: date, end_date: date, out_dir: str | Path = "data/camara"
+    start_date: date, end_date: date, out_dir: str | Path = APP_SETTINGS.CAMARA.OUT_DIR
 ) -> list[int]:
     logger = get_run_logger()
 
@@ -32,6 +32,7 @@ async def extract_proposicoes_camara(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         logger=logger,
+        validate_results=True,
     )
 
     dest = Path(out_dir) / "proposicoes.ndjson"

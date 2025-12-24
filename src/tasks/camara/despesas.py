@@ -47,7 +47,7 @@ async def extract_despesas_deputados(
     deputados_ids: list[int],
     start_date: date,
     legislatura: dict,
-    out_dir: str | Path = "data/camara",
+    out_dir: str | Path = APP_SETTINGS.CAMARA.OUT_DIR,
 ) -> str:
     logger = get_run_logger()
 
@@ -60,6 +60,7 @@ async def extract_despesas_deputados(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         logger=logger,
+        validate_results=True,
     )
 
     # Gerando artefato para validação dos dados

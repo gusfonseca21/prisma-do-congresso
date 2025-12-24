@@ -18,6 +18,7 @@ async def fetch_many_camara(
     max_retries: int = 10,
     follow_pagination: bool = False,
     logger: Any | None = None,
+    validate_results: bool = False,
 ) -> list[str] | list[dict]:
     """
     - Se out_dir for fornecido, salva cada JSON em um arquivo e retorna a lista de caminhos
@@ -64,7 +65,7 @@ async def fetch_many_camara(
                             total_items = response.headers.get("x-total-count", None)
 
                             if total_items:
-                                stats["total_items_from_headers"] += int(total_items)
+                                stats["total_items"] += int(total_items)
 
                         if out_dir:
                             raise Exception("O BLOCO out_dir ESTÁ COMENTADO")
@@ -111,7 +112,7 @@ async def fetch_many_camara(
 
     processed_urls = set()
     results = []
-    stats = {"total_items_from_headers": 0}
+    stats = {"total_items": 0}
 
     semaphore = asyncio.Semaphore(limit)
 
@@ -137,27 +138,13 @@ async def fetch_many_camara(
     for w in workers:
         w.cancel()
 
-    # Validação de downloads
-    downloaded_items = 0
-    for page in results:
-        page_items = len(page.get("dados", []))
-        downloaded_items += page_items
-
-    if stats["total_items_from_headers"]:
-        log(
-            f"Total de ítens baixados/headers: {downloaded_items}/{stats['total_items_from_headers']}"
-        )
-    else:
-        log(
-            f"O header do total de items para serem baixados não foi encontrado. Total de downloads: {downloaded_items}"
-        )
-
-    if (
-        stats["total_items_from_headers"]  # Se não possuir header, não valida
-        and stats["total_items_from_headers"] != downloaded_items
-    ):
-        raise Exception(
-            f"ERRO: O NÚMERO DE ITENS BAIXADOS É DIFERENTE DO NÚMERO TOTAL:\n Baixados: {downloaded_items}/{stats['total_items_from_headers']}"
+    if validate_results:
+        validate(
+            results=results,
+            urls=urls,
+            stats=stats,
+            log=log,
+            paginated=follow_pagination,
         )
 
     return results
@@ -188,3 +175,38 @@ def generate_pages_urls(url_self: str, url_last: str):
         urls.append(new_url)
 
     return urls
+
+
+def validate(
+    results: list[dict],
+    urls: list[str],
+    stats: dict[str, int],
+    log: Any,
+    paginated: bool,
+):
+    downloaded_items = 0
+
+    if paginated:
+        for page in results:
+            page_items = len(page.get("dados", []))
+            downloaded_items += page_items
+    else:
+        downloaded_items = len(results)
+        stats["total_items"] = len(urls)
+
+    if stats["total_items"]:
+        log(
+            f"Total de ítens baixados / headers/lenlista: {downloaded_items}/{stats['total_items']}"
+        )
+    else:
+        log(
+            f"O header do total de items para serem baixados não foi encontrado. Total de downloads: {downloaded_items}"
+        )
+
+    if (
+        stats["total_items"]  # Se não possuir header, não valida
+        and stats["total_items"] != downloaded_items
+    ):
+        raise Exception(
+            f"ERRO: O NÚMERO DE ITENS BAIXADOS É DIFERENTE DO NÚMERO TOTAL:\n Baixados: {downloaded_items}/{stats['total_items']}"
+        )
