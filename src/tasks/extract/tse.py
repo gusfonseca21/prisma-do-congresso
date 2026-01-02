@@ -4,7 +4,7 @@ from pathlib import Path
 from prefect import get_run_logger, task
 
 from config.loader import CACHE_POLICY_MAP, load_config
-from utils.br_data import BR_UFS, calculate_election_years
+from utils.br_data import BR_UFS, get_election_years
 from utils.file import keep_only_files
 from utils.io import download_stream
 
@@ -14,7 +14,7 @@ APP_SETTINGS = load_config()
 REDES_SOCIAIS_ENDPOINTS = {
     f"redes_sociais_{year}_{uf}": f"{APP_SETTINGS.TSE.BASE_URL}consulta_cand/rede_social_candidato_{year}_{uf}.zip"
     for uf in BR_UFS
-    for year in calculate_election_years()
+    for year in get_election_years()
     if not (uf == "DF" and year == 2018)  # Não há esses dados para a eleição de 2018
 }
 
@@ -39,14 +39,16 @@ TSE_ENDPOINTS = TSE_ENDPOINTS | REDES_SOCIAIS_ENDPOINTS
     cache_expiration=timedelta(days=APP_SETTINGS.TSE.CACHE_EXPIRATION),
     log_prints=True,
 )
-def extract_tse(name: str, url: str, out_dir: str = APP_SETTINGS.TSE.OUT_DIR) -> str:
+def extract_tse(
+    name: str, url: str, out_dir: str = APP_SETTINGS.TSE.OUTPUT_EXTRACT_DIR
+) -> str:
     logger = get_run_logger()
 
     dest = Path(out_dir) / f"{name}.zip"
     logger.info(f"Fazendo download  do endpoint TSE '{url}' -> {dest}")
     dest_path = download_stream(url, dest, unzip=True)
 
-    keep_only_files(path=APP_SETTINGS.TSE.OUT_DIR, file_ext="csv")
+    keep_only_files(path=APP_SETTINGS.TSE.OUTPUT_EXTRACT_DIR, file_ext="csv")
 
     if dest_path:
         return dest_path

@@ -45,7 +45,7 @@ def generate_urls(start_date: date, end_date: date) -> list[str]:
 async def extract_votacoes_camara(
     start_date: date,
     end_date: date,
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUT_DIR,
+    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
 ) -> list[str]:
     logger = get_run_logger()
 

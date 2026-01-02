@@ -18,7 +18,9 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def extract_legislatura(
-    start_date: date, end_date: date, out_dir: str = APP_SETTINGS.CAMARA.OUT_DIR
+    start_date: date,
+    end_date: date,
+    out_dir: str = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
 ) -> dict:
     LEGISLATURA_URL = (
         f"{APP_SETTINGS.CAMARA.REST_BASE_URL}/legislaturas?data={start_date}"

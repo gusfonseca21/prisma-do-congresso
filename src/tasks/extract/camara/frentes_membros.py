@@ -24,7 +24,7 @@ def frentes_membros_urls(frentes_ids: list[str]) -> list[str]:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_frentes_membros(
-    frentes_ids: list[str], out_dir: str | Path = APP_SETTINGS.CAMARA.OUT_DIR
+    frentes_ids: list[str], out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR
 ) -> str:
     logger = get_run_logger()
 

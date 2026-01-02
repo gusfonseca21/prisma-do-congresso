@@ -27,7 +27,7 @@ class AllEndpoints(BaseModel):
 
 class TSEConfig(BaseModel):
     BASE_URL: str
-    OUT_DIR: str
+    OUTPUT_EXTRACT_DIR: str
     TASK_RETRIES: int
     TASK_RETRY_DELAY: int
     TASK_TIMEOUT: int
@@ -38,7 +38,7 @@ class TSEConfig(BaseModel):
 class CamaraConfig(BaseModel):
     REST_BASE_URL: str
     PORTAL_BASE_URL: str
-    OUT_DIR: str
+    OUTPUT_EXTRACT_DIR: str
     TASK_RETRIES: int
     TASK_RETRY_DELAY: int
     TASK_TIMEOUT: int

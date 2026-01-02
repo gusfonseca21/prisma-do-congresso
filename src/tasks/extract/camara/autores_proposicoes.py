@@ -25,7 +25,8 @@ def autores_proposicoes_urls(proposicoes_ids: list[int]) -> list[str]:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_autores_proposicoes_camara(
-    proposicoes_ids: list[int], out_dir: str | Path = APP_SETTINGS.CAMARA.OUT_DIR
+    proposicoes_ids: list[int],
+    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
 ) -> str:
     logger = get_run_logger()
 

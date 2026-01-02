@@ -22,7 +22,7 @@ def frentes_url(id_legislatura: int) -> str:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_frentes(
-    id_legislatura: int, out_dir: str | Path = APP_SETTINGS.CAMARA.OUT_DIR
+    id_legislatura: int, out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR
 ) -> list[str]:
     logger = get_run_logger()
     url = frentes_url(id_legislatura)

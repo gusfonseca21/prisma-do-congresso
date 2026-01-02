@@ -24,7 +24,8 @@ def detalhes_deputados_urls(deputados_ids: list[int]) -> list[str]:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_detalhes_deputados(
-    deputados_ids: list[int], out_dir: str | Path = APP_SETTINGS.CAMARA.OUT_DIR
+    deputados_ids: list[int],
+    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
 ) -> str:
     logger = get_run_logger()
 

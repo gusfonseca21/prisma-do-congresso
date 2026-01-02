@@ -34,7 +34,7 @@ async def extract_discursos_deputados(
     deputados_ids: list[int],
     start_date: date,
     end_date: date,
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUT_DIR,
+    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
 ) -> str:
     logger = get_run_logger()
 

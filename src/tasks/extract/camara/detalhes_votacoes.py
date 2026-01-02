@@ -11,43 +11,40 @@ from utils.io import save_ndjson
 APP_SETTINGS = load_config()
 
 
-def detalhes_proposicoes_urls(proposicoes_ids: list[int]) -> list[str]:
-    return [
-        f"{APP_SETTINGS.CAMARA.REST_BASE_URL}proposicoes/{id}" for id in proposicoes_ids
-    ]
+def detalhes_votacoes_urls(votacoes_ids: list[str]) -> list[str]:
+    return [f"{APP_SETTINGS.CAMARA.REST_BASE_URL}votacoes/{id}" for id in votacoes_ids]
 
 
 @task(
-    task_run_name="extract_detalhes_proposicoes_camara",
+    task_run_name="extract_detalhes_votacoes_camara",
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
-async def extract_detalhes_proposicoes_camara(
-    proposicoes_ids: list[int],
+async def extract_detalhes_votacoes_camara(
+    votacoes_ids: list[str],
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
 ) -> str:
     logger = get_run_logger()
 
-    urls = detalhes_proposicoes_urls(proposicoes_ids)
+    urls = detalhes_votacoes_urls(votacoes_ids)
 
-    logger.info(f"Baixando detalhes de {len(urls)} proposições da Câmara")
+    logger.info(f"Baixando detalhes de votações da Câmara de {len(urls)} URLs")
 
     jsons = await fetch_many_camara(
         urls=urls,
-        limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
-        max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
+        limit=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         logger=logger,
         follow_pagination=False,
         validate_results=True,
     )
 
     await acreate_table_artifact(
-        key="detalhes-proposicoes-camara",
-        table=[{"total_proposicoes": len(jsons)}],
-        description="Detalhes Proposições da Câmara",
+        key="detalhes-votacoes-camara",
+        table=[{"total_votacoes": len(jsons)}],
+        description="Detalhes Votações da Câmara",
     )
 
-    dest = Path(out_dir) / "detalhes_proposicoes_camara.ndjson"
+    dest = Path(out_dir) / "detalhes_votacoes_camara.ndjson"
 
     return save_ndjson(cast(list[dict], jsons), dest)
