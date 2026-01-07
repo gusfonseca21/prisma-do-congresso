@@ -1,3 +1,5 @@
 from .colegiados import extract_colegiados
+from .detalhes_senadores import extract_detalhes_senadores
+from .senadores import extract_senadores
 
-__all__ = ["extract_colegiados"]
+__all__ = ["extract_colegiados", "extract_senadores", "extract_detalhes_senadores"]

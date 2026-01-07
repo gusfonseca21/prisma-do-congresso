@@ -16,7 +16,7 @@ APP_SETTINGS = load_config()
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
-async def extract_colegiados(
+def extract_colegiados(
     out_dir: str = APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR,
 ) -> str:
     logger = get_run_logger()
@@ -32,5 +32,17 @@ async def extract_colegiados(
     json = cast(dict, json)
 
     save_json(json, dest)
+
+    num_colegiados = len(
+        json.get("ListaColegiados", {}).get("Colegiados", {}).get("Colegiado", [])
+    )
+
+    logger.warning(num_colegiados)
+
+    create_table_artifact(
+        key="colegiados-senado",
+        table=[{"num_colegiados": num_colegiados}],
+        description="Colegiados do Senado",
+    )
 
     return str(dest)

@@ -6,7 +6,7 @@ from prefect import get_run_logger, task
 from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
-from utils.fetch_many_camara import fetch_many_camara
+from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import save_ndjson
 
 APP_SETTINGS = load_config()
@@ -53,7 +53,7 @@ async def extract_votacoes_camara(
 
     logger.info(f"Baixando dados de {len(urls)} URLs")
 
-    jsons = await fetch_many_camara(
+    jsons = await fetch_many_jsons(
         urls=urls,
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         follow_pagination=True,

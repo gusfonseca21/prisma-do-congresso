@@ -1,7 +1,7 @@
 import pytest
 import requests
 
-from ..fetch_many_camara import fetch_many_camara
+from ..fetch_many_jsons import fetch_many_camara
 
 
 @pytest.fixture

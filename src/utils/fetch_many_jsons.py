@@ -12,7 +12,7 @@ from .url_utils import alter_query_param_value, get_query_param_value, is_first_
 
 
 # Armazena em memória ou grava em disco uma lista de JSONs
-async def fetch_many_camara(
+async def fetch_many_jsons(
     urls: list[str],
     out_dir: str | Path | None = None,
     limit: int = 10,
