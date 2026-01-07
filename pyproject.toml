@@ -6,8 +6,8 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "pandas>=2.3.3",
-    "prefect>=3.4.24",
+    "prefect>=3.6.9",
     "pytest>=9.0.1",
     "pytest-asyncio>=1.3.0",
-    "selectolax>=0.4.0",
+    "selectolax>=0.4.6",
 ]

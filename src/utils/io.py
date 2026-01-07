@@ -10,7 +10,7 @@ from typing import Any
 
 import httpx
 
-from src.config.request_headers import headers
+from config.request_headers import headers
 
 from .log import get_prefect_logger_or_none
 

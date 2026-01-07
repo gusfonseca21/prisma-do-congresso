@@ -2,7 +2,6 @@ from datetime import date, datetime, timedelta
 
 from prefect import flow, get_run_logger
 
-# from prefect.task_runners import ThreadPoolTaskRunner
 from config.loader import load_config
 from config.parameters import FlowsNames
 
@@ -16,7 +15,6 @@ APP_SETTINGS = load_config()
 @flow(
     name="Pipeline Flow",
     flow_run_name="pipeline_flow",
-    # task_runner=ThreadPoolTaskRunner(max_workers=APP_SETTINGS.FLOW.MAX_RUNNERS),  # type: ignore
     description="Onde os outros Flows são chamados e coordenados.",
     log_prints=True,
 )
