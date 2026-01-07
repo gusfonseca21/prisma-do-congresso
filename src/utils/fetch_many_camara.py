@@ -4,6 +4,8 @@ from typing import Any
 
 import httpx
 
+from config.request_headers import headers
+
 from .io import ensure_dir
 from .log import get_prefect_logger_or_none
 from .url_utils import alter_query_param_value, get_query_param_value, is_first_page
@@ -115,7 +117,7 @@ async def fetch_many_camara(
 
     semaphore = asyncio.Semaphore(limit)
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(headers=headers) as client:
         workers = [
             asyncio.create_task(
                 worker(
@@ -199,7 +201,7 @@ def validate(
         )
     else:
         log(
-            f"O header do total de items para serem baixados não foi encontrado. Total de downloads: {downloaded_items}"
+            f"O header do total de items para serem baixados não foi encontrado ou é 0. Total de downloads: {downloaded_items}"
         )
 
     if (

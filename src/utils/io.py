@@ -10,6 +10,8 @@ from typing import Any
 
 import httpx
 
+from src.config.request_headers import headers
+
 from .log import get_prefect_logger_or_none
 
 
@@ -100,7 +102,7 @@ def fetch_json(
     log(f"Baixando URL: {url}")
 
     with httpx.Client(
-        timeout=timeout, follow_redirects=True, headers={"Accept": "application/json"}
+        timeout=timeout, follow_redirects=True, headers=headers
     ) as client:
         for attempt in range(max_retries):
             try:
