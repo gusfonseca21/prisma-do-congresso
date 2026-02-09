@@ -177,6 +177,7 @@ def camara_flow(start_date: date, end_date: date, ignore_tasks: list[str]):
         extract_camara_despesas_deputados_f = extract_despesas_deputados.submit(
             extract_camara_deputados_f,  # type: ignore
             start_date,
+            end_date,
             extract_camara_legislatura_f,  # type: ignore
         )
         resolve_futures_to_results(extract_camara_despesas_deputados_f)
