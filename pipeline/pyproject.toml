@@ -8,7 +8,9 @@ dependencies = [
     "alembic>=1.17.0",
     "pandas>=2.3.3",
     "prefect>=3.6.9",
+    "psycopg2-binary>=2.9.11",
     "pytest>=9.0.1",
     "pytest-asyncio>=1.3.0",
+    "python-dotenv>=1.1.1",
     "selectolax>=0.4.6",
 ]
