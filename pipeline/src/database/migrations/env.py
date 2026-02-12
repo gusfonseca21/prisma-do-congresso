@@ -5,7 +5,7 @@ from alembic import context
 from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
-from migrations.models.models import Base
+from src.database.models.models import Base
 
 load_dotenv()
 
@@ -52,7 +52,6 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        version_table_schema="oltp",
     )
 
     with context.begin_transaction():
@@ -70,7 +69,6 @@ def run_migrations_online() -> None:
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
-        connect_args={"options": "-c search_path=oltp"},
     )
 
     with connectable.connect() as connection:

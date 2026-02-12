@@ -29,6 +29,7 @@ No .env adicione a URL de conexão com o banco de dados que deseja ser utilizado
 ```bash
 uv run alembic upgrade head
 ```
+Para mais informações sobre como conversar com o banco de dados, veja o README em src/database/README.md
 
 ### 1. Iniciar o Servidor Prefect
 
