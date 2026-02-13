@@ -38,10 +38,10 @@ async def extract_detalhes_proposicoes_camara(
         urls=urls,
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
-        logger=logger,
         follow_pagination=False,
         validate_results=True,
         task="extract_detalhes_proposicoes_camara",
+        lote_id=lote_id,
     )
 
     await acreate_table_artifact(

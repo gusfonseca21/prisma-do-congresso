@@ -58,7 +58,6 @@ async def extract_discursos_senado(
         limit=APP_SETTINGS.SENADO.FETCH_LIMIT,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=False,
-        logger=logger,
         validate_results=False,
         task="extract_discursos_senado",
         lote_id=lote_id,

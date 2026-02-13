@@ -38,9 +38,9 @@ async def extract_detalhes_deputados_camara(
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=False,
-        logger=logger,
         validate_results=True,
         task="extract_detalhes_deputados_camara",
+        lote_id=lote_id,
     )
 
     await acreate_table_artifact(

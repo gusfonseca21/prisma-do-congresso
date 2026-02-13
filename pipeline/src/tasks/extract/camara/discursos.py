@@ -47,9 +47,9 @@ async def extract_discursos_deputados_camara(
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
-        logger=logger,
         validate_results=True,
         task="extract_discursos_deputados_camara",
+        lote_id=lote_id,
     )
 
     await acreate_table_artifact(

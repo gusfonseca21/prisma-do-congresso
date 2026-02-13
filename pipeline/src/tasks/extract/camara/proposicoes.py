@@ -35,9 +35,9 @@ async def extract_proposicoes_camara(
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
-        logger=logger,
         validate_results=True,
         task="extract_proposicoes_camara",
+        lote_id=lote_id,
     )
 
     dest = Path(out_dir) / "proposicoes.ndjson"

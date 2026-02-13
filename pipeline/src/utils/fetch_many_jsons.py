@@ -1,6 +1,5 @@
 import asyncio
 from pathlib import Path
-from typing import Any
 
 import httpx
 from prefect.logging import get_logger
@@ -9,10 +8,9 @@ from config.request_headers import headers
 from database.repository.erros_extract import insert_extract_error_db
 
 from .io import ensure_dir
-from .log import get_prefect_logger_or_none
 from .url_utils import alter_query_param_value, get_query_param_value, is_first_page
 
-logger1 = get_logger()
+logger = get_logger()
 
 
 # Armazena em memória ou grava em disco uma lista de JSONs
@@ -25,20 +23,12 @@ async def fetch_many_jsons(
     timeout: float = 30.0,
     max_retries: int = 10,
     follow_pagination: bool = False,
-    logger: Any | None = None,
     validate_results: bool = False,
 ) -> list[str] | list[dict]:
     """
     - Se out_dir for fornecido, salva cada JSON em um arquivo e retorna a lista de caminhos
     - Caso contrário, retorna a lista de dicionários em memória
     """
-    logger = logger or get_prefect_logger_or_none()
-
-    def log(msg: str):
-        if logger:
-            logger.warning(msg)
-        else:
-            print(msg)
 
     db_errors = []
     out_dir = ensure_dir(out_dir) if out_dir else None
@@ -122,14 +112,14 @@ async def fetch_many_jsons(
                         break
                     except Exception as e:
                         if attempt < max_retries - 1:
-                            log(
+                            logger.warning(
                                 f"Um erro ocorreu no fetch de dados: {e}. TENTANDO NOVAMENTE. Tentativa: {attempt}"
                             )
                             await asyncio.sleep(2**attempt)
                         else:
                             queue.task_done()
                             message = f"Falha permanente ao baixar {url} após {max_retries} tentativas: {e}"
-                            log(message)
+                            logger.error(message)
 
                             try:
                                 insert_extract_error_db(
@@ -140,7 +130,7 @@ async def fetch_many_jsons(
                                     url=url,
                                 )
                             except Exception as e:
-                                logger1.critical(
+                                logger.critical(
                                     f"Erro ao tentar inserir o erro da URL {url} no banco de dados"
                                 )
                                 db_errors.append(url)
@@ -188,7 +178,6 @@ async def fetch_many_jsons(
             results=results,
             urls=urls,
             stats=stats,
-            log=log,
             paginated=follow_pagination,
         )
 
@@ -231,7 +220,6 @@ def validate(
     results: list[dict],
     urls: list[str],
     stats: dict[str, int],
-    log: Any,
     paginated: bool,
 ):
     downloaded_items = 0
@@ -245,11 +233,11 @@ def validate(
         stats["total_items"] = len(urls)
 
     if stats["total_items"]:
-        log(
+        logger.info(
             f"Total de ítens baixados / headers/lenlista: {downloaded_items}/{stats['total_items']}"
         )
     else:
-        log(
+        logger.info(
             f"O header do total de items para serem baixados não foi encontrado ou é 0. Total de downloads: {downloaded_items}"
         )
 

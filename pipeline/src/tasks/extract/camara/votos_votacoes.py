@@ -37,10 +37,10 @@ async def extract_votos_votacoes_camara(
     jsons = await fetch_many_jsons(
         urls=urls,
         limit=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
-        logger=logger,
         follow_pagination=False,
         validate_results=True,
         task="extract_votos_votacoes_camara",
+        lote_id=lote_id,
     )
 
     await acreate_table_artifact(

@@ -39,9 +39,9 @@ async def extract_frentes_camara(
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=True,
-        logger=logger,
         validate_results=True,
         task="extract_frentes_camara",
+        lote_id=lote_id,
     )
     jsons = cast(list[dict], jsons)
 
