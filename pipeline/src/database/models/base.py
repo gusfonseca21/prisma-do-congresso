@@ -11,6 +11,7 @@ class PipelineParams:
     refresh_cache: bool
     ignore_tasks: list[str]
     ignore_flows: list[str]
+    message: str | None
 
 
 class Lote(Base):
@@ -30,8 +31,9 @@ class Lote(Base):
     )
     data_fim_extract = sa.Column(sa.Date, nullable=False)
     flows_ignoradas = sa.Column(sa.String(25), nullable=True)
-    tasks_ignoradas = sa.Column(sa.String(200), nullable=True)
+    tasks_ignoradas = sa.Column(sa.String(1500), nullable=True)
     resetar_cache = sa.Column(sa.Boolean, nullable=False)
+    mensagem = sa.Column(sa.String(256), nullable=True)
 
 
 class ErrosExtract(Base):

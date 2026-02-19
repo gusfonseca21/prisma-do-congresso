@@ -60,6 +60,11 @@ async def extract_assiduidade_camara(
     # Montando os resultados JSON e o artefato
     artifact_data = []
     json_results = []
+
+    # Caso ocorra erro na hora do download do HTML, eles podem retornar como None
+    # Para evitar erro, limpar os None. O erro já deve ter sido pêgo no download.
+    htmls = list(filter(None, htmls))
+
     for html in htmls:
         tree = HTMLParser(cast(str, html))
         all_links = tree.css("a")

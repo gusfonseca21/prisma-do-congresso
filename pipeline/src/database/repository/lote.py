@@ -25,6 +25,7 @@ def start_lote_in_db(
                 resetar_cache=params.refresh_cache,
                 tasks_ignoradas=seialize_params_list(params.ignore_tasks),
                 flows_ignoradas=seialize_params_list(params.ignore_flows),
+                mensagem=params.message,
             )
             .returning(lote.c.id)
         )

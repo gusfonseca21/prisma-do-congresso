@@ -26,8 +26,22 @@ def pipeline(
     - timedelta(days=APP_SETTINGS.FLOW.DATE_LOOKBACK),
     end_date: date = datetime.now().date(),
     refresh_cache: bool = False,
-    ignore_tasks: list[str] = [],
-    ignore_flows: list[str] = [],
+    ignore_tasks: list[str] = [
+        "extract_camara_frentes",
+        "extract_camara_frentes_membros",
+        "extract_camara_detalhes_deputados",
+        "extract_camara_discursos_deputados",
+        "extract_camara_proposicoes",
+        "extract_camara_detalhes_proposicoes",
+        "extract_camara_autores_proposicoes",
+        "extract_camara_despesas_deputados",
+        "extract_camara_votacoes",
+        "extract_camara_detalhes_votacoes",
+        "extract_camara_orientacoes_votacoes",
+        "extract_camara_votos_votacoes",
+    ],
+    ignore_flows: list[str] = ["tse", "senado"],
+    message: str | None = None,
 ):
     logger = get_run_logger()
     logger.info("Iniciando Pipeline ETL.")
@@ -39,6 +53,7 @@ def pipeline(
             refresh_cache=refresh_cache,
             ignore_tasks=ignore_tasks,
             ignore_flows=ignore_flows,
+            message=message,
         ),
     )
     logger.info(f"Lote {lote_id} iniciou.")
