@@ -11,6 +11,8 @@ from utils.io import save_ndjson
 
 APP_SETTINGS = load_config()
 
+TASK_NAME = "extract_votacoes_camara"
+
 
 def generate_urls(start_date: date, end_date: date) -> list[str]:
     # Documentação do endpoint diz que a dataInicio e dataFim só podem ser utilizadas se estiverem no mesmo ano.
@@ -37,7 +39,7 @@ def generate_urls(start_date: date, end_date: date) -> list[str]:
 
 
 @task(
-    task_run_name="extract_votacoes_camara",
+    task_run_name=TASK_NAME,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -60,7 +62,7 @@ async def extract_votacoes_camara(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
-        task="extract_votacoes_camara",
+        task=TASK_NAME,
         lote_id=lote_id,
     )
 

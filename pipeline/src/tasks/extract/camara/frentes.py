@@ -10,13 +10,15 @@ from utils.io import save_ndjson
 
 APP_SETTINGS = load_config()
 
+TASK_NAME = "extract_frentes_camara"
+
 
 def frentes_url(id_legislatura: int) -> str:
     return f"{APP_SETTINGS.CAMARA.REST_BASE_URL}/frentes?idLegislatura={id_legislatura}"
 
 
 @task(
-    task_run_name="extract_frentes_camara",
+    task_run_name=TASK_NAME,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -40,7 +42,7 @@ async def extract_frentes_camara(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=True,
         validate_results=True,
-        task="extract_frentes_camara",
+        task=TASK_NAME,
         lote_id=lote_id,
     )
     jsons = cast(list[dict], jsons)
@@ -57,7 +59,7 @@ async def extract_frentes_camara(
             artifact_data.append({"id": frente.get("id"), "nome": frente.get("titulo")})
 
     await acreate_table_artifact(
-        key="frentes", table=artifact_data, description="Frentes"
+        key="frentes-camara-membros", table=artifact_data, description="Frentes Câmara"
     )
 
     return frentes_ids

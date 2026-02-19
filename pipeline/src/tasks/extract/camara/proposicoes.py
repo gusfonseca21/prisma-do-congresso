@@ -11,9 +11,11 @@ from utils.io import save_ndjson
 
 APP_SETTINGS = load_config()
 
+TASK_NAME = "extract_proposicoes_camara"
+
 
 @task(
-    task_run_name="extract_proposicoes_camara",
+    task_run_name=TASK_NAME,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -36,7 +38,7 @@ async def extract_proposicoes_camara(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
-        task="extract_proposicoes_camara",
+        task=TASK_NAME,
         lote_id=lote_id,
     )
 

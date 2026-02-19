@@ -39,7 +39,7 @@ def insert_extract_error_db(
         conn.execute(stmt_lote)
 
 
-def verify_not_downloaded_urls_in_task_db(task: str):
+def verify_not_downloaded_urls_in_task_db(task: str) -> list[str]:
     """
     Verifica se existem URLs que falharam ao serem baixadas em lotes anteriores por task.
     Retorna uma lista de URLs para serem baixadas novamente.

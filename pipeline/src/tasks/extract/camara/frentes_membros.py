@@ -5,20 +5,30 @@ from prefect import get_run_logger, task
 from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
+from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import save_ndjson
 
 APP_SETTINGS = load_config()
 
+TASK_NAME = "extract_frentes_membros_camara"
+
 
 def frentes_membros_urls(frentes_ids: list[str]) -> list[str]:
-    return [
-        f"{APP_SETTINGS.CAMARA.REST_BASE_URL}frentes/{id}/membros" for id in frentes_ids
-    ]
+    urls = set()
+    not_downloaded_urls = verify_not_downloaded_urls_in_task_db(TASK_NAME)
+
+    if not_downloaded_urls:
+        urls.update(not_downloaded_urls)
+
+    for id in frentes_ids:
+        urls.add(f"{APP_SETTINGS.CAMARA.REST_BASE_URL}frentes/{id}/membros")
+
+    return list(urls)
 
 
 @task(
-    task_run_name="extract_frentes_membros_camara",
+    task_run_name=TASK_NAME,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -39,7 +49,7 @@ async def extract_frentes_membros_camara(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
-        task="extract_frentes_membros_camara",
+        task=TASK_NAME,
         lote_id=lote_id,
     )
 

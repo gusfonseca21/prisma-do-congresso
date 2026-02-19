@@ -6,10 +6,13 @@ from prefect import get_run_logger, task
 from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
+from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import save_ndjson
 
 APP_SETTINGS = load_config()
+
+TASK_NAME = "extract_despesas_camara"
 
 
 def urls_despesas(
@@ -26,7 +29,12 @@ def urls_despesas(
     new_month = ((start_date.month - 3 - 1) % 12) + 1
     adjusted_start = date(start_date.year + year_offset, new_month, 1)
 
-    urls = []
+    urls = set()
+    not_downloaded_urls = verify_not_downloaded_urls_in_task_db(TASK_NAME)
+
+    if not_downloaded_urls:
+        urls.update(not_downloaded_urls)
+
     for id_deputado in deputados_ids:
         # If the range covers full years, use year-only URLs
         if (
@@ -37,7 +45,7 @@ def urls_despesas(
         ):
             # Full year range
             for year in range(adjusted_start.year, end_date.year + 1):
-                urls.append(
+                urls.add(
                     f"{APP_SETTINGS.CAMARA.REST_BASE_URL}/deputados/{id_deputado}/despesas?"
                     f"ano={year}&ordem=ASC&ordenarPor=dataDocumento&itens=100"
                 )
@@ -47,7 +55,7 @@ def urls_despesas(
             # Add months from adjusted_start to end of its year
             current = adjusted_start
             while current.year == adjusted_start.year:
-                urls.append(
+                urls.add(
                     f"{APP_SETTINGS.CAMARA.REST_BASE_URL}/deputados/{id_deputado}/despesas?"
                     f"ano={current.year}&mes={current.month}&ordem=ASC&ordenarPor=dataDocumento&itens=100"
                 )
@@ -56,14 +64,14 @@ def urls_despesas(
                 current = date(current.year, current.month + 1, 1)
             # Add full years in between (if any)
             for year in range(adjusted_start.year + 1, end_date.year):
-                urls.append(
+                urls.add(
                     f"{APP_SETTINGS.CAMARA.REST_BASE_URL}/deputados/{id_deputado}/despesas?"
                     f"ano={year}&ordem=ASC&ordenarPor=dataDocumento&itens=100"
                 )
             # Add months from start of end_date's year to end_date
             current = date(end_date.year, 1, 1)
             while current <= end_date:
-                urls.append(
+                urls.add(
                     f"{APP_SETTINGS.CAMARA.REST_BASE_URL}/deputados/{id_deputado}/despesas?"
                     f"ano={current.year}&mes={current.month}&ordem=ASC&ordenarPor=dataDocumento&itens=100"
                 )
@@ -74,18 +82,18 @@ def urls_despesas(
             # Same year - just iterate months
             current = adjusted_start
             while current <= end_date:
-                urls.append(
+                urls.add(
                     f"{APP_SETTINGS.CAMARA.REST_BASE_URL}/deputados/{id_deputado}/despesas?"
                     f"ano={current.year}&mes={current.month}&ordem=ASC&ordenarPor=dataDocumento&itens=100"
                 )
                 if current.month == 12:
                     break
                 current = date(current.year, current.month + 1, 1)
-    return urls
+    return list(urls)
 
 
 @task(
-    task_run_name="extract_despesas_camara",
+    task_run_name=TASK_NAME,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -109,7 +117,7 @@ async def extract_despesas_camara(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
-        task="extract_despesas_camara",
+        task=TASK_NAME,
         lote_id=lote_id,
     )
 

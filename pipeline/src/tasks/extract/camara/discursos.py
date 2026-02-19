@@ -6,11 +6,14 @@ from prefect import get_run_logger, task
 from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
+from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import save_ndjson
 from utils.url_utils import get_path_parameter_value
 
 APP_SETTINGS = load_config()
+
+TASK_NAME = "extract_discursos_deputados_camara"
 
 
 def urls_discursos(
@@ -18,14 +21,23 @@ def urls_discursos(
 ) -> list[str]:
     # Discursos podem demorar a ser inseridos na base de dados
     one_month_back = start_date - timedelta(days=30)
-    return [
-        f"{APP_SETTINGS.CAMARA.REST_BASE_URL}deputados/{id}/discursos?dataInicio={one_month_back}&dataFim={end_date}&itens=100"
-        for id in deputados_ids
-    ]
+
+    urls = set()
+    not_downloaded_urls = verify_not_downloaded_urls_in_task_db(TASK_NAME)
+
+    if not_downloaded_urls:
+        urls.update(not_downloaded_urls)
+
+    for id in deputados_ids:
+        urls.add(
+            f"{APP_SETTINGS.CAMARA.REST_BASE_URL}deputados/{id}/discursos?dataInicio={one_month_back}&dataFim={end_date}&itens=100"
+        )
+
+    return list(urls)
 
 
 @task(
-    task_run_name="extract_discursos_deputados_camara",
+    task_run_name=TASK_NAME,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -48,7 +60,7 @@ async def extract_discursos_deputados_camara(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
-        task="extract_discursos_deputados_camara",
+        task=TASK_NAME,
         lote_id=lote_id,
     )
 
