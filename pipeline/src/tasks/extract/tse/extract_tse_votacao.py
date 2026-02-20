@@ -4,15 +4,16 @@ from pathlib import Path
 from prefect import get_run_logger, task
 
 from config.loader import CACHE_POLICY_MAP, load_config
+from config.parameters import TasksNames
 from utils.io import download_stream
 
 APP_SETTINGS = load_config()
 
 
 @task(
-    name="Extract TSE Candidatos",
-    task_run_name="extract_tse_candidatos_{year}",
-    description="Faz o download e gravação de tabelas de consulta de candidatos do TSE.",
+    name="Extract TSE Votação",
+    task_run_name=TasksNames.EXTRACT_TSE_VOTACAO + "_{year}",
+    description="Faz o download e gravação de tabelas de resultado de votação da eleição do TSE.",
     retries=APP_SETTINGS.TSE.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.TSE.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.TSE.TASK_TIMEOUT,
@@ -20,31 +21,29 @@ APP_SETTINGS = load_config()
     cache_expiration=timedelta(days=APP_SETTINGS.TSE.CACHE_EXPIRATION),
     log_prints=True,
 )
-def extract_candidatos(
+def extract_votacao(
     year: int,
     lote_id: int,
     out_dir: Path | str = APP_SETTINGS.TSE.OUTPUT_EXTRACT_DIR,
 ) -> str | None:
     logger = get_run_logger()
 
-    url = f"{APP_SETTINGS.TSE.BASE_URL}consulta_cand/consulta_cand_{year}.zip"
+    url = f"{APP_SETTINGS.TSE.BASE_URL}votacao_candidato_munzona/votacao_candidato_munzona_{year}.zip"
 
-    dir_dest_path = Path(out_dir) / "candidatos" / str(year)
+    dir_dest_path = Path(out_dir) / "votacao_candidato" / str(year)
 
     file_dest_path = dir_dest_path / f"{year}.zip"
 
     logger.info(
-        f"Fazendo download da lista de candidatos do TSE da eleição de {year}: {url}"
+        f"Fazendo download das tabelas de resultado de votação da eleição de {year}: {url}"
     )
 
     _tmp_zip_dest_path = download_stream(
         url=url,
         dest_path=file_dest_path,
         unzip=True,
+        task=f"{TasksNames.EXTRACT_TSE_VOTACAO}_{year}",
         lote_id=lote_id,
-        task=f"extract_tse_candidatos_{year}",
     )
-
-    logger.info(dir_dest_path)
 
     return str(dir_dest_path)

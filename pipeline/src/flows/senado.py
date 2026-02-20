@@ -28,7 +28,7 @@ def senado_flow(start_date: date, end_date: date, ignore_tasks: list[str], lote_
 
     ## COLEGIADOS
     extract_colegiados_senado_f = None
-    if TasksNames.EXTRACT_COLEGIADOS_SENADO not in ignore_tasks:
+    if TasksNames.EXTRACT_SENADO_COLEGIADOS not in ignore_tasks:
         extract_colegiados_senado_f = extract_colegiados.submit(lote_id=lote_id)
 
     ## SENADORES

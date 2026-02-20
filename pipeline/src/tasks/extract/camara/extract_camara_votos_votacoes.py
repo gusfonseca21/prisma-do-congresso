@@ -1,10 +1,11 @@
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 from prefect import get_run_logger, task
 from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
+from config.parameters import TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
@@ -12,18 +13,18 @@ from utils.io import save_ndjson
 
 APP_SETTINGS = load_config()
 
-TASK_NAME = "extract_autores_proposicoes_camara"
 
-
-def autores_proposicoes_urls(proposicoes_ids: list[int]) -> UrlsResult:
+def votos_votacoes_urls(votacoes_ids: list[str]) -> UrlsResult:
     urls = set()
-    not_downloaded_urls = verify_not_downloaded_urls_in_task_db(TASK_NAME)
+    not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
+        TasksNames.EXTRACT_CAMARA_VOTOS_VOTACOES
+    )
 
     if not_downloaded_urls:
         urls.update([error.url for error in not_downloaded_urls])
 
-    for id in proposicoes_ids:
-        urls.add(f"https://dadosabertos.camara.leg.br/api/v2/proposicoes/{id}/autores")
+    for id in votacoes_ids:
+        urls.add(f"{APP_SETTINGS.CAMARA.REST_BASE_URL}votacoes/{id}/votos")
 
     return UrlsResult(
         urls_to_download=list(urls), not_downloaded_urls=not_downloaded_urls
@@ -31,39 +32,46 @@ def autores_proposicoes_urls(proposicoes_ids: list[int]) -> UrlsResult:
 
 
 @task(
-    task_run_name=TASK_NAME,
+    task_run_name=TasksNames.EXTRACT_CAMARA_VOTOS_VOTACOES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
-async def extract_autores_proposicoes_camara(
-    proposicoes_ids: list[int],
+async def extract_votos_votacoes_camara(
+    votacoes_ids: list[str],
     lote_id: int,
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
 ) -> str:
     logger = get_run_logger()
 
-    urls = autores_proposicoes_urls(proposicoes_ids)
+    urls = votos_votacoes_urls(votacoes_ids)
 
-    logger.info(f"Baixando autores de {len(urls)} proposições da Câmara")
+    logger.info(f"Baixando votos de votações da Câmara de {len(urls)} URLs")
 
     jsons = await fetch_many_jsons(
         urls=urls["urls_to_download"],
         not_downloaded_urls=urls["not_downloaded_urls"],
-        limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
-        max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
+        limit=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=False,
         validate_results=True,
-        task=TASK_NAME,
+        task=TasksNames.EXTRACT_CAMARA_VOTOS_VOTACOES,
         lote_id=lote_id,
     )
 
     await acreate_table_artifact(
-        key="autores-proposicoes-camara",
-        table=[{"total_proposicoes": len(jsons)}],
-        description="Autores Proposições da Câmara",
+        key="votos-votacoes-camara",
+        table=generate_artifact(jsons),
+        description="Votos Votações da Câmara",
     )
 
-    dest = Path(out_dir) / "autores_proposicoes_camara.ndjson"
+    dest = Path(out_dir) / "votos_votacoes_camara.ndjson"
 
     return save_ndjson(cast(list[dict], jsons), dest)
+
+
+def generate_artifact(jsons: Any):
+    num_votacoes_votos = 0
+    for j in jsons:
+        if j.get("dados", []):
+            num_votacoes_votos += 1
+    return [{"total_votacoes_com_votos": f"{num_votacoes_votos}/{len(jsons)}"}]

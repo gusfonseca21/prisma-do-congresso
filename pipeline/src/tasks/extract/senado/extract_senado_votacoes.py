@@ -6,6 +6,7 @@ from prefect import get_run_logger, task
 from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
+from config.parameters import TasksNames
 from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import save_ndjson
 from utils.url_utils import generate_date_urls_senado
@@ -25,7 +26,7 @@ def get_votacoes_urls(start_date: date, end_date: date) -> list[str] | None:
 
 
 @task(
-    task_run_name="extract_votacoes_senado",
+    task_run_name=TasksNames.EXTRACT_SENADO_VOTACOES,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
@@ -52,7 +53,7 @@ async def extract_votacoes_senado(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=False,
         validate_results=False,
-        task="extract_votacoes_senado",
+        task=TasksNames.EXTRACT_SENADO_VOTACOES,
         lote_id=lote_id,
     )
 

@@ -8,20 +8,21 @@ from prefect.artifacts import acreate_table_artifact
 from selectolax.parser import HTMLParser
 
 from config.loader import load_config
+from config.parameters import TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.io import fetch_html_many_async, save_ndjson
 
 APP_SETTINGS = load_config()
 
-TASK_NAME = "extract_assiduidade_camara"
-
 
 def assiduidade_urls(
     deputados_ids: list[int], start_date: date, end_date: date
 ) -> UrlsResult:
     urls = set()
-    not_downloaded_urls = verify_not_downloaded_urls_in_task_db(TASK_NAME)
+    not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
+        TasksNames.EXTRACT_CAMARA_ASSIDUIDADE
+    )
 
     if not_downloaded_urls:
         urls.update([error.url for error in not_downloaded_urls])
@@ -38,7 +39,7 @@ def assiduidade_urls(
 
 
 @task(
-    task_run_name=TASK_NAME,
+    task_run_name=TasksNames.EXTRACT_CAMARA_ASSIDUIDADE,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -65,7 +66,7 @@ async def extract_assiduidade_camara(
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         lote_id=lote_id,
-        task=TASK_NAME,
+        task=TasksNames.EXTRACT_CAMARA_ASSIDUIDADE,
     )
 
     href_pattern = re.compile(r"https://www\.camara\.leg\.br/deputados/\d+")

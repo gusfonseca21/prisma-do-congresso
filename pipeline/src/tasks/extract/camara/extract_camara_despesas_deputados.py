@@ -6,14 +6,13 @@ from prefect import get_run_logger, task
 from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
+from config.parameters import TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import save_ndjson
 
 APP_SETTINGS = load_config()
-
-TASK_NAME = "extract_despesas_camara"
 
 
 def urls_despesas(
@@ -31,7 +30,9 @@ def urls_despesas(
     adjusted_start = date(start_date.year + year_offset, new_month, 1)
 
     urls = set()
-    not_downloaded_urls = verify_not_downloaded_urls_in_task_db(TASK_NAME)
+    not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
+        TasksNames.EXTRACT_CAMARA_DESPESAS_DEPUTADOS
+    )
 
     if not_downloaded_urls:
         urls.update([error.url for error in not_downloaded_urls])
@@ -97,7 +98,7 @@ def urls_despesas(
 
 
 @task(
-    task_run_name=TASK_NAME,
+    task_run_name=TasksNames.EXTRACT_CAMARA_DESPESAS_DEPUTADOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -122,7 +123,7 @@ async def extract_despesas_camara(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
-        task=TASK_NAME,
+        task=TasksNames.EXTRACT_CAMARA_DESPESAS_DEPUTADOS,
         lote_id=lote_id,
     )
 

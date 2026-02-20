@@ -5,12 +5,11 @@ from prefect import get_run_logger, task
 from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
+from config.parameters import TasksNames
 from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import save_ndjson
 
 APP_SETTINGS = load_config()
-
-TASK_NAME = "extract_frentes_camara"
 
 
 def frentes_url(id_legislatura: int) -> str:
@@ -18,7 +17,7 @@ def frentes_url(id_legislatura: int) -> str:
 
 
 @task(
-    task_run_name=TASK_NAME,
+    task_run_name=TasksNames.EXTRACT_CAMARA_FRENTES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -43,7 +42,7 @@ async def extract_frentes_camara(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=True,
         validate_results=True,
-        task=TASK_NAME,
+        task=TasksNames.EXTRACT_CAMARA_FRENTES,
         lote_id=lote_id,
     )
     jsons = cast(list[dict], jsons)

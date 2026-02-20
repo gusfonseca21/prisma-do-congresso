@@ -6,12 +6,11 @@ from prefect import get_run_logger, task
 from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
+from config.parameters import TasksNames
 from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import save_json
 
 APP_SETTINGS = load_config()
-
-TASK_NAME = "extract_processos_senado"
 
 
 def get_processos_url(start_date: date, end_date: date, logger: Any) -> list[str]:
@@ -34,7 +33,7 @@ def get_processos_url(start_date: date, end_date: date, logger: Any) -> list[str
 
 
 @task(
-    task_run_name=TASK_NAME,
+    task_run_name=TasksNames.EXTRACT_SENADO_PROCESSOS,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
@@ -58,7 +57,7 @@ async def extract_processos_senado(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=False,
         validate_results=False,
-        task=TASK_NAME,
+        task=TasksNames.EXTRACT_SENADO_PROCESSOS,
         lote_id=lote_id,
     )
 

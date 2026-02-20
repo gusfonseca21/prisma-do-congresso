@@ -6,13 +6,14 @@ from prefect import get_run_logger, task
 from prefect.artifacts import create_table_artifact
 
 from config.loader import load_config
+from config.parameters import TasksNames
 from utils.io import fetch_json, save_json
 
 APP_SETTINGS = load_config()
 
 
 @task(
-    task_run_name="extract_camara_legislatura",
+    task_run_name=TasksNames.EXTRACT_CAMARA_LEGISLATURA,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,

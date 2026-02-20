@@ -4,15 +4,16 @@ from pathlib import Path
 from prefect import get_run_logger, task
 
 from config.loader import CACHE_POLICY_MAP, load_config
+from config.parameters import TasksNames
 from utils.io import download_stream
 
 APP_SETTINGS = load_config()
 
 
 @task(
-    name="Extract TSE Votação",
-    task_run_name="extract_tse_votacao_{year}",
-    description="Faz o download e gravação de tabelas de resultado de votação da eleição do TSE.",
+    name="Extract TSE Redes Sociais",
+    task_run_name=TasksNames.EXTRACT_TSE_REDES_SOCIAIS + "_{uf}_{year}",
+    description="Faz o download e gravação de tabelas de redes sociais de candidatos do TSE.",
     retries=APP_SETTINGS.TSE.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.TSE.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.TSE.TASK_TIMEOUT,
@@ -20,28 +21,29 @@ APP_SETTINGS = load_config()
     cache_expiration=timedelta(days=APP_SETTINGS.TSE.CACHE_EXPIRATION),
     log_prints=True,
 )
-def extract_votacao(
+def extract_redes_sociais(
     year: int,
+    uf: str,
     lote_id: int,
     out_dir: Path | str = APP_SETTINGS.TSE.OUTPUT_EXTRACT_DIR,
 ) -> str | None:
     logger = get_run_logger()
 
-    url = f"{APP_SETTINGS.TSE.BASE_URL}votacao_candidato_munzona/votacao_candidato_munzona_{year}.zip"
+    url = f"{APP_SETTINGS.TSE.BASE_URL}consulta_cand/rede_social_candidato_{year}_{uf}.zip"
 
-    dir_dest_path = Path(out_dir) / "votacao_candidato" / str(year)
+    dir_dest_path = Path(out_dir) / "redes_sociais" / str(year)
 
-    file_dest_path = dir_dest_path / f"{year}.zip"
+    file_dest_path = dir_dest_path / f"{uf}-{year}.zip"
 
     logger.info(
-        f"Fazendo download das tabelas de resultado de votação da eleição de {year}: {url}"
+        f"Fazendo download das tabelas de redes sociais dos candidatos do estado {uf} da eleição de {year}: {url}"
     )
 
     _tmp_zip_dest_path = download_stream(
         url=url,
         dest_path=file_dest_path,
         unzip=True,
-        task=f"extract_tse_votacao_{year}",
+        task=f"{TasksNames.EXTRACT_TSE_REDES_SOCIAIS}_{uf}_{year}",
         lote_id=lote_id,
     )
 

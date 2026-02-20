@@ -4,6 +4,7 @@ from pathlib import Path
 from prefect import get_run_logger, task
 
 from config.loader import CACHE_POLICY_MAP, load_config
+from config.parameters import TasksNames
 from utils.io import download_stream
 
 APP_SETTINGS = load_config()
@@ -11,7 +12,7 @@ APP_SETTINGS = load_config()
 
 @task(
     name="Extract TSE Prestação de Contas",
-    task_run_name="extract_tse_prestacao_contas_{year}",
+    task_run_name=TasksNames.EXTRACT_TSE_PRESTACAO_CONTAS + "_{year}",
     description="Faz o download e gravação de tabelas de consulta de prestação de contas de candidatos do TSE.",
     retries=APP_SETTINGS.TSE.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.TSE.TASK_RETRY_DELAY,
@@ -41,7 +42,7 @@ def extract_prestacao_contas(
         url=url,
         dest_path=file_dest_path,
         unzip=True,
-        task=f"extract_tse_prestacao_contas_{year}",
+        task=f"{TasksNames.EXTRACT_TSE_PRESTACAO_CONTAS}_{year}",
         lote_id=lote_id,
     )
 
