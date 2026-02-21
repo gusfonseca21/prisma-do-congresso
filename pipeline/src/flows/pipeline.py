@@ -2,11 +2,13 @@ from datetime import date, datetime, timedelta
 
 from prefect import flow, get_run_logger
 from prefect.futures import resolve_futures_to_states
+from prefect.runtime import flow_run
 
 from config.loader import load_config
 from config.parameters import FlowsNames
 from database.models.base import PipelineParams
 from database.repository.lote import end_lote_in_db, start_lote_in_db
+from utils.logs import save_logs
 
 from .camara import run_camara_flow
 from .senado import run_senado_flow
@@ -17,7 +19,7 @@ APP_SETTINGS = load_config()
 
 @flow(
     name="Pipeline Flow",
-    flow_run_name="pipeline_flow",
+    flow_run_name=FlowsNames.PIPELINE.value,
     description="Onde os outros Flows são chamados e coordenados.",
     log_prints=True,
 )
@@ -51,7 +53,7 @@ def pipeline(
         # "extract_senado_detalhes_processos",
         # "extract_senado_votacoes",
     ],
-    ignore_flows: list[str] = ["senado", "camara"],
+    ignore_flows: list[str] = ["tse", "camara", "senado"],
     message: str | None = None,
 ):
     logger = get_run_logger()
@@ -71,17 +73,17 @@ def pipeline(
 
     futures = []
 
-    if FlowsNames.TSE not in ignore_flows:
+    if FlowsNames.TSE.value not in ignore_flows:
         futures.append(
             run_tse_flow.submit(start_date, refresh_cache, ignore_tasks, lote_id)
         )
 
-    if FlowsNames.CAMARA not in ignore_flows:
+    if FlowsNames.CAMARA.value not in ignore_flows:
         futures.append(
             run_camara_flow.submit(start_date, end_date, ignore_tasks, lote_id)
         )
 
-    if FlowsNames.SENADO not in ignore_flows:
+    if FlowsNames.SENADO.value not in ignore_flows:
         futures.append(
             run_senado_flow.submit(start_date, end_date, ignore_tasks, lote_id)
         )
@@ -93,3 +95,9 @@ def pipeline(
 
     lote_id_end = end_lote_in_db(lote_id, all_flows_ok)
     logger.info(f"Lote {lote_id_end} finalizou com sucesso")
+
+    save_logs(
+        flow_run_name=FlowsNames.PIPELINE.value,
+        flow_run_id=flow_run.id,
+        lote_id=lote_id,
+    )

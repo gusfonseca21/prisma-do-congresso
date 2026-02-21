@@ -69,3 +69,16 @@ class ErrosExtract(Base):
     baixado = sa.Column(sa.Boolean, nullable=False, server_default=sa.false())
     data_hora_baixado = sa.Column(sa.DateTime(timezone=True), nullable=True)
     lote_baixado = sa.Column(sa.Integer, nullable=True)
+
+
+class Logs(Base):
+    __tablename__ = "logs"
+
+    id = sa.Column(sa.Integer, sa.Identity(start=1, cycle=False), primary_key=True)
+    lote_id = sa.Column(
+        sa.Integer, sa.ForeignKey("lote.id"), nullable=False, unique=True
+    )
+    data_hora = sa.Column(sa.DateTime(timezone=True), nullable=True)
+    level = sa.Column(sa.String(24), nullable=False)
+    flow_run = sa.Column(sa.String(256), nullable=False)
+    mensagem = sa.Column(sa.Text, nullable=False)

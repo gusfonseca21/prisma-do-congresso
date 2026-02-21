@@ -1,2 +1,7 @@
-- Podemos manipular o estado final da execução de um flow para impedir que, se apenas um endpoint retornar com erro ou se apenas algumas urls retornarem com erro no download de uma lista, a flow continue retornando com sucesso.
-- Task Runners, Global concurrency limits
+# WARNING, ERROR, CRITICAL only
+uv run prefect flow-run ls --limit 500 -o json | jq -r '.[].id' | while read id; do
+  echo "=== Logs for flow run $id ==="
+  uv run prefect flow-run logs "$id" | grep -E '\b(WARNING|ERROR|CRITICAL)\b'
+  echo
+done > warn_plus.log
+k

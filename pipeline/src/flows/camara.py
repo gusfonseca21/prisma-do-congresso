@@ -2,6 +2,7 @@ from datetime import date
 
 from prefect import flow, get_run_logger, task
 from prefect.futures import resolve_futures_to_results
+from prefect.runtime import flow_run
 
 from config.parameters import TasksNames
 from tasks.extract.camara import (
@@ -33,7 +34,7 @@ def camara_flow(
     start_date: date, end_date: date, ignore_tasks: list[str], lote_id: int
 ):
     logger = get_run_logger()
-    logger.info("Iniciando execução da Flow da Câmara")
+    logger.info(f"Iniciando execução da Flow da Câmara - Lote {lote_id}")
 
     ## LEGISLATURA
     extract_camara_legislatura_f = None

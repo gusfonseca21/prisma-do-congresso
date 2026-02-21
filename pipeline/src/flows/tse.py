@@ -2,6 +2,7 @@ from datetime import date
 
 from prefect import flow, get_run_logger, task
 from prefect.futures import resolve_futures_to_results
+from prefect.runtime import flow_run
 
 from config.parameters import TasksNames
 from tasks.extract.tse import (
@@ -23,7 +24,7 @@ def tse_flow(
     start_date: date, refresh_cache: bool, ignore_tasks: list[str], lote_id: int
 ):
     logger = get_run_logger()
-    logger.info("Iniciando execução da Flow do TSE")
+    logger.info(f"Iniciando execução da Flow do TSE - Lote {lote_id}")
 
     elections_years = get_election_years(start_date.year)
 

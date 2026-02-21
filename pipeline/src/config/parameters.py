@@ -1,4 +1,8 @@
-class FlowsNames:
+from enum import Enum
+
+
+class FlowsNames(str, Enum):
+    PIPELINE = "pipeline"
     TSE = "tse"
     CAMARA = "camara"
     SENADO = "senado"

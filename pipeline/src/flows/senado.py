@@ -2,6 +2,7 @@ from datetime import date
 
 from prefect import flow, get_run_logger, task
 from prefect.futures import resolve_futures_to_results
+from prefect.runtime import flow_run
 
 from config.parameters import TasksNames
 from tasks.extract.senado import (
@@ -24,7 +25,7 @@ from tasks.extract.senado import (
 )
 def senado_flow(start_date: date, end_date: date, ignore_tasks: list[str], lote_id):
     logger = get_run_logger()
-    logger.info("Iniciando execução da Flow do Senado")
+    logger.info(f"Iniciando execução da Flow do Senado - Lote {lote_id}")
 
     ## COLEGIADOS
     extract_colegiados_senado_f = None
