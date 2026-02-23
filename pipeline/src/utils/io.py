@@ -311,3 +311,11 @@ def update_url_not_downloaded(
     if url in failed_urls:
         error = failed_urls[url]
         update_not_downloaded_urls_db(lote_id=lote_id, error_id=error.id)
+
+
+def save_htmls_in_zip(records: list[dict], zip_path: str | Path):
+    with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for r in records:
+            filename = f"{r['deputado_id']}_{r['ano']}.html"
+            zf.writestr(filename, r["html"])
+    return zip_path

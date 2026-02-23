@@ -4,14 +4,13 @@ from pathlib import Path
 from typing import cast
 
 from prefect import get_run_logger, task
-from prefect.artifacts import acreate_table_artifact
 from selectolax.parser import HTMLParser
 
 from config.loader import load_config
 from config.parameters import TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
-from utils.io import fetch_html_many_async, save_ndjson
+from utils.io import fetch_html_many_async, save_htmls_in_zip
 
 APP_SETTINGS = load_config()
 
@@ -21,7 +20,7 @@ def assiduidade_urls(
 ) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
-        TasksNames.EXTRACT_CAMARA_ASSIDUIDADE
+        TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES
     )
 
     if not_downloaded_urls:
@@ -30,7 +29,7 @@ def assiduidade_urls(
     for id in deputados_ids:
         for year in range(start_date.year, end_date.year + 1):
             urls.add(
-                f"{APP_SETTINGS.CAMARA.PORTAL_BASE_URL}deputados/{id}/presenca-plenario/{year}"
+                f"{APP_SETTINGS.CAMARA.PORTAL_BASE_URL}deputados/{id}/presenca-comissoes/{year}"
             )
 
     return UrlsResult(
@@ -39,12 +38,12 @@ def assiduidade_urls(
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_CAMARA_ASSIDUIDADE,
+    task_run_name=TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
-async def extract_assiduidade_camara(
+async def extract_camara_assiduidade_comissoes(
     deputados_ids: list[int],
     start_date: date,
     end_date: date,
@@ -52,13 +51,15 @@ async def extract_assiduidade_camara(
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
 ) -> str:
     """
-    Baixa páginas HTML com os dados sobre a assiduidade dos Deputados
+    Baixa páginas HTML com os dados sobre a assiduidade dos Deputados em Comissões
     """
     logger = get_run_logger()
 
     urls = assiduidade_urls(deputados_ids, start_date, end_date)
 
-    logger.info(f"Câmara: buscando assiduidade de {len(deputados_ids)}.")
+    logger.info(
+        f"Câmara: buscando Assiduidade Comissões de {len(deputados_ids)} deputados."
+    )
 
     htmls = await fetch_html_many_async(
         urls=urls["urls_to_download"],
@@ -66,15 +67,13 @@ async def extract_assiduidade_camara(
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         lote_id=lote_id,
-        task=TasksNames.EXTRACT_CAMARA_ASSIDUIDADE,
+        task=TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES,
     )
 
     href_pattern = re.compile(r"https://www\.camara\.leg\.br/deputados/\d+")
     id_ano_pattern = r"/deputados/(?P<id>\d+)\?.*ano=(?P<ano>\d+)"
 
-    # Montando os resultados JSON e o artefato
-    artifact_data = []
-    json_results = []
+    htmls_list = []
 
     # Caso ocorra erro na hora do download do HTML, eles podem retornar como None
     # Para evitar erro, limpar os None. O erro já deve ter sido pêgo no download.
@@ -92,23 +91,10 @@ async def extract_assiduidade_camara(
                         deputado_id = int(match.group("id"))
                         year = int(match.group("ano"))
 
-                        json_results.append(
+                        htmls_list.append(
                             {"deputado_id": deputado_id, "ano": year, "html": html}
                         )
 
-                        tables = tree.css("table.table.table-bordered")
-                        name = tree.css_first("h1.titulo-internal")
-                        name_text = name.text(strip=True) if name else None
-                        artifact_row = {
-                            "id": deputado_id,
-                            "nome": name_text,
-                            "ano": year,
-                        }
-                        if tables:
-                            artifact_row["possui_dados"] = "Sim"
-                        else:
-                            artifact_row["possui_dados"] = "Não"
-                        artifact_data.append(artifact_row)
                     else:
                         logger.warning(
                             "Não foram encontrados dados suficientes na página HTML"
@@ -116,10 +102,8 @@ async def extract_assiduidade_camara(
             else:
                 logger.warning(f"O href {href} não é string")
 
-    await acreate_table_artifact(
-        key="assiduidade", table=artifact_data, description="Assiduidade de deputados"
-    )
+    dest = Path(out_dir) / "assiduidade_comissoes.zip"
 
-    dest = Path(out_dir) / "assiduidade.ndjson"
-    dest_path = save_ndjson(json_results, dest)
-    return dest_path
+    dest_path = save_htmls_in_zip(htmls_list, dest)
+
+    return str(dest_path)

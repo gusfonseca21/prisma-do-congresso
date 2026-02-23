@@ -5,8 +5,9 @@ from prefect.runtime import flow_run
 
 from config.parameters import FlowsNames, TasksNames
 from tasks.extract.camara import (
-    extract_assiduidade_camara,
     extract_autores_proposicoes_camara,
+    extract_camara_assiduidade_comissoes,
+    extract_camara_assiduidade_plenario,
     extract_camara_detalhes_partidos,
     extract_camara_legislaturas_lideres,
     extract_camara_legislaturas_mesa,
@@ -60,19 +61,37 @@ def camara_flow(
         )
         extract_camara_deputados_f = extract_camara_deputados_f.result()  # type: ignore
 
-    ## ASSIDUIDADE
-    extract_camara_assiduidade_f = None
+    ## ASSIDUIDADE PLENÁRIO
+    extract_camara_assiduidade_plenario_f = None
     if (
         extract_camara_deputados_f is not None
-        and TasksNames.EXTRACT_CAMARA_ASSIDUIDADE not in ignore_tasks
+        and TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO not in ignore_tasks
     ):
-        extract_camara_assiduidade_f = extract_assiduidade_camara.submit(
-            deputados_ids=extract_camara_deputados_f,
-            start_date=start_date,
-            end_date=end_date,
-            lote_id=lote_id,
+        extract_camara_assiduidade_plenario_f = (
+            extract_camara_assiduidade_plenario.submit(
+                deputados_ids=extract_camara_deputados_f,
+                start_date=start_date,
+                end_date=end_date,
+                lote_id=lote_id,
+            )
         )
-        futures.append(extract_camara_assiduidade_f)
+        futures.append(extract_camara_assiduidade_plenario_f)
+
+    ## ASSIDUIDADE COMISSÕES
+    extract_camara_assiduidade_comissoes_f = None
+    if (
+        extract_camara_deputados_f is not None
+        and TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES not in ignore_tasks
+    ):
+        extract_camara_assiduidade_comissoes_f = (
+            extract_camara_assiduidade_comissoes.submit(
+                deputados_ids=extract_camara_deputados_f,
+                start_date=start_date,
+                end_date=end_date,
+                lote_id=lote_id,
+            )
+        )
+        futures.append(extract_camara_assiduidade_comissoes_f)
 
     ## FRENTES
     extract_camara_frentes_f = None

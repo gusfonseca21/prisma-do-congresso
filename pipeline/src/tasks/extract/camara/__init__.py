@@ -1,4 +1,5 @@
-from .extract_camara_assiduidade import extract_assiduidade_camara
+from .extract_camara_assiduidade_comissoes import extract_camara_assiduidade_comissoes
+from .extract_camara_assiduidade_plenario import extract_camara_assiduidade_plenario
 from .extract_camara_autores_proposicoes import extract_autores_proposicoes_camara
 from .extract_camara_deputados import extract_deputados_camara
 from .extract_camara_despesas_deputados import extract_despesas_camara
@@ -19,7 +20,7 @@ from .extract_camara_votacoes import extract_votacoes_camara
 from .extract_camara_votos_votacoes import extract_votos_votacoes_camara
 
 __all__ = [
-    "extract_assiduidade_camara",
+    "extract_camara_assiduidade_plenario",
     "extract_deputados_camara",
     "extract_detalhes_deputados_camara",
     "extract_frentes_membros_camara",
@@ -38,4 +39,5 @@ __all__ = [
     "extract_camara_detalhes_partidos",
     "extract_camara_legislaturas_lideres",
     "extract_camara_legislaturas_mesa",
+    "extract_camara_assiduidade_comissoes",
 ]

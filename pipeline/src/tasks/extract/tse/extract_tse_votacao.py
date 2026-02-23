@@ -25,6 +25,7 @@ def cache_by_year(_ctx, params):
     # cache_policy=CACHE_POLICY_MAP[APP_SETTINGS.TSE.CACHE_POLICY],
     cache_expiration=timedelta(days=APP_SETTINGS.TSE.CACHE_EXPIRATION),
     log_prints=True,
+    persist_result=True,
 )
 def extract_votacao(
     year: int,
