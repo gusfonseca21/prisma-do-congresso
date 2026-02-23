@@ -20,6 +20,7 @@ class TasksNames:
     EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO = "extract_camara_assiduidade_plenario"
     EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES = "extract_camara_assiduidade_comissoes"
     EXTRACT_CAMARA_FRENTES = "extract_camara_frentes"
+    EXTRACT_CAMARA_DETALHES_FRENTES = "extract_camara_detalhes_frentes"
     EXTRACT_CAMARA_FRENTES_MEMBROS = "extract_camara_frentes_membros"
     EXTRACT_CAMARA_DETALHES_DEPUTADOS = "extract_camara_detalhes_deputados"
     EXTRACT_CAMARA_DISCURSOS_DEPUTADOS = "extract_camara_discursos_deputados"

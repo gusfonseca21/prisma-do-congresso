@@ -31,9 +31,10 @@ def pipeline(
     ignore_tasks: list[str] = [
         ## ----> CAMARA <----
         "extract_camara_detalhes_deputados",
-        # "extract_camara_assiduidade_plenario",
-        # "extract_camara_assiduidade_comissoes",
-        "extract_camara_frentes",
+        "extract_camara_assiduidade_plenario",
+        "extract_camara_assiduidade_comissoes",
+        # "extract_camara_frentes",
+        # "extract_camara_detalhes_frentes",
         "extract_camara_frentes_membros",
         "extract_camara_discursos_deputados",
         "extract_camara_proposicoes",

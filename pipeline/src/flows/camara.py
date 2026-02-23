@@ -8,6 +8,7 @@ from tasks.extract.camara import (
     extract_autores_proposicoes_camara,
     extract_camara_assiduidade_comissoes,
     extract_camara_assiduidade_plenario,
+    extract_camara_detalhes_frentes,
     extract_camara_detalhes_partidos,
     extract_camara_legislaturas_lideres,
     extract_camara_legislaturas_mesa,
@@ -103,6 +104,18 @@ def camara_flow(
             legislatura=extract_camara_legislatura_f, lote_id=lote_id
         )
         extract_camara_frentes_f.result()  # type: ignore
+
+    ## FRENTES DETALHES
+    extract_camara_detalhes_frentes_f = None
+    if (
+        extract_camara_frentes_f is not None
+        and TasksNames.EXTRACT_CAMARA_DETALHES_FRENTES not in ignore_tasks
+    ):
+        extract_camara_detalhes_frentes_f = extract_camara_detalhes_frentes.submit(
+            frentes_ids=extract_camara_frentes_f,  # type: ignore
+            lote_id=lote_id,
+        )
+        extract_camara_detalhes_frentes_f.result()  # type: ignore
 
     ## FRENTES MEMBROS
     extract_camara_frentes_membros_f = None
