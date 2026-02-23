@@ -30,6 +30,10 @@ class TasksNames:
     EXTRACT_CAMARA_DETALHES_VOTACOES = "extract_camara_detalhes_votacoes"
     EXTRACT_CAMARA_ORIENTACOES_VOTACOES = "extract_camara_orientacoes_votacoes"
     EXTRACT_CAMARA_VOTOS_VOTACOES = "extract_camara_votos_votacoes"
+    EXTRACT_CAMARA_PARTIDOS = "extract_camara_partidos"
+    EXTRACT_CAMARA_DETALHES_PARTIDOS = "extract_camara_detalhes_partidos"
+    EXTRACT_CAMARA_LEGISLATURAS_LIDERES = "extract_camara_legislaturas_lideres"
+    EXTRACT_CAMARA_LEGISLATURAS_MESA = "extract_camara_legislaturas_mesa"
     # SENADO
     EXTRACT_SENADO_COLEGIADOS = "extract_senado_colegiados"
     EXTRACT_SENADO_SENADORES = "extract_senado_senadores"

@@ -7,6 +7,10 @@ from config.parameters import FlowsNames, TasksNames
 from tasks.extract.camara import (
     extract_assiduidade_camara,
     extract_autores_proposicoes_camara,
+    extract_camara_detalhes_partidos,
+    extract_camara_legislaturas_lideres,
+    extract_camara_legislaturas_mesa,
+    extract_camara_partidos,
     extract_deputados_camara,
     extract_despesas_camara,
     extract_detalhes_deputados_camara,
@@ -216,6 +220,55 @@ def camara_flow(
             lote_id=lote_id,
         )
         extract_camara_despesas_deputados_f.result()  # type: ignore
+
+    ## PARTIDOS
+    extract_camara_partidos_f = None
+    if (
+        extract_camara_legislatura_f is not None
+        and TasksNames.EXTRACT_CAMARA_PARTIDOS not in ignore_tasks
+    ):
+        extract_camara_partidos_f = extract_camara_partidos.submit(
+            legislatura=extract_camara_legislatura_f, lote_id=lote_id
+        )
+        extract_camara_partidos_f.result()  # type: ignore
+
+    ## DETALHES PARTIDOS
+    extract_camara_detalhes_partidos_f = None
+    if (
+        extract_camara_partidos_f is not None
+        and TasksNames.EXTRACT_CAMARA_DETALHES_PARTIDOS not in ignore_tasks
+    ):
+        extract_camara_detalhes_partidos_f = extract_camara_detalhes_partidos.submit(
+            partidos_ids=extract_camara_partidos_f,  # type: ignore
+            lote_id=lote_id,
+        )
+        extract_camara_detalhes_partidos_f.result()  # type: ignore
+
+    ## LÍDERES LEGISLATURA
+    extract_camara_legislaturas_lideres_f = None
+    if (
+        extract_camara_legislatura_f is not None
+        and TasksNames.EXTRACT_CAMARA_LEGISLATURAS_LIDERES not in ignore_tasks
+    ):
+        extract_camara_legislaturas_lideres_f = (
+            extract_camara_legislaturas_lideres.submit(
+                legislatura=extract_camara_legislatura_f, lote_id=lote_id
+            )
+        )
+        extract_camara_legislaturas_lideres_f.result()  # type: ignore
+
+    ## MESA LEGISLATURAS
+    extract_camara_legislaturas_mesa_f = None
+    if (
+        extract_camara_legislatura_f is not None
+        and TasksNames.EXTRACT_CAMARA_LEGISLATURAS_MESA not in ignore_tasks
+    ):
+        extract_camara_legislaturas_mesa_f = extract_camara_legislaturas_mesa.submit(
+            legislatura=extract_camara_legislatura_f, lote_id=lote_id
+        )
+        extract_camara_legislaturas_mesa_f.result()
+
+    ### FINALIZANDO FLOW ###
 
     for future in futures:
         future.result()
