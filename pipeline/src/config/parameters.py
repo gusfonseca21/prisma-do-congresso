@@ -15,6 +15,7 @@ class TasksNames:
     EXTRACT_TSE_REDES_SOCIAIS = "extract_tse_redes_sociais"
     EXTRACT_TSE_VOTACAO = "extract_tse_votacao"
     # CAMARA
+    ## EXTRACT
     EXTRACT_CAMARA_LEGISLATURA = "extract_camara_legislatura"
     EXTRACT_CAMARA_DEPUTADOS = "extract_camara_deputados"
     EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO = "extract_camara_assiduidade_plenario"
@@ -36,6 +37,8 @@ class TasksNames:
     EXTRACT_CAMARA_DETALHES_PARTIDOS = "extract_camara_detalhes_partidos"
     EXTRACT_CAMARA_LEGISLATURAS_LIDERES = "extract_camara_legislaturas_lideres"
     EXTRACT_CAMARA_LEGISLATURAS_MESA = "extract_camara_legislaturas_mesa"
+    ## LOAD
+    LOAD_CAMARA_LEGISLATURA = "load_camara_legislatura"
     # SENADO
     EXTRACT_SENADO_COLEGIADOS = "extract_senado_colegiados"
     EXTRACT_SENADO_SENADORES = "extract_senado_senadores"

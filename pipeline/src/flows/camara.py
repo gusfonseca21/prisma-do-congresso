@@ -27,6 +27,7 @@ from tasks.extract.camara import (
     extract_votacoes_camara,
     extract_votos_votacoes_camara,
 )
+from tasks.load.camara import load_camara_legislatura
 from utils.logs import save_logs
 
 
@@ -50,6 +51,11 @@ def camara_flow(
         extract_camara_legislatura_f = extract_legislatura(
             start_date=start_date, lote_id=lote_id
         )
+        if TasksNames.LOAD_CAMARA_LEGISLATURA not in ignore_tasks:
+            load_camara_legislatura_f = load_camara_legislatura.submit(
+                lote_id=lote_id, legislatura=extract_camara_legislatura_f
+            )
+            futures.append(load_camara_legislatura_f)
 
     ## DEPUTADOS
     extract_camara_deputados_f = None

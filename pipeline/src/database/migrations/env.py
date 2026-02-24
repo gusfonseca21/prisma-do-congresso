@@ -5,7 +5,8 @@ from alembic import context
 from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
-from src.database.models.base import Base
+from database.models.base import Base
+from database.models.camara.camara_legislatura import CamaraLegislatura
 
 load_dotenv()
 

@@ -30,11 +30,12 @@ def pipeline(
     refresh_cache: bool = False,
     ignore_tasks: list[str] = [
         ## ----> CAMARA <----
+        ### EXTTRACT ###
         "extract_camara_detalhes_deputados",
         "extract_camara_assiduidade_plenario",
         "extract_camara_assiduidade_comissoes",
-        # "extract_camara_frentes",
-        # "extract_camara_detalhes_frentes",
+        "extract_camara_frentes",
+        "extract_camara_detalhes_frentes",
         "extract_camara_frentes_membros",
         "extract_camara_discursos_deputados",
         "extract_camara_proposicoes",
@@ -49,6 +50,8 @@ def pipeline(
         "extract_camara_detalhes_partidos",
         "extract_camara_legislaturas_lideres",
         "extract_camara_legislaturas_mesa",
+        ### LOAD ###
+        # "load_camara_legislatura",
         ## ----> SENADO <----
         # "extract_colegiados_senado",
         # "extract_senado_senadores",
