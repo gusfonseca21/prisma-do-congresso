@@ -17,13 +17,16 @@ class TasksNames:
     # CAMARA
     ## EXTRACT
     EXTRACT_CAMARA_LEGISLATURA = "extract_camara_legislatura"
+    EXTRACT_CAMARA_PARTIDOS = "extract_camara_partidos"
+    EXTRACT_CAMARA_DETALHES_PARTIDOS = "extract_camara_detalhes_partidos"
     EXTRACT_CAMARA_DEPUTADOS = "extract_camara_deputados"
+    EXTRACT_CAMARA_DETALHES_DEPUTADOS = "extract_camara_detalhes_deputados"
+    EXTRACT_CAMARA_HISTORICO_DEPUTADOS = "extract_camara_historico_deputados"
     EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO = "extract_camara_assiduidade_plenario"
     EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES = "extract_camara_assiduidade_comissoes"
     EXTRACT_CAMARA_FRENTES = "extract_camara_frentes"
     EXTRACT_CAMARA_DETALHES_FRENTES = "extract_camara_detalhes_frentes"
     EXTRACT_CAMARA_FRENTES_MEMBROS = "extract_camara_frentes_membros"
-    EXTRACT_CAMARA_DETALHES_DEPUTADOS = "extract_camara_detalhes_deputados"
     EXTRACT_CAMARA_DISCURSOS_DEPUTADOS = "extract_camara_discursos_deputados"
     EXTRACT_CAMARA_PROPOSICOES = "extract_camara_proposicoes"
     EXTRACT_CAMARA_DETALHES_PROPOSICOES = "extract_camara_detalhes_proposicoes"
@@ -33,14 +36,12 @@ class TasksNames:
     EXTRACT_CAMARA_DETALHES_VOTACOES = "extract_camara_detalhes_votacoes"
     EXTRACT_CAMARA_ORIENTACOES_VOTACOES = "extract_camara_orientacoes_votacoes"
     EXTRACT_CAMARA_VOTOS_VOTACOES = "extract_camara_votos_votacoes"
-    EXTRACT_CAMARA_PARTIDOS = "extract_camara_partidos"
-    EXTRACT_CAMARA_DETALHES_PARTIDOS = "extract_camara_detalhes_partidos"
     EXTRACT_CAMARA_LEGISLATURAS_LIDERES = "extract_camara_legislaturas_lideres"
     EXTRACT_CAMARA_LEGISLATURAS_MESA = "extract_camara_legislaturas_mesa"
     ## LOAD
     LOAD_CAMARA_LEGISLATURA = "load_camara_legislatura"
-    LOAD_CAMARA_DEPUTADOS = "load_camara_deputados"
     LOAD_CAMARA_PARTIDOS = "load_camara_partidos"
+    LOAD_CAMARA_DEPUTADOS = "load_camara_deputados"
     # SENADO
     EXTRACT_SENADO_COLEGIADOS = "extract_senado_colegiados"
     EXTRACT_SENADO_SENADORES = "extract_senado_senadores"

@@ -34,6 +34,7 @@ def pipeline(
         # "extract_camara_partidos",
         # "extract_camara_detalhes_partidos",
         # "extract_camara_detalhes_deputados",
+        # "extract_camara_historico_deputados",
         "extract_camara_assiduidade_plenario",
         "extract_camara_assiduidade_comissoes",
         "extract_camara_frentes",

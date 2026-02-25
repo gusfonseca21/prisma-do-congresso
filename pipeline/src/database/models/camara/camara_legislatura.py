@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from pydantic import BaseModel
 
 from database.models.base import Base
-from database.models.mixins import LoteMixin
+from database.models.mixins import BaseMixin
 
 
 class CamaraLegislaturaArg(BaseModel):
@@ -19,10 +19,9 @@ class CamaraLegislaturaArg(BaseModel):
     data_fim: datetime.date
 
 
-class CamaraLegislatura(Base, LoteMixin):
+class CamaraLegislatura(Base, BaseMixin):
     __tablename__ = "camara_legislatura"
 
-    id = sa.Column(sa.Integer, sa.Identity(start=1, cycle=False), primary_key=True)
     id_legislatura = sa.Column(sa.Integer, nullable=False, unique=True)
     data_inicio = sa.Column(sa.Date, nullable=False)
     data_fim = sa.Column(sa.Date, nullable=False)

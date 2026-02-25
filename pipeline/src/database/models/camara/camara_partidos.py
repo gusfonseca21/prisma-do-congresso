@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from pydantic import BaseModel
 
 from database.models.base import Base
-from database.models.mixins import LoteMixin
+from database.models.mixins import BaseMixin
 
 
 class CamaraPartidosArgs(BaseModel):
@@ -33,10 +33,9 @@ class CamaraPartidosArgs(BaseModel):
     id_lider: int | None
 
 
-class CamaraPartidos(Base, LoteMixin):
+class CamaraPartidos(Base, BaseMixin):
     __tablename__ = "camara_partidos"
 
-    id = sa.Column(sa.Integer, sa.Identity(start=1, cycle=False), primary_key=True)
     id_partido = sa.Column(sa.Integer, unique=True, nullable=False)
     sigla = sa.Column(sa.String(15), unique=True, nullable=False)
     nome = sa.Column(sa.Text, nullable=False, unique=True)

@@ -4,6 +4,8 @@ from database.engine import get_connection
 from database.models.camara.camara_deputados import (
     CamaraDeputados,
     CamaraDeputadosArg,
+    CamaraDeputadosHistorico,
+    CamaraDeputadosHistoricoArg,
     CamaraDeputadosRedesSociais,
     CamaraDeputadosRedesSociaisArg,
 )
@@ -11,12 +13,14 @@ from utils.db import columns_to_compare, update_dict, where_clause
 
 deputados = CamaraDeputados.__table__
 redes_sociais = CamaraDeputadosRedesSociais.__table__
+historico = CamaraDeputadosHistorico.__table__
 
 
 def insert_camara_deputados(
     lote_id: int,
     deputados_data: list[CamaraDeputadosArg],
     redes_sociais_data: list[CamaraDeputadosRedesSociaisArg],
+    historico_deputados_data: list[CamaraDeputadosHistoricoArg],
 ):
     """
     Carrega os dados de Deputados e suas Redes Sociais no Banco de Dados
@@ -83,3 +87,28 @@ def insert_camara_deputados(
             .on_conflict_do_nothing(index_elements=["url"])
         )
         conn.execute(stmt_redes_sociais)
+
+        stmt_historico = (
+            insert(historico)
+            .values(
+                [
+                    {
+                        "id_lote": historico.id_lote,
+                        "id_deputado": historico.id_deputado,
+                        "nome": historico.nome,
+                        "id_partido": historico.id_partido,
+                        "sigla_uf": historico.sigla_uf,
+                        "id_legislatura": historico.id_legislatura,
+                        "data_hora": historico.data_hora,
+                        "situacao": historico.situacao,
+                        "condicao_eleitoral": historico.condicao_eleitoral,
+                        "descricao_status": historico.descricao_status,
+                        "nome_eleitoral": historico.nome_eleitoral,
+                        "hash": historico.hash,
+                    }
+                    for historico in historico_deputados_data
+                ]
+            )
+            .on_conflict_do_nothing(index_elements=["hash"])
+        )
+        conn.execute(stmt_historico)

@@ -1,4 +1,5 @@
-from datetime import date
+import hashlib
+from datetime import date, datetime
 
 from prefect import get_run_logger, task
 
@@ -6,6 +7,7 @@ from config.loader import load_config
 from config.parameters import TasksNames
 from database.models.camara.camara_deputados import (
     CamaraDeputadosArg,
+    CamaraDeputadosHistoricoArg,
     CamaraDeputadosRedesSociaisArg,
 )
 from database.repository.camara.repository_camara_deputados import (
@@ -24,7 +26,9 @@ APP_SETTINGS = load_config()
 )
 def load_camara_deputados(
     lote_id: int,
+    legislatura: dict,
     deputados: list[dict] | None,
+    historico_deputados: list[dict] | None,
 ):
     logger = get_run_logger()
 
@@ -32,11 +36,16 @@ def load_camara_deputados(
 
     if deputados is None:
         raise ValueError(
-            "Erro ao carregar dados de Deputados no Banco de Dados: o parâmetro deputados é Nulo"
+            "Erro ao carregar dados de Deputados no Banco de Dados: o parâmetro 'deputados' é Nulo"
+        )
+    if historico_deputados is None:
+        raise ValueError(
+            "Erro ao carregar dados de Deputados no Banco de Dados: o parâmetro 'historico_deputados' é Nulo"
         )
 
     deputados_data: list[CamaraDeputadosArg] = []
     redes_sociais_data: list[CamaraDeputadosRedesSociaisArg] = []
+    historico_deputados_data: list[CamaraDeputadosHistoricoArg] = []
 
     id_sigla_partidos = get_partidos_siglas()
 
@@ -53,7 +62,7 @@ def load_camara_deputados(
         id_partido = map_partidos.get(ultimo_status.get("siglaPartido"))
         if id_partido is None:
             raise ValueError(
-                "Erro ao inserir na tabela camara_deputados. O valor de id_partido é nulo"
+                f"Erro ao inserir na tabela camara_deputados. O valor de id_partido é nulo para o Deputado de Id: {id_deputado}"
             )
 
         deputados_data.append(
@@ -96,10 +105,48 @@ def load_camara_deputados(
                 )
             )
 
+    # O Endpoint de Histórico de Deputados trás dados de legislaturas anteriores. Iremos descartá-las.
+    id_legislatura_atual = legislatura.get("dados", [])[0].get("id")
+
+    for h_data in historico_deputados:
+        historico_dados = h_data.get("dados", [])
+
+        for historico in historico_dados:
+            if historico.get("idLegislatura") != id_legislatura_atual:
+                continue
+
+            id_partido = map_partidos.get(historico.get("siglaPartido"))
+            if id_partido is None:
+                raise ValueError(
+                    f"Erro ao inserir na tabela camara_deputados. O valor de id_partido é nulo para o Deputado de Id {historico.get('id')}"
+                )
+
+            pre_hash_content = f"{historico.get('id')}|{historico.get('nome')}|{historico.get('nomeEleitoral')}|{id_partido}|{historico.get('siglaUf')}|{historico.get('idLegislatura')}|{historico.get('dataHora')}|{historico.get('situacao')}|{historico.get('condicaoEleitoral')}|{historico.get('descricaoStatus')}"
+
+            hash = hashlib.md5(pre_hash_content.encode()).hexdigest()
+
+            historico_deputados_data.append(
+                CamaraDeputadosHistoricoArg(
+                    id_lote=lote_id,
+                    id_deputado=historico.get("id"),
+                    nome=historico.get("nome"),
+                    nome_eleitoral=historico.get("nomeEleitoral"),
+                    id_partido=id_partido,
+                    sigla_uf=historico.get("siglaUf"),
+                    id_legislatura=historico.get("idLegislatura"),
+                    data_hora=datetime.fromisoformat(historico.get("dataHora")),
+                    situacao=historico.get("situacao"),
+                    condicao_eleitoral=historico.get("condicaoEleitoral"),
+                    descricao_status=historico.get("descricaoStatus"),
+                    hash=hash,
+                )
+            )
+
     insert_camara_deputados(
         lote_id=lote_id,
         deputados_data=deputados_data,
         redes_sociais_data=redes_sociais_data,
+        historico_deputados_data=historico_deputados_data,
     )
 
     return

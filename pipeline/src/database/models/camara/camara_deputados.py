@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from pydantic import BaseModel
 
 from database.models.base import Base
-from database.models.mixins import LoteMixin
+from database.models.mixins import BaseMixin
 
 
 class CamaraDeputadosArg(BaseModel):
@@ -76,10 +76,39 @@ class CamaraDeputadosRedesSociaisArg(BaseModel):
     url: str
 
 
-class CamaraDeputados(Base, LoteMixin):
+class CamaraDeputadosHistoricoArg(BaseModel):
+    """
+    id_lote: int
+    id_deputado: int
+    nome: str
+    id_partido: int
+    sigla_uf: str
+    id_legislatura: int
+    data_hora: datetime.datetime
+    situacao: str | None
+    condicao_eleitoral: str | None
+    descricao_status: str | None
+    nome_eleitoral: str
+    hash: str
+    """
+
+    id_lote: int
+    id_deputado: int
+    nome: str
+    id_partido: int
+    sigla_uf: str
+    id_legislatura: int
+    data_hora: datetime.datetime
+    situacao: str | None
+    condicao_eleitoral: str | None
+    descricao_status: str | None
+    nome_eleitoral: str
+    hash: str
+
+
+class CamaraDeputados(Base, BaseMixin):
     __tablename__ = "camara_deputados"
 
-    id = sa.Column(sa.Integer, sa.Identity(start=1, cycle=False), primary_key=True)
     id_deputado = sa.Column(sa.Integer, unique=True, nullable=False)
     nome_civil = sa.Column(sa.Text, nullable=False)
     nome = sa.Column(sa.Text, nullable=False)
@@ -107,11 +136,30 @@ class CamaraDeputados(Base, LoteMixin):
     escolaridade = sa.Column(sa.Text, nullable=True)
 
 
-class CamaraDeputadosRedesSociais(Base, LoteMixin):
+class CamaraDeputadosRedesSociais(Base, BaseMixin):
     __tablename__ = "camara_deputados_redes_sociais"
 
-    id = sa.Column(sa.Integer, sa.Identity(start=1, cycle=False), primary_key=True)
     id_deputado = sa.Column(
         sa.Integer, sa.ForeignKey("camara_deputados.id_deputado"), nullable=False
     )
     url = sa.Column(sa.Text, nullable=False, unique=True)
+
+
+class CamaraDeputadosHistorico(Base, BaseMixin):
+    __tablename__ = "camara_deputados_historico"
+
+    id_deputado = sa.Column(
+        sa.Integer, sa.ForeignKey("camara_deputados.id_deputado"), nullable=False
+    )
+    nome = sa.Column(sa.Text, nullable=False)
+    id_partido = sa.Column(
+        sa.Integer, sa.ForeignKey("camara_partidos.id_partido"), nullable=False
+    )
+    sigla_uf = sa.Column(sa.CHAR(2), nullable=False)
+    id_legislatura = sa.Column(sa.Integer, nullable=False)
+    data_hora = sa.Column(sa.DateTime(timezone=True), nullable=False)
+    situacao = sa.Column(sa.Text, nullable=True)
+    condicao_eleitoral = sa.Column(sa.Text, nullable=True)
+    descricao_status = sa.Column(sa.Text, nullable=True)
+    nome_eleitoral = sa.Column(sa.Text, nullable=False)
+    hash = sa.Column(sa.CHAR(32), nullable=False, unique=True)
