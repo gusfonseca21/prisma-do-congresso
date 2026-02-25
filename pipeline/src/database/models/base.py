@@ -3,9 +3,22 @@ from typing import TypedDict
 
 import sqlalchemy as sa
 from pydantic.dataclasses import dataclass
+from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
+
+# conventions necessário para dar nome às constraints automaticamente.
+# Sem ela teremos problemas ao executar alembic downgrade base
+convention = {
+    "fk": "fk_%(table_name)s_%(column_0_name)s",
+    "pk": "pk_%(table_name)s",
+    "ix": "ix_%(table_name)s_%(column_0_name)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+}
+
+Base = declarative_base(metadata=MetaData(naming_convention=convention))
 
 
 # Atenção, não é utilizado para Migrations

@@ -5,7 +5,9 @@ from prefect import get_run_logger, task
 from config.loader import load_config
 from config.parameters import TasksNames
 from database.models.camara.camara_legislatura import CamaraLegislaturaArg
-from database.repository.camara.camara_legislatura import insert_camara_legislatura
+from database.repository.camara.repository_camara_legislatura import (
+    insert_camara_legislatura,
+)
 
 APP_SETTINGS = load_config()
 

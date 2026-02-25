@@ -1,4 +1,5 @@
 from datetime import date
+from typing import cast
 
 from prefect import flow, get_run_logger, task
 from prefect.runtime import flow_run
@@ -27,7 +28,11 @@ from tasks.extract.camara import (
     extract_votacoes_camara,
     extract_votos_votacoes_camara,
 )
-from tasks.load.camara import load_camara_legislatura
+from tasks.load.camara import (
+    load_camara_deputados,
+    load_camara_legislatura,
+    load_camara_partidos,
+)
 from utils.logs import save_logs
 
 
@@ -57,6 +62,36 @@ def camara_flow(
             )
             futures.append(load_camara_legislatura_f)
 
+    ## PARTIDOS
+    extract_camara_partidos_f = None
+    if (
+        extract_camara_legislatura_f is not None
+        and TasksNames.EXTRACT_CAMARA_PARTIDOS not in ignore_tasks
+    ):
+        extract_camara_partidos_f = extract_camara_partidos.submit(
+            legislatura=extract_camara_legislatura_f, lote_id=lote_id
+        )
+        extract_camara_partidos_f.result()  # type: ignore
+
+    ## DETALHES PARTIDOS
+    extract_camara_detalhes_partidos_f = None
+    if (
+        extract_camara_partidos_f is not None
+        and TasksNames.EXTRACT_CAMARA_DETALHES_PARTIDOS not in ignore_tasks
+    ):
+        extract_camara_detalhes_partidos_f = extract_camara_detalhes_partidos.submit(
+            partidos_ids=extract_camara_partidos_f,  # type: ignore
+            lote_id=lote_id,
+        )
+        extract_camara_detalhes_partidos_f.result()  # type: ignore
+
+        if TasksNames.LOAD_CAMARA_PARTIDOS not in ignore_tasks:
+            load_camara_partidos_f = load_camara_partidos.submit(
+                lote_id=lote_id,
+                partidos=cast(list[dict], extract_camara_detalhes_partidos_f),
+            )
+            futures.append(load_camara_partidos_f)
+
     ## DEPUTADOS
     extract_camara_deputados_f = None
     if (
@@ -67,6 +102,23 @@ def camara_flow(
             legislatura=extract_camara_legislatura_f, lote_id=lote_id
         )
         extract_camara_deputados_f = extract_camara_deputados_f.result()  # type: ignore
+
+    ## DETALHES DEPUTADOS
+    extract_camara_detalhes_deputados_f = None
+    if (
+        extract_camara_deputados_f is not None
+        and TasksNames.EXTRACT_CAMARA_DETALHES_DEPUTADOS not in ignore_tasks
+    ):
+        extract_camara_detalhes_deputados_f = extract_detalhes_deputados_camara.submit(
+            deputados_ids=extract_camara_deputados_f, lote_id=lote_id
+        )
+        extract_camara_detalhes_deputados_f.result()  # type: ignore
+        if TasksNames.LOAD_CAMARA_DEPUTADOS not in ignore_tasks:
+            load_camara_deputados_f = load_camara_deputados.submit(
+                lote_id=lote_id,
+                deputados=cast(list[dict], extract_camara_detalhes_deputados_f),
+            )
+            futures.append(load_camara_deputados_f)
 
     ## ASSIDUIDADE PLENÁRIO
     extract_camara_assiduidade_plenario_f = None
@@ -134,17 +186,6 @@ def camara_flow(
             lote_id=lote_id,
         )
         extract_camara_frentes_membros_f.result()  # type: ignore
-
-    ## DETALHES DEPUTADOS
-    extract_camara_detalhes_deputados_f = None
-    if (
-        extract_camara_deputados_f is not None
-        and TasksNames.EXTRACT_CAMARA_DETALHES_DEPUTADOS not in ignore_tasks
-    ):
-        extract_camara_detalhes_deputados_f = extract_detalhes_deputados_camara.submit(
-            deputados_ids=extract_camara_deputados_f, lote_id=lote_id
-        )
-        extract_camara_detalhes_deputados_f.result()  # type: ignore
 
     ## DISCURSOS DEPUTADOS
     extract_camara_discursos_deputados_f = None
@@ -258,29 +299,6 @@ def camara_flow(
             lote_id=lote_id,
         )
         extract_camara_despesas_deputados_f.result()  # type: ignore
-
-    ## PARTIDOS
-    extract_camara_partidos_f = None
-    if (
-        extract_camara_legislatura_f is not None
-        and TasksNames.EXTRACT_CAMARA_PARTIDOS not in ignore_tasks
-    ):
-        extract_camara_partidos_f = extract_camara_partidos.submit(
-            legislatura=extract_camara_legislatura_f, lote_id=lote_id
-        )
-        extract_camara_partidos_f.result()  # type: ignore
-
-    ## DETALHES PARTIDOS
-    extract_camara_detalhes_partidos_f = None
-    if (
-        extract_camara_partidos_f is not None
-        and TasksNames.EXTRACT_CAMARA_DETALHES_PARTIDOS not in ignore_tasks
-    ):
-        extract_camara_detalhes_partidos_f = extract_camara_detalhes_partidos.submit(
-            partidos_ids=extract_camara_partidos_f,  # type: ignore
-            lote_id=lote_id,
-        )
-        extract_camara_detalhes_partidos_f.result()  # type: ignore
 
     ## LÍDERES LEGISLATURA
     extract_camara_legislaturas_lideres_f = None

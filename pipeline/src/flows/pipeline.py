@@ -31,7 +31,9 @@ def pipeline(
     ignore_tasks: list[str] = [
         ## ----> CAMARA <----
         ### EXTTRACT ###
-        "extract_camara_detalhes_deputados",
+        # "extract_camara_partidos",
+        # "extract_camara_detalhes_partidos",
+        # "extract_camara_detalhes_deputados",
         "extract_camara_assiduidade_plenario",
         "extract_camara_assiduidade_comissoes",
         "extract_camara_frentes",
@@ -46,12 +48,12 @@ def pipeline(
         "extract_camara_detalhes_votacoes",
         "extract_camara_orientacoes_votacoes",
         "extract_camara_votos_votacoes",
-        "extract_camara_partidos",
-        "extract_camara_detalhes_partidos",
         "extract_camara_legislaturas_lideres",
         "extract_camara_legislaturas_mesa",
         ### LOAD ###
         # "load_camara_legislatura",
+        # "load_camara_partidos",
+        # "load_camara_deputados",
         ## ----> SENADO <----
         # "extract_colegiados_senado",
         # "extract_senado_senadores",

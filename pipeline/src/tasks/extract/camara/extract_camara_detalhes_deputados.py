@@ -41,7 +41,7 @@ async def extract_detalhes_deputados_camara(
     deputados_ids: list[int],
     lote_id: int,
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> str:
+) -> list[dict]:
     logger = get_run_logger()
 
     urls = detalhes_deputados_urls(deputados_ids)
@@ -65,7 +65,10 @@ async def extract_detalhes_deputados_camara(
     )
 
     dest = Path(out_dir) / "detalhes_deputados.ndjson"
-    return save_ndjson(cast(list[dict], jsons), dest)
+
+    save_ndjson(cast(list[dict], jsons), dest)
+
+    return cast(list[dict], jsons)
 
 
 def generate_artifact(jsons: Any):

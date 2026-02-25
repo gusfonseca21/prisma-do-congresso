@@ -39,6 +39,8 @@ class TasksNames:
     EXTRACT_CAMARA_LEGISLATURAS_MESA = "extract_camara_legislaturas_mesa"
     ## LOAD
     LOAD_CAMARA_LEGISLATURA = "load_camara_legislatura"
+    LOAD_CAMARA_DEPUTADOS = "load_camara_deputados"
+    LOAD_CAMARA_PARTIDOS = "load_camara_partidos"
     # SENADO
     EXTRACT_SENADO_COLEGIADOS = "extract_senado_colegiados"
     EXTRACT_SENADO_SENADORES = "extract_senado_senadores"

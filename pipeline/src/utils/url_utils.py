@@ -27,12 +27,13 @@ def alter_query_param_value(base_url: str, param_name: str, new_value) -> str:
     return new_url
 
 
-def get_path_parameter_value(url: str, param_name: str) -> Any:
-    path_parts = urlparse(url).path.strip("/").split("/")
-
-    param_index = path_parts.index(param_name)
-
-    return path_parts[param_index + 1]
+def get_path_parameter_value(url: str, param_name: str, default_value: Any) -> Any:
+    try:
+        path_parts = urlparse(url).path.strip("/").split("/")
+        param_index = path_parts.index(param_name)
+        return path_parts[param_index + 1]
+    except (ValueError, IndexError):
+        return default_value
 
 
 def is_first_page(url: str) -> bool:
