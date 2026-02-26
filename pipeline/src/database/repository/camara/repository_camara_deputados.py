@@ -1,3 +1,4 @@
+from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import insert
 
 from database.engine import get_connection
@@ -8,6 +9,10 @@ from database.models.camara.camara_deputados import (
     CamaraDeputadosHistoricoArg,
     CamaraDeputadosMandatosExternos,
     CamaraDeputadosMandatosExternosArg,
+    CamaraDeputadosOcupacoes,
+    CamaraDeputadosOcupacoesArg,
+    CamaraDeputadosProfissoes,
+    CamaraDeputadosProfissoesArg,
     CamaraDeputadosRedesSociais,
     CamaraDeputadosRedesSociaisArg,
 )
@@ -17,6 +22,8 @@ deputados = CamaraDeputados.__table__
 redes_sociais = CamaraDeputadosRedesSociais.__table__
 historico = CamaraDeputadosHistorico.__table__
 mandatos_externos = CamaraDeputadosMandatosExternos.__table__
+ocupacoes = CamaraDeputadosOcupacoes.__table__
+profissoes = CamaraDeputadosProfissoes.__table__
 
 
 def insert_camara_deputados(
@@ -25,11 +32,14 @@ def insert_camara_deputados(
     redes_sociais_data: list[CamaraDeputadosRedesSociaisArg],
     historico_deputados_data: list[CamaraDeputadosHistoricoArg],
     mandatos_externos_data: list[CamaraDeputadosMandatosExternosArg],
+    ocupacoes_data: list[CamaraDeputadosOcupacoesArg],
+    profissoes_data: list[CamaraDeputadosProfissoesArg],
 ):
     """
-    Carrega os dados de Deputados e suas Redes Sociais no Banco de Dados
+    Carrega os dados de Redes Sociais, Histórico, Mandatos Externos e Ocupações de Deputados no Banco de Dados
     """
     with get_connection() as conn:
+        ## DEPUTADOS
         stmt_deputado = insert(deputados).values(
             [
                 {
@@ -76,6 +86,7 @@ def insert_camara_deputados(
 
         conn.execute(stmt_deputado)
 
+        ## REDES SOCIAIS
         stmt_redes_sociais = (
             insert(redes_sociais)
             .values(
@@ -92,6 +103,7 @@ def insert_camara_deputados(
         )
         conn.execute(stmt_redes_sociais)
 
+        ## HISTÓRICO
         stmt_historico = (
             insert(historico)
             .values(
@@ -117,6 +129,7 @@ def insert_camara_deputados(
         )
         conn.execute(stmt_historico)
 
+        ## MANDATOS EXTERNOS
         stmt_mandatos_externos = insert(mandatos_externos).values(
             [
                 {
@@ -136,6 +149,56 @@ def insert_camara_deputados(
         stmt_mandatos_externos = stmt_mandatos_externos.on_conflict_do_update(
             index_elements=["id_deputado", "cargo", "ano_inicio"],
             set_={"ano_fim": stmt_mandatos_externos.excluded.ano_fim},
+            where=and_(
+                stmt_mandatos_externos.excluded.ano_fim.isnot(None),
+                historico.c.ano_fim.is_(None),
+            ),
+        )
+        conn.execute(stmt_mandatos_externos)
+
+        ## OCUPAÇÕES
+        stmt_ocupacoes = insert(ocupacoes).values(
+            [
+                {
+                    "id_lote": ocupacao.id_lote,
+                    "id_deputado": ocupacao.id_deputado,
+                    "titulo": ocupacao.titulo,
+                    "entidade": ocupacao.entidade,
+                    "entidade_uf": ocupacao.entidade_uf,
+                    "entidade_pais": ocupacao.entidade_pais,
+                    "ano_inicio": ocupacao.ano_inicio,
+                    "ano_fim": ocupacao.ano_fim,
+                }
+                for ocupacao in ocupacoes_data
+            ]
         )
 
-        conn.execute(stmt_mandatos_externos)
+        stmt_ocupacoes = stmt_ocupacoes.on_conflict_do_update(
+            index_elements=["id_deputado", "titulo", "ano_inicio"],
+            set_={"ano_fim": stmt_ocupacoes.excluded.ano_fim},
+            where=and_(
+                stmt_ocupacoes.excluded.ano_fim.isnot(None),
+                ocupacoes.c.ano_fim.is_(None),
+            ),
+        )
+
+        conn.execute(stmt_ocupacoes)
+
+        ## PROFISSÕES
+        stmt_profissoes = (
+            insert(profissoes)
+            .values(
+                [
+                    {
+                        "id_lote": profissao.id_lote,
+                        "id_deputado": profissao.id_deputado,
+                        "data_hora": profissao.data_hora,
+                        "titulo": profissao.titulo,
+                    }
+                    for profissao in profissoes_data
+                ]
+            )
+            .on_conflict_do_nothing(index_elements=["id_deputado", "titulo"])
+        )
+
+        conn.execute(stmt_profissoes)

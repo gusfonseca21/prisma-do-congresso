@@ -25,6 +25,8 @@ class TasksNames:
     EXTRACT_CAMARA_MANDATOS_EXTERNOS_DEPUTADOS = (
         "extract_camara_mandatos_externos_deputados"
     )
+    EXTRACT_CAMARA_OCUPACOES_DEPUTADOS = "extract_camara_ocupacoes_deputados"
+    EXTRACT_CAMARA_PROFISSOES_DEPUTADOS = "extract_camara_profissoes_deputados"
     EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO = "extract_camara_assiduidade_plenario"
     EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES = "extract_camara_assiduidade_comissoes"
     EXTRACT_CAMARA_FRENTES = "extract_camara_frentes"

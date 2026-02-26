@@ -319,3 +319,8 @@ def save_htmls_in_zip(records: list[dict], zip_path: str | Path):
             filename = f"{r['deputado_id']}_{r['ano']}.html"
             zf.writestr(filename, r["html"])
     return zip_path
+
+
+def ndjson_to_list(path: str | Path) -> list[dict]:
+    with open(path, "r", encoding="utf-8") as f:
+        return [json.loads(line) for line in f if line.strip()]

@@ -128,6 +128,42 @@ class CamaraDeputadosMandatosExternosArg(BaseModel):
     sigla_partido: str | None
 
 
+class CamaraDeputadosOcupacoesArg(BaseModel):
+    """
+    id_lote: int
+    id_deputado: int
+    titulo: str
+    entidade: str | None
+    entidade_uf: str | None
+    entidade_pais: str | None
+    ano_inicio: int
+    ano_fim: int | None
+    """
+
+    id_lote: int
+    id_deputado: int
+    titulo: str
+    entidade: str | None
+    entidade_uf: str | None
+    entidade_pais: str | None
+    ano_inicio: int
+    ano_fim: int | None
+
+
+class CamaraDeputadosProfissoesArg(BaseModel):
+    """
+    id_lote: int
+    id_deputado: int
+    data_hora: datetime.datetime | None
+    titulo: str
+    """
+
+    id_lote: int
+    id_deputado: int
+    data_hora: datetime.datetime | None
+    titulo: str
+
+
 class CamaraDeputados(Base, BaseMixin):
     __tablename__ = "camara_deputados"
 
@@ -205,3 +241,35 @@ class CamaraDeputadosMandatosExternos(Base, BaseMixin):
             "id_deputado", "cargo", "ano_inicio", name="uq_mandato_externo"
         ),
     )
+
+
+class CamaraDeputadosOcupacoes(Base, BaseMixin):
+    __tablename__ = "camara_deputados_ocupacoes"
+
+    id_deputado = sa.Column(
+        sa.Integer, sa.ForeignKey("camara_deputados.id_deputado"), nullable=False
+    )
+    titulo = sa.Column(sa.Text, nullable=False)
+    entidade = sa.Column(sa.Text, nullable=True)
+    entidade_uf = sa.Column(sa.CHAR(2), nullable=True)
+    entidade_pais = sa.Column(sa.Text, nullable=True)
+    ano_inicio = sa.Column(sa.Integer, nullable=False)
+    ano_fim = sa.Column(sa.Integer, nullable=True)
+
+    __table_args__ = (
+        sa.UniqueConstraint(
+            "id_deputado", "titulo", "ano_inicio", name="uq_deputados_ocupacoes"
+        ),
+    )
+
+
+class CamaraDeputadosProfissoes(Base, BaseMixin):
+    __tablename__ = "camara_deputados_profissoes"
+
+    id_deputado = sa.Column(
+        sa.Integer, sa.ForeignKey("camara_deputados.id_deputado"), nullable=False
+    )
+    data_hora = sa.Column(sa.DateTime(timezone=True), nullable=True)
+    titulo = sa.Column(sa.Text, nullable=False)
+
+    __table_args__ = (sa.UniqueConstraint("id_deputado", "titulo"),)
