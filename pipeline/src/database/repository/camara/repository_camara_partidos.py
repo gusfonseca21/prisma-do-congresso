@@ -6,14 +6,14 @@ from sqlalchemy.dialects.postgresql import insert
 from database.engine import get_connection
 from database.models.camara.camara_partidos import (
     CamaraPartidos,
-    CamaraPartidosArgs,
+    CamaraPartidosArg,
 )
 from utils.db import columns_to_compare, update_dict, where_clause
 
 partidos = CamaraPartidos.__table__
 
 
-def insert_camara_partidos(data: list[CamaraPartidosArgs]):
+def insert_camara_partidos(data: list[CamaraPartidosArg]):
     """
     Carrega os dados de Partidos no Banco de Dados
     """

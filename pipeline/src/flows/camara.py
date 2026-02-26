@@ -14,6 +14,7 @@ from tasks.extract.camara import (
     extract_camara_historico_deputados,
     extract_camara_legislaturas_lideres,
     extract_camara_legislaturas_mesa,
+    extract_camara_mandatos_externos_deputados,
     extract_camara_partidos,
     extract_deputados_camara,
     extract_despesas_camara,
@@ -104,6 +105,7 @@ def camara_flow(
         )
         extract_camara_deputados_f = extract_camara_deputados_f.result()  # type: ignore
 
+    ## HISTORICO DEPUTADOS
     extract_camara_historico_deputados_f = None
     if (
         extract_camara_deputados_f is not None
@@ -116,11 +118,23 @@ def camara_flow(
         )
         extract_camara_historico_deputados_f.result()  # type: ignore
 
+    ## MANDATOS EXTERNOS DEPUTADOS
+    extract_camara_mandatos_externos_deputados_f = None
+    if (
+        extract_camara_deputados_f is not None
+        and TasksNames.EXTRACT_CAMARA_MANDATOS_EXTERNOS_DEPUTADOS not in ignore_tasks
+    ):
+        extract_camara_mandatos_externos_deputados_f = (
+            extract_camara_mandatos_externos_deputados.submit(
+                lote_id=lote_id, deputados_ids=extract_camara_deputados_f
+            )
+        )
+        extract_camara_mandatos_externos_deputados_f.result()  # type: ignore
+
     ## DETALHES DEPUTADOS
     extract_camara_detalhes_deputados_f = None
     if (
-        extract_camara_legislatura_f is not None
-        and extract_camara_deputados_f is not None
+        extract_camara_deputados_f is not None
         and TasksNames.EXTRACT_CAMARA_DETALHES_DEPUTADOS not in ignore_tasks
     ):
         extract_camara_detalhes_deputados_f = extract_detalhes_deputados_camara.submit(
@@ -134,7 +148,9 @@ def camara_flow(
                 historico_deputados=cast(
                     list[dict], extract_camara_historico_deputados_f
                 ),
-                legislatura=extract_camara_legislatura_f,
+                mandatos_externos=cast(
+                    list[dict], extract_camara_mandatos_externos_deputados_f
+                ),
             )
             futures.append(load_camara_deputados_f)
 

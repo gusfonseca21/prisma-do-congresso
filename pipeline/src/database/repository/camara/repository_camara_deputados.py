@@ -6,6 +6,8 @@ from database.models.camara.camara_deputados import (
     CamaraDeputadosArg,
     CamaraDeputadosHistorico,
     CamaraDeputadosHistoricoArg,
+    CamaraDeputadosMandatosExternos,
+    CamaraDeputadosMandatosExternosArg,
     CamaraDeputadosRedesSociais,
     CamaraDeputadosRedesSociaisArg,
 )
@@ -14,6 +16,7 @@ from utils.db import columns_to_compare, update_dict, where_clause
 deputados = CamaraDeputados.__table__
 redes_sociais = CamaraDeputadosRedesSociais.__table__
 historico = CamaraDeputadosHistorico.__table__
+mandatos_externos = CamaraDeputadosMandatosExternos.__table__
 
 
 def insert_camara_deputados(
@@ -21,6 +24,7 @@ def insert_camara_deputados(
     deputados_data: list[CamaraDeputadosArg],
     redes_sociais_data: list[CamaraDeputadosRedesSociaisArg],
     historico_deputados_data: list[CamaraDeputadosHistoricoArg],
+    mandatos_externos_data: list[CamaraDeputadosMandatosExternosArg],
 ):
     """
     Carrega os dados de Deputados e suas Redes Sociais no Banco de Dados
@@ -96,7 +100,7 @@ def insert_camara_deputados(
                         "id_lote": historico.id_lote,
                         "id_deputado": historico.id_deputado,
                         "nome": historico.nome,
-                        "id_partido": historico.id_partido,
+                        "sigla_partido": historico.sigla_partido,
                         "sigla_uf": historico.sigla_uf,
                         "id_legislatura": historico.id_legislatura,
                         "data_hora": historico.data_hora,
@@ -112,3 +116,26 @@ def insert_camara_deputados(
             .on_conflict_do_nothing(index_elements=["hash"])
         )
         conn.execute(stmt_historico)
+
+        stmt_mandatos_externos = insert(mandatos_externos).values(
+            [
+                {
+                    "id_lote": mandato.id_lote,
+                    "id_deputado": mandato.id_deputado,
+                    "cargo": mandato.cargo,
+                    "sigla_uf": mandato.sigla_uf,
+                    "municipio": mandato.municipio,
+                    "ano_inicio": mandato.ano_inicio,
+                    "ano_fim": mandato.ano_fim,
+                    "sigla_partido": mandato.sigla_partido,
+                }
+                for mandato in mandatos_externos_data
+            ]
+        )
+
+        stmt_mandatos_externos = stmt_mandatos_externos.on_conflict_do_update(
+            index_elements=["id_deputado", "cargo", "ano_inicio"],
+            set_={"ano_fim": stmt_mandatos_externos.excluded.ano_fim},
+        )
+
+        conn.execute(stmt_mandatos_externos)

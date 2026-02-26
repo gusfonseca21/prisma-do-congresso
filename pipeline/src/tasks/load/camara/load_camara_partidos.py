@@ -4,7 +4,7 @@ from prefect import get_run_logger, task
 
 from config.loader import load_config
 from config.parameters import TasksNames
-from database.models.camara.camara_partidos import CamaraPartidos, CamaraPartidosArgs
+from database.models.camara.camara_partidos import CamaraPartidosArg
 from database.repository.camara.repository_camara_partidos import insert_camara_partidos
 from utils.url_utils import get_path_parameter_value
 
@@ -51,7 +51,7 @@ def load_camara_partidos(
             status_data = datetime.fromisoformat(status_data)
 
         partidos_data.append(
-            CamaraPartidosArgs(
+            CamaraPartidosArg(
                 id_lote=lote_id,
                 id_partido=p.get("id"),
                 sigla=p.get("sigla"),

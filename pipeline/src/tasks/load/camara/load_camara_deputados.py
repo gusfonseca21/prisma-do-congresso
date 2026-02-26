@@ -8,12 +8,14 @@ from config.parameters import TasksNames
 from database.models.camara.camara_deputados import (
     CamaraDeputadosArg,
     CamaraDeputadosHistoricoArg,
+    CamaraDeputadosMandatosExternosArg,
     CamaraDeputadosRedesSociaisArg,
 )
 from database.repository.camara.repository_camara_deputados import (
     insert_camara_deputados,
 )
 from database.repository.camara.repository_camara_partidos import get_partidos_siglas
+from utils.url_utils import get_path_parameter_value
 
 APP_SETTINGS = load_config()
 
@@ -26,9 +28,9 @@ APP_SETTINGS = load_config()
 )
 def load_camara_deputados(
     lote_id: int,
-    legislatura: dict,
     deputados: list[dict] | None,
     historico_deputados: list[dict] | None,
+    mandatos_externos: list[dict] | None,
 ):
     logger = get_run_logger()
 
@@ -42,10 +44,15 @@ def load_camara_deputados(
         raise ValueError(
             "Erro ao carregar dados de Deputados no Banco de Dados: o parâmetro 'historico_deputados' é Nulo"
         )
+    if mandatos_externos is None:
+        raise ValueError(
+            "Erro ao carregar dados de Deputados no Banco de Dados: o parâmetro 'mandatos_externos' é Nulo"
+        )
 
     deputados_data: list[CamaraDeputadosArg] = []
     redes_sociais_data: list[CamaraDeputadosRedesSociaisArg] = []
     historico_deputados_data: list[CamaraDeputadosHistoricoArg] = []
+    mandatos_externos_data: list[CamaraDeputadosMandatosExternosArg] = []
 
     id_sigla_partidos = get_partidos_siglas()
 
@@ -61,6 +68,7 @@ def load_camara_deputados(
 
         id_partido = map_partidos.get(ultimo_status.get("siglaPartido"))
         if id_partido is None:
+            logger.warning(map_partidos)
             raise ValueError(
                 f"Erro ao inserir na tabela camara_deputados. O valor de id_partido é nulo para o Deputado de Id: {id_deputado}"
             )
@@ -105,23 +113,11 @@ def load_camara_deputados(
                 )
             )
 
-    # O Endpoint de Histórico de Deputados trás dados de legislaturas anteriores. Iremos descartá-las.
-    id_legislatura_atual = legislatura.get("dados", [])[0].get("id")
-
     for h_data in historico_deputados:
         historico_dados = h_data.get("dados", [])
 
         for historico in historico_dados:
-            if historico.get("idLegislatura") != id_legislatura_atual:
-                continue
-
-            id_partido = map_partidos.get(historico.get("siglaPartido"))
-            if id_partido is None:
-                raise ValueError(
-                    f"Erro ao inserir na tabela camara_deputados. O valor de id_partido é nulo para o Deputado de Id {historico.get('id')}"
-                )
-
-            pre_hash_content = f"{historico.get('id')}|{historico.get('nome')}|{historico.get('nomeEleitoral')}|{id_partido}|{historico.get('siglaUf')}|{historico.get('idLegislatura')}|{historico.get('dataHora')}|{historico.get('situacao')}|{historico.get('condicaoEleitoral')}|{historico.get('descricaoStatus')}"
+            pre_hash_content = f"{historico.get('id')}|{historico.get('nome')}|{historico.get('nomeEleitoral')}|{historico.get('siglaPartido')}|{historico.get('siglaUf')}|{historico.get('idLegislatura')}|{historico.get('dataHora')}|{historico.get('situacao')}|{historico.get('condicaoEleitoral')}|{historico.get('descricaoStatus')}"
 
             hash = hashlib.md5(pre_hash_content.encode()).hexdigest()
 
@@ -131,7 +127,7 @@ def load_camara_deputados(
                     id_deputado=historico.get("id"),
                     nome=historico.get("nome"),
                     nome_eleitoral=historico.get("nomeEleitoral"),
-                    id_partido=id_partido,
+                    sigla_partido=historico.get("siglaPartido"),
                     sigla_uf=historico.get("siglaUf"),
                     id_legislatura=historico.get("idLegislatura"),
                     data_hora=datetime.fromisoformat(historico.get("dataHora")),
@@ -142,11 +138,41 @@ def load_camara_deputados(
                 )
             )
 
+    for me_data in mandatos_externos:
+        href = me_data.get("links", [])[0].get("href")
+        id_deputado = get_path_parameter_value(href, "deputados", None)
+
+        mandatos_dados = me_data.get("dados", [])
+        for mandato in mandatos_dados:
+            mandatos_externos_data.append(
+                CamaraDeputadosMandatosExternosArg(
+                    id_lote=lote_id,
+                    id_deputado=id_deputado,
+                    cargo=mandato.get("cargo"),
+                    sigla_uf=mandato.get("siglaUf"),
+                    municipio=mandato.get("municipio"),
+                    ano_inicio=int(mandato.get("anoInicio")),
+                    ano_fim=int(mandato.get("anoFim"))
+                    if mandato.get("anoFim")
+                    else None,
+                    sigla_partido=mandato.get("siglaPartidoEleicao"),
+                )
+            )
+
+    # Limpa registros duplicados
+    mandatos_externos_data = list(
+        {
+            (mandato.id_deputado, mandato.cargo, mandato.ano_inicio): mandato
+            for mandato in mandatos_externos_data
+        }.values()
+    )
+
     insert_camara_deputados(
         lote_id=lote_id,
         deputados_data=deputados_data,
         redes_sociais_data=redes_sociais_data,
         historico_deputados_data=historico_deputados_data,
+        mandatos_externos_data=mandatos_externos_data,
     )
 
     return

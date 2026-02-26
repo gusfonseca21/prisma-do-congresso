@@ -7,7 +7,7 @@ from database.models.base import Base
 from database.models.mixins import BaseMixin
 
 
-class CamaraPartidosArgs(BaseModel):
+class CamaraPartidosArg(BaseModel):
     """
     id_lote: int
     id_partido: int
@@ -45,5 +45,10 @@ class CamaraPartidos(Base, BaseMixin):
     total_posse = sa.Column(sa.Integer, nullable=False)
     total_membros = sa.Column(sa.Integer, nullable=False)
     id_lider = sa.Column(
-        sa.Integer, sa.ForeignKey("camara_deputados.id_deputado"), nullable=True
+        sa.Integer,
+        sa.ForeignKey(
+            "camara_deputados.id_deputado",
+            use_alter=True,
+        ),
+        nullable=True,
     )

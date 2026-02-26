@@ -81,29 +81,51 @@ class CamaraDeputadosHistoricoArg(BaseModel):
     id_lote: int
     id_deputado: int
     nome: str
-    id_partido: int
+    sigla_partido: str
     sigla_uf: str
     id_legislatura: int
     data_hora: datetime.datetime
     situacao: str | None
     condicao_eleitoral: str | None
     descricao_status: str | None
-    nome_eleitoral: str
+    nome_eleitoral: str | None
     hash: str
     """
 
     id_lote: int
     id_deputado: int
     nome: str
-    id_partido: int
+    sigla_partido: str
     sigla_uf: str
     id_legislatura: int
     data_hora: datetime.datetime
     situacao: str | None
     condicao_eleitoral: str | None
     descricao_status: str | None
-    nome_eleitoral: str
+    nome_eleitoral: str | None
     hash: str
+
+
+class CamaraDeputadosMandatosExternosArg(BaseModel):
+    """
+    id_lote: int
+    id_deputado: int
+    cargo: str
+    sigla_uf: str | None
+    municipio: str | None
+    ano_inicio: int
+    ano_fim: int | None
+    sigla_partido: str | None
+    """
+
+    id_lote: int
+    id_deputado: int
+    cargo: str
+    sigla_uf: str | None
+    municipio: str | None
+    ano_inicio: int
+    ano_fim: int | None
+    sigla_partido: str | None
 
 
 class CamaraDeputados(Base, BaseMixin):
@@ -152,14 +174,34 @@ class CamaraDeputadosHistorico(Base, BaseMixin):
         sa.Integer, sa.ForeignKey("camara_deputados.id_deputado"), nullable=False
     )
     nome = sa.Column(sa.Text, nullable=False)
-    id_partido = sa.Column(
-        sa.Integer, sa.ForeignKey("camara_partidos.id_partido"), nullable=False
-    )
+    sigla_partido = sa.Column(sa.String(15), nullable=False)
     sigla_uf = sa.Column(sa.CHAR(2), nullable=False)
     id_legislatura = sa.Column(sa.Integer, nullable=False)
     data_hora = sa.Column(sa.DateTime(timezone=True), nullable=False)
     situacao = sa.Column(sa.Text, nullable=True)
     condicao_eleitoral = sa.Column(sa.Text, nullable=True)
     descricao_status = sa.Column(sa.Text, nullable=True)
-    nome_eleitoral = sa.Column(sa.Text, nullable=False)
+    nome_eleitoral = sa.Column(sa.Text, nullable=True)
     hash = sa.Column(sa.CHAR(32), nullable=False, unique=True)
+
+
+class CamaraDeputadosMandatosExternos(Base, BaseMixin):
+    __tablename__ = "camara_deputados_mandatos_externos"
+
+    id_deputado = sa.Column(
+        sa.Integer,
+        sa.ForeignKey("camara_deputados.id_deputado"),
+        nullable=False,
+    )
+    cargo = sa.Column(sa.Text, nullable=False)
+    sigla_uf = sa.Column(sa.CHAR(2), nullable=True)
+    municipio = sa.Column(sa.Text, nullable=True)
+    ano_inicio = sa.Column(sa.Integer, nullable=False)
+    ano_fim = sa.Column(sa.Integer, nullable=True)
+    sigla_partido = sa.Column(sa.String(15), nullable=True)
+
+    __table_args__ = (
+        sa.UniqueConstraint(
+            "id_deputado", "cargo", "ano_inicio", name="uq_mandato_externo"
+        ),
+    )
