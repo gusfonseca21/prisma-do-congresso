@@ -38,11 +38,23 @@ def detalhes_partidos_urls(partidos_ids: list[int]) -> UrlsResult:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_detalhes_partidos(
-    partidos_ids: list[int],
+    partidos_ids: list[int] | None,
     lote_id: int,
+    ignore_tasks: list[str],
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> list[dict]:
+) -> list[dict] | None:
     logger = get_run_logger()
+
+    if not partidos_ids:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DETALHES_PARTIDOS}' pois o argumento do parâmetro 'partidos_ids' é nulo"
+        )
+        return
+    if TasksNames.EXTRACT_CAMARA_DETALHES_PARTIDOS in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.EXTRACT_CAMARA_DETALHES_PARTIDOS} foi ignorada"
+        )
+        return
 
     logger.info("Iniciando Download de Detalhes Partidos Câmara")
 

@@ -18,19 +18,22 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_partidos(
-    lote_id: int,
-    partidos: list[dict] | None,
+    lote_id: int, partidos: list[dict] | None, ignore_tasks: list[str]
 ):
     logger = get_run_logger()
 
+    if TasksNames.LOAD_CAMARA_PARTIDOS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.LOAD_CAMARA_PARTIDOS} foi ignorada")
+        return
+    if partidos is None:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_PARTIDOS}' pois o argumento do parâmetro 'legislatura' é nulo"
+        )
+        return
+
     logger.info("Carregando Partidos da Câmara no Banco de Dados")
 
-    if partidos is None:
-        raise ValueError(
-            "Erro ao carregar dados de Partidos no Banco de Dados: o parâmetro 'partidos' é Nulo"
-        )
-
-    partidos_data = []
+    partidos_data: list[CamaraPartidosArg] = []
     lideres_partidos = []
 
     for lp in partidos:

@@ -37,11 +37,23 @@ def frentes_detalhes_urls(frentes_ids: list[str]) -> UrlsResult:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_detalhes_frentes(
-    frentes_ids: list[str],
+    frentes_ids: list[str] | None,
     lote_id: int,
+    ignore_tasks: list[str],
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> str:
+) -> str | None:
     logger = get_run_logger()
+
+    if not frentes_ids:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DETALHES_FRENTES}' pois o argumento do parâmetro 'frentes_ids' é nulo"
+        )
+        return
+    if TasksNames.EXTRACT_CAMARA_DETALHES_FRENTES in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.EXTRACT_CAMARA_DETALHES_FRENTES} foi ignorada"
+        )
+        return
 
     urls = frentes_detalhes_urls(frentes_ids)
     logger.info(f"Câmara: buscando Detalhes de {len(urls)} Frentes")

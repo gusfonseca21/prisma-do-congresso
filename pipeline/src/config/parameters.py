@@ -47,6 +47,10 @@ class TasksNames:
     LOAD_CAMARA_LEGISLATURA = "load_camara_legislatura"
     LOAD_CAMARA_PARTIDOS = "load_camara_partidos"
     LOAD_CAMARA_DEPUTADOS = "load_camara_deputados"
+    LOAD_CAMARA_HISTORICO_DEPUTADOS = "load_camara_historico_deputados"
+    LOAD_CAMARA_MANDATOS_EXTERNOS_DEPUTADOS = "load_camara_mantados_externos_deputados"
+    LOAD_CAMARA_OCUPACOES_DEPUTADOS = "load_camara_ocupacoes_deputados"
+    LOAD_CAMARA_PROFISSOES_DEPUTADOS = "load_camara_profissoes_deputados"
     # SENADO
     EXTRACT_SENADO_COLEGIADOS = "extract_senado_colegiados"
     EXTRACT_SENADO_SENADORES = "extract_senado_senadores"

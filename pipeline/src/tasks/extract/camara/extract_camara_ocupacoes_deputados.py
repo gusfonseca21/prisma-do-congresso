@@ -37,11 +37,23 @@ def ocupacoes_deputados_urls(deputados_ids: list[int]) -> UrlsResult:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_ocupacoes_deputados(
-    deputados_ids: list[int],
+    deputados_ids: list[int] | None,
     lote_id: int,
+    ignore_tasks: list[str],
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> list[dict]:
+) -> list[dict] | None:
     logger = get_run_logger()
+
+    if not deputados_ids:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_OCUPACOES_DEPUTADOS}' pois o argumento do parâmetro 'legislatura' é nulo"
+        )
+        return
+    if TasksNames.EXTRACT_CAMARA_OCUPACOES_DEPUTADOS in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.EXTRACT_CAMARA_OCUPACOES_DEPUTADOS} foi ignorada"
+        )
+        return
 
     urls = ocupacoes_deputados_urls(deputados_ids)
     logger.info(f"Baixando dados de Ocupaçṍes de {len(urls['urls_to_download'])} URLs")

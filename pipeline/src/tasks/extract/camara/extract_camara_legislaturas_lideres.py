@@ -23,11 +23,24 @@ def lideres_url(legislatura: dict) -> str:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_legislaturas_lideres(
-    legislatura: dict,
+    legislatura: dict | None,
     lote_id: int,
+    ignore_tasks: list[str],
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> str:
+) -> str | None:
     logger = get_run_logger()
+
+    if not legislatura:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_LEGISLATURAS_LIDERES}' pois o argumento do parâmetro 'legislatura' é nulo"
+        )
+        return
+    if TasksNames.EXTRACT_CAMARA_LEGISLATURAS_LIDERES in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.EXTRACT_CAMARA_LEGISLATURAS_LIDERES} foi ignorada"
+        )
+        return
+
     logger.info("Baixando Líderes Legislatura Câmara")
     url = lideres_url(legislatura)
     dest = Path(out_dir) / "legislaturas_lideres.ndjson"

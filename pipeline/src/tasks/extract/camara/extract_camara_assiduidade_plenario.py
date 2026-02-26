@@ -45,16 +45,28 @@ def assiduidade_urls(
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_assiduidade_plenario(
-    deputados_ids: list[int],
+    deputados_ids: list[int] | None,
     start_date: date,
     end_date: date,
     lote_id: int,
+    ignore_tasks: list[str],
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> str:
+) -> str | None:
     """
     Baixa páginas HTML com os dados sobre a assiduidade dos Deputados em Plenário
     """
     logger = get_run_logger()
+
+    if not deputados_ids:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO}' pois o argumento do parâmetro 'deputados_ids' é nulo"
+        )
+        return
+    if TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO} foi ignorada"
+        )
+        return
 
     urls = assiduidade_urls(deputados_ids, start_date, end_date)
 

@@ -23,9 +23,14 @@ async def extract_proposicoes_camara(
     start_date: date,
     end_date: date,
     lote_id: int,
+    ignore_tasks: list[str],
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> list[int]:
+) -> list[int] | None:
     logger = get_run_logger()
+
+    if TasksNames.EXTRACT_CAMARA_PROPOSICOES in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_PROPOSICOES} foi ignorada")
+        return
 
     # url = f"{APP_SETTINGS.CAMARA.REST_BASE_URL}proposicoes?dataInicio={start_date}&dataFim={end_date}&itens=100&ordem=ASC&ordenarPor=id"
     ## Retiirando dataFim pois está bugando

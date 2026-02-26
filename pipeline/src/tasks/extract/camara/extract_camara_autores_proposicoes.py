@@ -38,11 +38,23 @@ def autores_proposicoes_urls(proposicoes_ids: list[int]) -> UrlsResult:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_autores_proposicoes_camara(
-    proposicoes_ids: list[int],
+    proposicoes_ids: list[int] | None,
     lote_id: int,
+    ignore_tasks: list[str],
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> str:
+) -> str | None:
     logger = get_run_logger()
+
+    if not proposicoes_ids:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_AUTORES_PROPOSICOES}' pois o argumento do parâmetro 'proposicoes_ids' é nulo"
+        )
+        return
+    if TasksNames.EXTRACT_CAMARA_AUTORES_PROPOSICOES in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.EXTRACT_CAMARA_AUTORES_PROPOSICOES} foi ignorada"
+        )
+        return
 
     urls = autores_proposicoes_urls(proposicoes_ids)
 

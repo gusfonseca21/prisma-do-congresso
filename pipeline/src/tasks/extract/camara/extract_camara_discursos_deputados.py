@@ -47,13 +47,25 @@ def urls_discursos(
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_discursos_deputados_camara(
-    deputados_ids: list[int],
+    deputados_ids: list[int] | None,
     start_date: date,
     end_date: date,
     lote_id: int,
+    ignore_tasks: list[str],
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> str:
+) -> str | None:
     logger = get_run_logger()
+
+    if not deputados_ids:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS}' pois o argumento do parâmetro 'deputados_ids' é nulo"
+        )
+        return
+    if TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS} foi ignorada"
+        )
+        return
 
     urls = urls_discursos(deputados_ids, start_date, end_date)
     logger.info(f"Câmara: buscando discursos de {len(urls)} deputados")
@@ -88,7 +100,7 @@ def generate_artifact(jsons: Any):
 
         # Pegando o id do deputado
         deputado_id = get_path_parameter_value(
-            url=links.get("self", ""), param_name="deputados"
+            url=links.get("self", ""), param_name="deputados", default_value=None
         )
 
         # Aqui next é usado pois não precisa varrer a lista inteira, ele para no primeiro que encontrar

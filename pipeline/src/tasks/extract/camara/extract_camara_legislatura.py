@@ -21,9 +21,14 @@ APP_SETTINGS = load_config()
 def extract_legislatura(
     start_date: date,
     lote_id: int,
+    ignore_tasks: list[str],
     out_dir: str = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> dict:
+) -> dict | None:
     logger = get_run_logger()
+
+    if TasksNames.EXTRACT_CAMARA_LEGISLATURA in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_LEGISLATURA} foi ignorada")
+        return
 
     LEGISLATURA_URL = (
         f"{APP_SETTINGS.CAMARA.REST_BASE_URL}legislaturas?data={start_date}"

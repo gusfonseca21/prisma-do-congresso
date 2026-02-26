@@ -30,14 +30,7 @@ def insert_camara_deputados(
     lote_id: int,
     deputados_data: list[CamaraDeputadosArg],
     redes_sociais_data: list[CamaraDeputadosRedesSociaisArg],
-    historico_deputados_data: list[CamaraDeputadosHistoricoArg],
-    mandatos_externos_data: list[CamaraDeputadosMandatosExternosArg],
-    ocupacoes_data: list[CamaraDeputadosOcupacoesArg],
-    profissoes_data: list[CamaraDeputadosProfissoesArg],
 ):
-    """
-    Carrega os dados de Redes Sociais, Histórico, Mandatos Externos e Ocupações de Deputados no Banco de Dados
-    """
     with get_connection() as conn:
         ## DEPUTADOS
         stmt_deputado = insert(deputados).values(
@@ -103,7 +96,11 @@ def insert_camara_deputados(
         )
         conn.execute(stmt_redes_sociais)
 
-        ## HISTÓRICO
+
+def insert_camara_historico_deputados(
+    historico_deputados_data: list[CamaraDeputadosHistoricoArg],
+):
+    with get_connection() as conn:
         stmt_historico = (
             insert(historico)
             .values(
@@ -129,7 +126,11 @@ def insert_camara_deputados(
         )
         conn.execute(stmt_historico)
 
-        ## MANDATOS EXTERNOS
+
+def insert_camara_mandatos_externos_deputados(
+    mandatos_externos_data: list[CamaraDeputadosMandatosExternosArg],
+):
+    with get_connection() as conn:
         stmt_mandatos_externos = insert(mandatos_externos).values(
             [
                 {
@@ -151,12 +152,16 @@ def insert_camara_deputados(
             set_={"ano_fim": stmt_mandatos_externos.excluded.ano_fim},
             where=and_(
                 stmt_mandatos_externos.excluded.ano_fim.isnot(None),
-                historico.c.ano_fim.is_(None),
+                mandatos_externos.c.ano_fim.is_(None),
             ),
         )
         conn.execute(stmt_mandatos_externos)
 
-        ## OCUPAÇÕES
+
+def insert_camara_ocupacoes_deputados(
+    ocupacoes_data: list[CamaraDeputadosOcupacoesArg],
+):
+    with get_connection() as conn:
         stmt_ocupacoes = insert(ocupacoes).values(
             [
                 {
@@ -181,10 +186,13 @@ def insert_camara_deputados(
                 ocupacoes.c.ano_fim.is_(None),
             ),
         )
-
         conn.execute(stmt_ocupacoes)
 
-        ## PROFISSÕES
+
+def insert_camara_profissoes_deputados(
+    profissoes_data: list[CamaraDeputadosProfissoesArg],
+):
+    with get_connection() as conn:
         stmt_profissoes = (
             insert(profissoes)
             .values(

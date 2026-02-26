@@ -19,17 +19,20 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_legislatura(
-    lote_id: int,
-    legislatura: dict | None,
+    lote_id: int, legislatura: dict | None, ignore_tasks: list[str]
 ):
     logger = get_run_logger()
 
-    logger.info("Carregando Legislatura no Banco de Dados")
-
+    if TasksNames.LOAD_CAMARA_LEGISLATURA in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.LOAD_CAMARA_LEGISLATURA} foi ignorada")
+        return
     if legislatura is None:
-        raise ValueError(
-            "Erro ao carregar dados de Legislatura no Banco de Dados: o parâmetro legislatura é Nulo"
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_LEGISLATURA}' pois o argumento do parâmetro 'legislatura' é nulo"
         )
+        return
+
+    logger.info("Carregando Legislatura no Banco de Dados")
 
     legislatura_data = legislatura.get("dados", [])[0]
 

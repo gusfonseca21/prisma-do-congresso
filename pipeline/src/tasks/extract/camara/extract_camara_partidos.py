@@ -24,11 +24,22 @@ def partidos_url(legislatura: dict) -> str:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_partidos(
-    legislatura: dict,
+    legislatura: dict | None,
     lote_id: int,
+    ignore_tasks: list[str],
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> list[int]:
+) -> list[int] | None:
     logger = get_run_logger()
+
+    if not legislatura:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_PARTIDOS}' pois o argumento do parâmetro 'legislatura' é nulo"
+        )
+        return
+    if TasksNames.EXTRACT_CAMARA_PARTIDOS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_PARTIDOS} foi ignorada")
+        return
+
     logger.info("Baixando Partidos Câmara")
     url = partidos_url(legislatura)
     dest = Path(out_dir) / "partidos.ndjson"

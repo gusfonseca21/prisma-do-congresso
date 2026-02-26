@@ -25,11 +25,22 @@ def deputados_url(legislatura: dict) -> str:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def extract_deputados_camara(
-    legislatura: dict,
+    legislatura: dict | None,
     lote_id: int,
+    ignore_tasks: list[str],
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> list[int]:
+) -> list[int] | None:
     logger = get_run_logger()
+
+    if not legislatura:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DEPUTADOS}' pois o argumento do parâmetro 'legislatura' é nulo"
+        )
+        return
+    if TasksNames.EXTRACT_CAMARA_DEPUTADOS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_DEPUTADOS} foi ignorada")
+        return
+
     url = deputados_url(legislatura)
     dest = Path(out_dir) / "deputados.json"
     logger.info(f"Câmara: buscando Deputados de {url} -> {dest}")

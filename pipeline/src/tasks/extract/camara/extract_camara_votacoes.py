@@ -47,9 +47,14 @@ async def extract_votacoes_camara(
     start_date: date,
     end_date: date,
     lote_id: int,
+    ignore_tasks: list[str],
     out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> list[str]:
+) -> list[str] | None:
     logger = get_run_logger()
+
+    if TasksNames.EXTRACT_CAMARA_VOTACOES in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_VOTACOES} foi ignorada")
+        return
 
     urls = generate_urls(start_date, end_date)
 

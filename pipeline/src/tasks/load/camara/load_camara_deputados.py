@@ -1,5 +1,4 @@
-import hashlib
-from datetime import date, datetime
+from datetime import date
 
 from prefect import get_run_logger, task
 
@@ -7,17 +6,12 @@ from config.loader import load_config
 from config.parameters import TasksNames
 from database.models.camara.camara_deputados import (
     CamaraDeputadosArg,
-    CamaraDeputadosHistoricoArg,
-    CamaraDeputadosMandatosExternosArg,
-    CamaraDeputadosOcupacoesArg,
-    CamaraDeputadosProfissoesArg,
     CamaraDeputadosRedesSociaisArg,
 )
 from database.repository.camara.repository_camara_deputados import (
     insert_camara_deputados,
 )
 from database.repository.camara.repository_camara_partidos import get_partidos_siglas
-from utils.url_utils import get_path_parameter_value
 
 APP_SETTINGS = load_config()
 
@@ -29,44 +23,23 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_deputados(
-    lote_id: int,
-    deputados: list[dict] | None,
-    historico_deputados: list[dict] | None,
-    mandatos_externos: list[dict] | None,
-    ocupacoes: list[dict] | None,
-    profissoes: list[dict] | None,
+    lote_id: int, deputados: list[dict] | None, ignore_tasks: list[str]
 ):
     logger = get_run_logger()
 
-    logger.info("Carregando Deputados da Câmara no Banco de Dados")
+    if not deputados:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_DEPUTADOS}' pois o argumento do parâmetro 'deputados' é nulo"
+        )
+        return
+    if TasksNames.LOAD_CAMARA_DEPUTADOS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.LOAD_CAMARA_DEPUTADOS} foi ignorada")
+        return
 
-    if deputados is None:
-        raise ValueError(
-            "Erro ao carregar dados de Deputados no Banco de Dados: o parâmetro 'deputados' é Nulo"
-        )
-    if historico_deputados is None:
-        raise ValueError(
-            "Erro ao carregar dados de Deputados no Banco de Dados: o parâmetro 'historico_deputados' é Nulo"
-        )
-    if mandatos_externos is None:
-        raise ValueError(
-            "Erro ao carregar dados de Deputados no Banco de Dados: o parâmetro 'mandatos_externos' é Nulo"
-        )
-    if ocupacoes is None:
-        raise ValueError(
-            "Erro ao carregar dados de Deputados no Banco de Dados: o parâmetro 'ocupacoes' é Nulo"
-        )
-    if profissoes is None:
-        raise ValueError(
-            "Erro ao carregar dados de Deputados no Banco de Dados: o parâmetro 'profissoes' é Nulo"
-        )
+    logger.info("Carregando Deputados da Câmara no Banco de Dados")
 
     deputados_data: list[CamaraDeputadosArg] = []
     redes_sociais_data: list[CamaraDeputadosRedesSociaisArg] = []
-    historico_deputados_data: list[CamaraDeputadosHistoricoArg] = []
-    mandatos_externos_data: list[CamaraDeputadosMandatosExternosArg] = []
-    ocupacoes_data: list[CamaraDeputadosOcupacoesArg] = []
-    profissoes_data: list[CamaraDeputadosProfissoesArg] = []
 
     id_sigla_partidos = get_partidos_siglas()
 
@@ -79,7 +52,7 @@ def load_camara_deputados(
         gabinete = ultimo_status.get("gabinete")
         redes_sociais = dados.get("redeSocial", [])
         id_deputado = dados.get("id")
-        data_falescimento = dados.get("dataFalecimento")
+        data_falecimento = dados.get("dataFalecimento")
 
         id_partido = map_partidos.get(ultimo_status.get("siglaPartido"))
         if id_partido is None:
@@ -112,8 +85,8 @@ def load_camara_deputados(
                 cpf=dados.get("cpf"),
                 sexo=dados.get("sexo"),
                 data_nascimento=date.fromisoformat(dados.get("dataNascimento")),
-                data_falecimento=date.fromisoformat(data_falescimento)
-                if data_falescimento
+                data_falecimento=date.fromisoformat(data_falecimento)
+                if data_falecimento
                 else None,
                 uf_nascimento=dados.get("ufNascimento"),
                 municipio_nascimento=dados.get("municipioNascimento"),
@@ -128,123 +101,10 @@ def load_camara_deputados(
                 )
             )
 
-    ## HISTÓRICO
-    for h_data in historico_deputados:
-        historico_dados = h_data.get("dados", [])
-
-        for historico in historico_dados:
-            pre_hash_content = f"{historico.get('id')}|{historico.get('nome')}|{historico.get('nomeEleitoral')}|{historico.get('siglaPartido')}|{historico.get('siglaUf')}|{historico.get('idLegislatura')}|{historico.get('dataHora')}|{historico.get('situacao')}|{historico.get('condicaoEleitoral')}|{historico.get('descricaoStatus')}"
-
-            hash = hashlib.md5(pre_hash_content.encode()).hexdigest()
-
-            historico_deputados_data.append(
-                CamaraDeputadosHistoricoArg(
-                    id_lote=lote_id,
-                    id_deputado=historico.get("id"),
-                    nome=historico.get("nome"),
-                    nome_eleitoral=historico.get("nomeEleitoral"),
-                    sigla_partido=historico.get("siglaPartido"),
-                    sigla_uf=historico.get("siglaUf"),
-                    id_legislatura=historico.get("idLegislatura"),
-                    data_hora=datetime.fromisoformat(historico.get("dataHora")),
-                    situacao=historico.get("situacao"),
-                    condicao_eleitoral=historico.get("condicaoEleitoral"),
-                    descricao_status=historico.get("descricaoStatus"),
-                    hash=hash,
-                )
-            )
-
-    ## MANDATOS EXTERNOS
-    for me_data in mandatos_externos:
-        href = me_data.get("links", [])[0].get("href")
-        id_deputado = get_path_parameter_value(href, "deputados", None)
-
-        mandatos_dados = me_data.get("dados", [])
-        for mandato in mandatos_dados:
-            mandatos_externos_data.append(
-                CamaraDeputadosMandatosExternosArg(
-                    id_lote=lote_id,
-                    id_deputado=id_deputado,
-                    cargo=mandato.get("cargo"),
-                    sigla_uf=mandato.get("siglaUf"),
-                    municipio=mandato.get("municipio"),
-                    ano_inicio=int(mandato.get("anoInicio")),
-                    ano_fim=int(mandato.get("anoFim"))
-                    if mandato.get("anoFim")
-                    else None,
-                    sigla_partido=mandato.get("siglaPartidoEleicao"),
-                )
-            )
-
-    # Limpa registros duplicados
-    mandatos_externos_data = list(
-        {
-            (mandato.id_deputado, mandato.cargo, mandato.ano_inicio): mandato
-            for mandato in mandatos_externos_data
-        }.values()
-    )
-
-    ## OCUPAÇÕES
-    for o_data in ocupacoes:
-        href = o_data.get("links", [])[0].get("href")
-        id_deputado = get_path_parameter_value(href, "deputados", None)
-
-        ocupacoes_dados = o_data.get("dados", [])
-        for ocupacao in ocupacoes_dados:
-            titulo = ocupacao.get("titulo", None)
-            ano_inicio = ocupacao.get("anoInicio", None)
-            if not titulo or not ano_inicio:
-                continue
-            ocupacoes_data.append(
-                CamaraDeputadosOcupacoesArg(
-                    id_lote=lote_id,
-                    id_deputado=id_deputado,
-                    titulo=titulo,
-                    entidade=ocupacao.get("entidade"),
-                    entidade_uf=ocupacao.get("entidadeUF"),
-                    entidade_pais=ocupacao.get("entidadePais"),
-                    ano_inicio=int(ocupacao.get("anoInicio")),
-                    ano_fim=ocupacao.get("anoFim"),
-                )
-            )
-
-    # Limpa registros duplicados
-    ocupacoes_data = list(
-        {
-            (ocupacao.id_deputado, ocupacao.titulo, ocupacao.ano_inicio): ocupacao
-            for ocupacao in ocupacoes_data
-        }.values()
-    )
-
-    ## PROFISSÕES
-    for p_data in profissoes:
-        href = p_data.get("links", [])[0].get("href")
-        id_deputado = get_path_parameter_value(href, "deputados", None)
-
-        profissoes_dados = p_data.get("dados", [])
-        for profissao in profissoes_dados:
-            data_hora = profissao.get("dataHora")
-            titulo = profissao.get("titulo")
-            if not titulo:
-                continue
-
-            profissoes_data.append(
-                CamaraDeputadosProfissoesArg(
-                    id_lote=lote_id,
-                    id_deputado=id_deputado,
-                    data_hora=datetime.fromisoformat(data_hora) if data_hora else None,
-                    titulo=profissao.get("titulo"),
-                )
-            )
-
     insert_camara_deputados(
         lote_id=lote_id,
         deputados_data=deputados_data,
         redes_sociais_data=redes_sociais_data,
-        historico_deputados_data=historico_deputados_data,
-        mandatos_externos_data=mandatos_externos_data,
-        ocupacoes_data=ocupacoes_data,
-        profissoes_data=profissoes_data,
     )
 
     return
