@@ -45,14 +45,14 @@ async def extract_detalhes_deputados_camara(
 ) -> list[dict] | None:
     logger = get_run_logger()
 
-    if not deputados_ids:
-        logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DETALHES_DEPUTADOS}' pois o argumento do parâmetro 'deputados_ids' é nulo"
-        )
-        return
     if TasksNames.EXTRACT_CAMARA_DETALHES_DEPUTADOS in ignore_tasks:
         logger.warning(
             f"A Task {TasksNames.EXTRACT_CAMARA_DETALHES_DEPUTADOS} foi ignorada"
+        )
+        return
+    if not deputados_ids:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DETALHES_DEPUTADOS}' pois o argumento do parâmetro 'deputados_ids' é nulo"
         )
         return
 

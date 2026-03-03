@@ -6,7 +6,7 @@ from config.loader import load_config
 from config.parameters import TasksNames
 from database.models.camara.camara_legislatura import CamaraLegislaturaArg
 from database.repository.camara.repository_camara_legislatura import (
-    insert_camara_legislatura,
+    insert_camara_legislatura_db,
 )
 
 APP_SETTINGS = load_config()
@@ -42,6 +42,6 @@ def load_camara_legislatura(
         data_fim=date.fromisoformat(legislatura_data.get("dataFim")),
     )
 
-    insert_camara_legislatura(lote_id=lote_id, data=data)
+    insert_camara_legislatura_db(lote_id=lote_id, data=data)
 
     return

@@ -31,13 +31,13 @@ async def extract_camara_partidos(
 ) -> list[int] | None:
     logger = get_run_logger()
 
+    if TasksNames.EXTRACT_CAMARA_PARTIDOS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_PARTIDOS} foi ignorada")
+        return
     if not legislatura:
         logger.warning(
             f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_PARTIDOS}' pois o argumento do parâmetro 'legislatura' é nulo"
         )
-        return
-    if TasksNames.EXTRACT_CAMARA_PARTIDOS in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_PARTIDOS} foi ignorada")
         return
 
     logger.info("Baixando Partidos Câmara")
@@ -64,7 +64,6 @@ async def extract_camara_partidos(
 
     _dest_path = save_ndjson(cast(list[dict], jsons), dest)
 
-    # ids_partidos = [partido.get("id") for partido in json.get("dados", []) for json in jsons]
     ids_partidos = [
         partido.get("id")
         for json in jsons

@@ -5,7 +5,9 @@ from prefect import get_run_logger, task
 from config.loader import load_config
 from config.parameters import TasksNames
 from database.models.camara.camara_partidos import CamaraPartidosArg
-from database.repository.camara.repository_camara_partidos import insert_camara_partidos
+from database.repository.camara.repository_camara_partidos import (
+    insert_camara_partidos_db,
+)
 from utils.url_utils import get_path_parameter_value
 
 APP_SETTINGS = load_config()
@@ -27,7 +29,7 @@ def load_camara_partidos(
         return
     if partidos is None:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_PARTIDOS}' pois o argumento do parâmetro 'legislatura' é nulo"
+            f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_PARTIDOS}' pois o argumento do parâmetro 'partidos' é nulo"
         )
         return
 
@@ -68,6 +70,6 @@ def load_camara_partidos(
             )
         )
 
-    insert_camara_partidos(data=partidos_data)
+    insert_camara_partidos_db(data=partidos_data)
 
     return lideres_partidos

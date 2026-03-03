@@ -9,9 +9,9 @@ from database.models.camara.camara_deputados import (
     CamaraDeputadosRedesSociaisArg,
 )
 from database.repository.camara.repository_camara_deputados import (
-    insert_camara_deputados,
+    insert_camara_deputados_db,
 )
-from database.repository.camara.repository_camara_partidos import get_partidos_siglas
+from database.repository.camara.repository_camara_partidos import get_partidos_siglas_db
 
 APP_SETTINGS = load_config()
 
@@ -27,13 +27,13 @@ def load_camara_deputados(
 ):
     logger = get_run_logger()
 
+    if TasksNames.LOAD_CAMARA_DEPUTADOS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.LOAD_CAMARA_DEPUTADOS} foi ignorada")
+        return
     if not deputados:
         logger.warning(
             f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_DEPUTADOS}' pois o argumento do parâmetro 'deputados' é nulo"
         )
-        return
-    if TasksNames.LOAD_CAMARA_DEPUTADOS in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.LOAD_CAMARA_DEPUTADOS} foi ignorada")
         return
 
     logger.info("Carregando Deputados da Câmara no Banco de Dados")
@@ -41,7 +41,7 @@ def load_camara_deputados(
     deputados_data: list[CamaraDeputadosArg] = []
     redes_sociais_data: list[CamaraDeputadosRedesSociaisArg] = []
 
-    id_sigla_partidos = get_partidos_siglas()
+    id_sigla_partidos = get_partidos_siglas_db()
 
     map_partidos: dict[str, int] = {p.sigla: p.id_partido for p in id_sigla_partidos}
 
@@ -101,7 +101,7 @@ def load_camara_deputados(
                 )
             )
 
-    insert_camara_deputados(
+    insert_camara_deputados_db(
         lote_id=lote_id,
         deputados_data=deputados_data,
         redes_sociais_data=redes_sociais_data,

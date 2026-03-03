@@ -53,6 +53,13 @@ class UrlsResult(TypedDict):
     not_downloaded_urls: list[ErrorExtract]
 
 
+class RowsModified(TypedDict):
+    inserted: int
+    updated: int
+    ignored: int
+    total: int
+
+
 class Lote(Base):
     __tablename__ = "lote"
 
@@ -105,3 +112,15 @@ class Logs(Base):
     flow_run_name = sa.Column(sa.String(256), nullable=False)
     task_run_name = sa.Column(sa.String(256), nullable=True)
     mensagem = sa.Column(sa.Text, nullable=False)
+
+
+class LogLinhas(Base):
+    __tablename__ = "log_linhas"
+
+    id = sa.Column(sa.Integer, sa.Identity(start=1, cycle=False), primary_key=True)
+    id_lote = sa.Column(sa.Integer, sa.ForeignKey("lote.id"), nullable=False)
+    tabela = sa.Column(sa.Text, nullable=False)
+    inseridos = sa.Column(sa.Integer, nullable=False)
+    atualizados = sa.Column(sa.Integer, nullable=False)
+    ignorados = sa.Column(sa.Integer, nullable=False)
+    total = sa.Column(sa.Integer, nullable=False)

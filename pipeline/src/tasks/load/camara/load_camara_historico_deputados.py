@@ -9,7 +9,7 @@ from database.models.camara.camara_deputados import (
     CamaraDeputadosHistoricoArg,
 )
 from database.repository.camara.repository_camara_deputados import (
-    insert_camara_historico_deputados,
+    insert_camara_historico_deputados_db,
 )
 
 APP_SETTINGS = load_config()
@@ -22,17 +22,22 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_historico_deputados(
-    lote_id: int,
-    historico_deputados: list[dict] | None,
+    lote_id: int, historico_deputados: list[dict] | None, ignore_tasks: list[str]
 ):
     logger = get_run_logger()
 
-    logger.info("Carregando Histórico de Deputados da Câmara no Banco de Dados")
-
-    if historico_deputados is None:
-        raise ValueError(
-            "Erro ao carregar dados de Histórico de Deputados no Banco de Dados: o parâmetro 'historico_deputados' é Nulo"
+    if TasksNames.LOAD_CAMARA_HISTORICO_DEPUTADOS in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.LOAD_CAMARA_HISTORICO_DEPUTADOS} foi ignorada"
         )
+        return
+    if historico_deputados is None:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_HISTORICO_DEPUTADOS}' pois o argumento do parâmetro 'historico_deputados' é nulo"
+        )
+        return
+
+    logger.info("Carregando Histórico de Deputados da Câmara no Banco de Dados")
 
     historico_deputados_data: list[CamaraDeputadosHistoricoArg] = []
 
@@ -61,6 +66,8 @@ def load_camara_historico_deputados(
                 )
             )
 
-    insert_camara_historico_deputados(historico_deputados_data=historico_deputados_data)
+    insert_camara_historico_deputados_db(
+        historico_deputados_data=historico_deputados_data
+    )
 
     return

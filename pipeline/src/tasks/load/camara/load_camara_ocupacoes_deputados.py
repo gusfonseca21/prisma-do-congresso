@@ -6,7 +6,7 @@ from database.models.camara.camara_deputados import (
     CamaraDeputadosOcupacoesArg,
 )
 from database.repository.camara.repository_camara_deputados import (
-    insert_camara_ocupacoes_deputados,
+    insert_camara_ocupacoes_deputados_db,
 )
 from utils.url_utils import get_path_parameter_value
 
@@ -20,17 +20,22 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_ocupacoes_deputados(
-    lote_id: int,
-    ocupacoes: list[dict] | None,
+    lote_id: int, ocupacoes: list[dict] | None, ignore_tasks: list[str]
 ):
     logger = get_run_logger()
 
-    logger.info("Carregando Ocupações de Deputados da Câmara no Banco de Dados")
-
-    if ocupacoes is None:
-        raise ValueError(
-            "Erro ao carregar dados de Ocupações de Deputados no Banco de Dados: o parâmetro 'ocupacoes' é Nulo"
+    if TasksNames.LOAD_CAMARA_OCUPACOES_DEPUTADOS in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.LOAD_CAMARA_OCUPACOES_DEPUTADOS} foi ignorada"
         )
+        return
+    if not ocupacoes:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_OCUPACOES_DEPUTADOS}' pois o argumento do parâmetro 'ocupacoes' é nulo"
+        )
+        return
+
+    logger.info("Carregando Ocupações de Deputados da Câmara no Banco de Dados")
 
     ocupacoes_data: list[CamaraDeputadosOcupacoesArg] = []
 
@@ -66,6 +71,6 @@ def load_camara_ocupacoes_deputados(
         }.values()
     )
 
-    insert_camara_ocupacoes_deputados(ocupacoes_data=ocupacoes_data)
+    insert_camara_ocupacoes_deputados_db(ocupacoes_data=ocupacoes_data)
 
     return

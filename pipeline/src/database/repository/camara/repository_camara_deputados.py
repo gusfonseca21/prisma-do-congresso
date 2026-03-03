@@ -1,3 +1,4 @@
+import sqlalchemy as sa
 from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import insert
 
@@ -16,6 +17,7 @@ from database.models.camara.camara_deputados import (
     CamaraDeputadosRedesSociais,
     CamaraDeputadosRedesSociaisArg,
 )
+from database.repository.logs import insert_log_linhas_db
 from utils.db import columns_to_compare, update_dict, where_clause
 
 deputados = CamaraDeputados.__table__
@@ -26,7 +28,7 @@ ocupacoes = CamaraDeputadosOcupacoes.__table__
 profissoes = CamaraDeputadosProfissoes.__table__
 
 
-def insert_camara_deputados(
+def insert_camara_deputados_db(
     lote_id: int,
     deputados_data: list[CamaraDeputadosArg],
     redes_sociais_data: list[CamaraDeputadosRedesSociaisArg],
@@ -77,7 +79,24 @@ def insert_camara_deputados(
             ),
         )
 
-        conn.execute(stmt_deputado)
+        stmt_deputado = stmt_deputado.returning(deputados.c.id, sa.text("xmax"))
+
+        result_deputado = conn.execute(stmt_deputado)
+
+        rows_deputado = result_deputado.fetchall()
+        total_deputado = len(deputados_data)
+        inserted_deputado = sum(1 for row in rows_deputado if int(row.xmax) == 0)
+        updated_deputado = sum(1 for row in rows_deputado if int(row.xmax) != 0)
+        ignored_deputado = total_deputado - len(rows_deputado)
+
+        insert_log_linhas_db(
+            id_lote=deputados_data[0].id_lote,
+            table=deputados.name,
+            inserted=inserted_deputado,
+            updated=updated_deputado,
+            ignored=ignored_deputado,
+            total=total_deputado,
+        )
 
         ## REDES SOCIAIS
         stmt_redes_sociais = (
@@ -94,10 +113,25 @@ def insert_camara_deputados(
             )
             .on_conflict_do_nothing(index_elements=["url"])
         )
-        conn.execute(stmt_redes_sociais)
+
+        result_redes_sociais = conn.execute(stmt_redes_sociais)
+
+        total_redes_sociais = len(redes_sociais_data)
+        inserted_redes_sociais = result_redes_sociais.rowcount
+        updated_redes_sociais = 0  # Não atualiza
+        ignored_redes_sociais = total_redes_sociais - inserted_redes_sociais
+
+        insert_log_linhas_db(
+            id_lote=redes_sociais_data[0].id_lote,
+            table=redes_sociais.name,
+            inserted=inserted_redes_sociais,
+            updated=updated_redes_sociais,
+            ignored=ignored_redes_sociais,
+            total=total_redes_sociais,
+        )
 
 
-def insert_camara_historico_deputados(
+def insert_camara_historico_deputados_db(
     historico_deputados_data: list[CamaraDeputadosHistoricoArg],
 ):
     with get_connection() as conn:
@@ -124,10 +158,27 @@ def insert_camara_historico_deputados(
             )
             .on_conflict_do_nothing(index_elements=["hash"])
         )
-        conn.execute(stmt_historico)
+
+        stmt_historico = stmt_historico
+
+        result = conn.execute(stmt_historico)
+
+        total = len(historico_deputados_data)
+        inserted = result.rowcount
+        updated = 0  # Não atualiza
+        ignored = total - inserted
+
+        insert_log_linhas_db(
+            id_lote=historico_deputados_data[0].id_lote,
+            table=historico.name,
+            inserted=inserted,
+            updated=updated,
+            ignored=ignored,
+            total=total,
+        )
 
 
-def insert_camara_mandatos_externos_deputados(
+def insert_camara_mandatos_externos_deputados_db(
     mandatos_externos_data: list[CamaraDeputadosMandatosExternosArg],
 ):
     with get_connection() as conn:
@@ -155,10 +206,31 @@ def insert_camara_mandatos_externos_deputados(
                 mandatos_externos.c.ano_fim.is_(None),
             ),
         )
-        conn.execute(stmt_mandatos_externos)
+
+        stmt_mandatos_externos = stmt_mandatos_externos.returning(
+            mandatos_externos.c.id, sa.text("xmax")
+        )
+
+        result = conn.execute(stmt_mandatos_externos)
+
+        rows = result.fetchall()
+
+        total = len(mandatos_externos_data)
+        inserted = sum(1 for row in rows if int(row.xmax) == 0)
+        updated = sum(1 for row in rows if int(row.xmax) != 0)
+        ignored = total - len(rows)
+
+        insert_log_linhas_db(
+            id_lote=mandatos_externos_data[0].id_lote,
+            table=mandatos_externos.name,
+            inserted=inserted,
+            updated=updated,
+            ignored=ignored,
+            total=total,
+        )
 
 
-def insert_camara_ocupacoes_deputados(
+def insert_camara_ocupacoes_deputados_db(
     ocupacoes_data: list[CamaraDeputadosOcupacoesArg],
 ):
     with get_connection() as conn:
@@ -186,10 +258,29 @@ def insert_camara_ocupacoes_deputados(
                 ocupacoes.c.ano_fim.is_(None),
             ),
         )
-        conn.execute(stmt_ocupacoes)
+
+        stmt_ocupacoes = stmt_ocupacoes.returning(ocupacoes.c.id, sa.text("xmax"))
+
+        result = conn.execute(stmt_ocupacoes)
+
+        rows = result.fetchall()
+
+        total = len(ocupacoes_data)
+        inserted = sum(1 for row in rows if int(row.xmax) == 0)
+        updated = sum(1 for row in rows if int(row.xmax) != 0)
+        ignored = total - len(rows)
+
+        insert_log_linhas_db(
+            id_lote=ocupacoes_data[0].id_lote,
+            table=ocupacoes.name,
+            inserted=inserted,
+            updated=updated,
+            ignored=ignored,
+            total=total,
+        )
 
 
-def insert_camara_profissoes_deputados(
+def insert_camara_profissoes_deputados_db(
     profissoes_data: list[CamaraDeputadosProfissoesArg],
 ):
     with get_connection() as conn:
@@ -209,4 +300,18 @@ def insert_camara_profissoes_deputados(
             .on_conflict_do_nothing(index_elements=["id_deputado", "titulo"])
         )
 
-        conn.execute(stmt_profissoes)
+        result = conn.execute(stmt_profissoes)
+
+        total = len(profissoes_data)
+        inserted = result.rowcount
+        updated = 0  # Não atualiza
+        ignored = total - inserted
+
+        insert_log_linhas_db(
+            id_lote=profissoes_data[0].id_lote,
+            table=profissoes.name,
+            inserted=inserted,
+            updated=updated,
+            ignored=ignored,
+            total=total,
+        )

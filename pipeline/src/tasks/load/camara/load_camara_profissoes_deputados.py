@@ -6,7 +6,7 @@ from config.loader import load_config
 from config.parameters import TasksNames
 from database.models.camara.camara_deputados import CamaraDeputadosProfissoesArg
 from database.repository.camara.repository_camara_deputados import (
-    insert_camara_profissoes_deputados,
+    insert_camara_profissoes_deputados_db,
 )
 from utils.url_utils import get_path_parameter_value
 
@@ -20,17 +20,22 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_profissoes_deputados(
-    lote_id: int,
-    profissoes: list[dict] | None,
+    lote_id: int, profissoes: list[dict] | None, ignore_tasks: list[str]
 ):
     logger = get_run_logger()
 
     logger.info("Carregando Profissões de Deputados da Câmara no Banco de Dados")
 
-    if profissoes is None:
-        raise ValueError(
-            "Erro ao carregar dados de Profissões de Deputados no Banco de Dados: o parâmetro 'profissoes' é Nulo"
+    if TasksNames.LOAD_CAMARA_PROFISSOES_DEPUTADOS in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.LOAD_CAMARA_PROFISSOES_DEPUTADOS} foi ignorada"
         )
+        return
+    if not profissoes:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_PROFISSOES_DEPUTADOS}' pois o argumento do parâmetro 'profissoes' é nulo"
+        )
+        return
 
     profissoes_data: list[CamaraDeputadosProfissoesArg] = []
 
@@ -55,6 +60,6 @@ def load_camara_profissoes_deputados(
                 )
             )
 
-    insert_camara_profissoes_deputados(profissoes_data=profissoes_data)
+    insert_camara_profissoes_deputados_db(profissoes_data=profissoes_data)
 
     return

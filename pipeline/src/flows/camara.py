@@ -34,8 +34,12 @@ from tasks.extract.camara import (
 )
 from tasks.load.camara import (
     load_camara_deputados,
+    load_camara_historico_deputados,
     load_camara_legislatura,
+    load_camara_mandatos_externos_deputados,
+    load_camara_ocupacoes_deputados,
     load_camara_partidos,
+    load_camara_profissoes_deputados,
 )
 from utils.logs import save_logs
 
@@ -123,6 +127,14 @@ def camara_flow(
     )
     extract_camara_historico_deputados_f.result()  # type: ignore
 
+    ## LOAD HISTORICO DEPUTADOS
+    load_camara_historico_deputados_f = load_camara_historico_deputados.submit(
+        lote_id=lote_id,
+        historico_deputados=cast(list[dict], extract_camara_historico_deputados_f),
+        ignore_tasks=ignore_tasks,
+    )
+    futures.append(load_camara_historico_deputados_f)
+
     ## EXTRACT MANDATOS EXTERNOS DEPUTADOS
     extract_camara_mandatos_externos_deputados_f = (
         extract_camara_mandatos_externos_deputados.submit(
@@ -133,6 +145,18 @@ def camara_flow(
     )
     extract_camara_mandatos_externos_deputados_f.result()  # type: ignore
 
+    ## LOAD MANDATOS EXTERNOS DEPUTADOS
+    load_camara_mandatos_externos_deputados_f = (
+        load_camara_mandatos_externos_deputados.submit(
+            lote_id=lote_id,
+            mandatos_externos=cast(
+                list[dict], extract_camara_mandatos_externos_deputados_f
+            ),
+            ignore_tasks=ignore_tasks,
+        )
+    )
+    futures.append(load_camara_mandatos_externos_deputados_f)
+
     ## EXTRACT OCUPAÇÕES DEPUTADOS
     extract_camara_ocupacoes_deputados_f = extract_camara_ocupacoes_deputados.submit(
         lote_id=lote_id,
@@ -141,6 +165,14 @@ def camara_flow(
     )
     extract_camara_ocupacoes_deputados_f.result()  # type: ignore
 
+    ## LOAD OCUPAÇÕES DEPUTADOS
+    load_camara_ocupacoes_deputados_f = load_camara_ocupacoes_deputados.submit(
+        lote_id=lote_id,
+        ocupacoes=cast(list[dict], extract_camara_ocupacoes_deputados_f),
+        ignore_tasks=ignore_tasks,
+    )
+    futures.append(load_camara_ocupacoes_deputados_f)
+
     ## EXTRACT PROFISSÕES DEPUTADOS
     extract_camara_profissoes_deputados_f = extract_camara_profissoes_deputados.submit(
         lote_id=lote_id,
@@ -148,6 +180,14 @@ def camara_flow(
         ignore_tasks=ignore_tasks,
     )
     extract_camara_profissoes_deputados_f.result()  # type: ignore
+
+    ## LOAD PROFISSÕES DEPUTADOS
+    load_camara_profissoes_deputados_f = load_camara_profissoes_deputados.submit(
+        lote_id=lote_id,
+        profissoes=cast(list[dict], extract_camara_profissoes_deputados_f),
+        ignore_tasks=ignore_tasks,
+    )
+    futures.append(load_camara_profissoes_deputados_f)
 
     ## EXTRACT ASSIDUIDADE PLENÁRIO
     extract_camara_assiduidade_plenario_f = extract_camara_assiduidade_plenario.submit(

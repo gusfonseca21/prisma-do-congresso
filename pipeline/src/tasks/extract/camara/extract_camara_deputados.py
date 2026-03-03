@@ -32,13 +32,13 @@ def extract_deputados_camara(
 ) -> list[int] | None:
     logger = get_run_logger()
 
+    if TasksNames.EXTRACT_CAMARA_DEPUTADOS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_DEPUTADOS} foi ignorada")
+        return
     if not legislatura:
         logger.warning(
             f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DEPUTADOS}' pois o argumento do parâmetro 'legislatura' é nulo"
         )
-        return
-    if TasksNames.EXTRACT_CAMARA_DEPUTADOS in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_DEPUTADOS} foi ignorada")
         return
 
     url = deputados_url(legislatura)

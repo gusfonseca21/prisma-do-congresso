@@ -6,7 +6,7 @@ from database.models.camara.camara_deputados import (
     CamaraDeputadosMandatosExternosArg,
 )
 from database.repository.camara.repository_camara_deputados import (
-    insert_camara_mandatos_externos_deputados,
+    insert_camara_mandatos_externos_deputados_db,
 )
 from utils.url_utils import get_path_parameter_value
 
@@ -20,17 +20,22 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_mandatos_externos_deputados(
-    lote_id: int,
-    mandatos_externos: list[dict] | None,
+    lote_id: int, mandatos_externos: list[dict] | None, ignore_tasks: list[str]
 ):
     logger = get_run_logger()
 
-    logger.info("Carregando Mandatos Externos de Deputados da Câmara no Banco de Dados")
-
-    if mandatos_externos is None:
-        raise ValueError(
-            "Erro ao carregar dados de Mandatos Externos de Deputados no Banco de Dados: o parâmetro 'mandatos_externos' é Nulo"
+    if TasksNames.LOAD_CAMARA_MANDATOS_EXTERNOS_DEPUTADOS in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.LOAD_CAMARA_MANDATOS_EXTERNOS_DEPUTADOS} foi ignorada"
         )
+        return
+    if not mandatos_externos:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_MANDATOS_EXTERNOS_DEPUTADOS}' pois o argumento do parâmetro 'mandatos_externos' é nulo"
+        )
+        return
+
+    logger.info("Carregando Mandatos Externos de Deputados da Câmara no Banco de Dados")
 
     mandatos_externos_data: list[CamaraDeputadosMandatosExternosArg] = []
 
@@ -64,7 +69,7 @@ def load_camara_mandatos_externos_deputados(
         }.values()
     )
 
-    insert_camara_mandatos_externos_deputados(
+    insert_camara_mandatos_externos_deputados_db(
         mandatos_externos_data=mandatos_externos_data,
     )
 
