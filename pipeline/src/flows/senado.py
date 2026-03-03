@@ -3,7 +3,7 @@ from datetime import date
 from prefect import flow, get_run_logger, task
 from prefect.runtime import flow_run
 
-from config.parameters import FlowsNames, TasksNames
+from config.parameters import FlowsNames
 from tasks.extract.senado import (
     extract_colegiados,
     extract_despesas_senado,
@@ -32,94 +32,79 @@ def senado_flow(
     futures = []
 
     ## COLEGIADOS
-    extract_colegiados_senado_f = None
-    if TasksNames.EXTRACT_SENADO_COLEGIADOS not in ignore_tasks:
-        extract_colegiados_senado_f = extract_colegiados.submit(
-            lote_id=lote_id, use_files=use_files
-        )
-        futures.append(extract_colegiados_senado_f)
+    extract_colegiados_senado_f = extract_colegiados.submit(
+        lote_id=lote_id,
+        use_files=use_files,
+        ignore_tasks=ignore_tasks,
+    )
+    futures.append(extract_colegiados_senado_f)
 
     ## SENADORES
-    extract_senadores_senado_f = None
-    if TasksNames.EXTRACT_SENADO_SENADORES not in ignore_tasks:
-        extract_senadores_senado_f = extract_senadores_senado.submit(
-            lote_id=lote_id, use_files=use_files
-        )
-        extract_senadores_senado_f.result()
+    extract_senadores_senado_f = extract_senadores_senado.submit(
+        lote_id=lote_id,
+        use_files=use_files,
+        ignore_tasks=ignore_tasks,
+    )
+    extract_senadores_senado_f.result()
 
     ## DETALHES SENADORES
-    extract_detalhes_senadores_senado_f = None
-    if (
-        extract_senadores_senado_f is not None
-        and TasksNames.EXTRACT_SENADO_DETALHES_SENADORES not in ignore_tasks
-    ):
-        extract_detalhes_senadores_senado_f = extract_detalhes_senadores_senado.submit(
-            ids_senadores=extract_senadores_senado_f,  # type: ignore
-            lote_id=lote_id,
-            use_files=use_files,
-        )
-        extract_detalhes_senadores_senado_f.result()  # type: ignore
+    extract_detalhes_senadores_senado_f = extract_detalhes_senadores_senado.submit(
+        ids_senadores=extract_senadores_senado_f,  # type: ignore
+        lote_id=lote_id,
+        use_files=use_files,
+        ignore_tasks=ignore_tasks,
+    )
+    extract_detalhes_senadores_senado_f.result()  # type: ignore
 
     ## DISCURSOS SENADORES
-    extract_discursos_senado_f = None
-    if (
-        extract_senadores_senado_f is not None
-        and TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES not in ignore_tasks
-    ):
-        extract_discursos_senado_f = extract_discursos_senado.submit(
-            ids_senadores=extract_senadores_senado_f,  # type: ignore
-            start_date=start_date,
-            end_date=end_date,
-            lote_id=lote_id,
-            use_files=use_files,
-        )
-        extract_discursos_senado_f.result()  # type: ignore
+    extract_discursos_senado_f = extract_discursos_senado.submit(
+        ids_senadores=extract_senadores_senado_f,  # type: ignore
+        start_date=start_date,
+        end_date=end_date,
+        lote_id=lote_id,
+        use_files=use_files,
+        ignore_tasks=ignore_tasks,
+    )
+    extract_discursos_senado_f.result()  # type: ignore
 
     ## DESPESAS SENADORES
-    extract_despesas_senado_f = None
-    if TasksNames.EXTRACT_SENADO_DESPESAS_SENADORES not in ignore_tasks:
-        extract_despesas_senado_f = extract_despesas_senado.submit(
-            start_date=start_date,
-            end_date=end_date,
-            lote_id=lote_id,
-            use_files=use_files,
-        )
-        futures.append(extract_despesas_senado_f)
+    extract_despesas_senado_f = extract_despesas_senado.submit(
+        start_date=start_date,
+        end_date=end_date,
+        lote_id=lote_id,
+        use_files=use_files,
+        ignore_tasks=ignore_tasks,
+    )
+    futures.append(extract_despesas_senado_f)
 
     ## PROCESSOS SENADO
-    extract_processos_senado_f = None
-    if TasksNames.EXTRACT_SENADO_PROCESSOS not in ignore_tasks:
-        extract_processos_senado_f = extract_processos_senado.submit(
-            start_date=start_date,
-            end_date=end_date,
-            lote_id=lote_id,
-            use_files=use_files,
-        )
-        extract_processos_senado_f.result()  # type: ignore
+    extract_processos_senado_f = extract_processos_senado.submit(
+        start_date=start_date,
+        end_date=end_date,
+        lote_id=lote_id,
+        use_files=use_files,
+        ignore_tasks=ignore_tasks,
+    )
+    extract_processos_senado_f.result()  # type: ignore
 
     ## DETALHES PROCESSOS
-    extract_detalhes_processos_senado_f = None
-    if (
-        extract_processos_senado_f is not None
-        and TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS not in ignore_tasks
-    ):
-        extract_detalhes_processos_senado_f = extract_detalhes_processos_senado.submit(
-            ids_processos=extract_processos_senado_f,  # type: ignore
-            lote_id=lote_id,
-            use_files=use_files,
-        )
-        extract_detalhes_processos_senado_f.result()  # type: ignore
+    extract_detalhes_processos_senado_f = extract_detalhes_processos_senado.submit(
+        ids_processos=extract_processos_senado_f,  # type: ignore
+        lote_id=lote_id,
+        use_files=use_files,
+        ignore_tasks=ignore_tasks,
+    )
+    extract_detalhes_processos_senado_f.result()  # type: ignore
 
     ## VOTACOES
-    extract_votacoes_senado_f = None
-    if TasksNames.EXTRACT_SENADO_VOTACOES not in ignore_tasks:
-        extract_votacoes_senado_f = extract_votacoes_senado.submit(
-            start_date=start_date,
-            end_date=end_date,
-            lote_id=lote_id,
-            use_files=use_files,
-        )
-        futures.append(extract_votacoes_senado_f)
+    extract_votacoes_senado_f = extract_votacoes_senado.submit(
+        start_date=start_date,
+        end_date=end_date,
+        lote_id=lote_id,
+        use_files=use_files,
+        ignore_tasks=ignore_tasks,
+    )
+    futures.append(extract_votacoes_senado_f)
 
     # Para finalizar o Flow corretamente na GUI do servidor, é preciso resolver os futures dos endpoints que não foram passados para outras tasks.
     for future in futures:
@@ -145,5 +130,7 @@ def run_senado_flow(
     ignore_tasks: list[str],
     lote_id: int,
     use_files: bool,
+    ignore_flows: list[str],
 ):
-    senado_flow(start_date, end_date, ignore_tasks, lote_id, use_files)
+    if FlowsNames.SENADO.value not in ignore_flows:
+        senado_flow(start_date, end_date, ignore_tasks, lote_id, use_files)

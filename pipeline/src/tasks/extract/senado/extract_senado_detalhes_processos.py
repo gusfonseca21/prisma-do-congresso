@@ -36,10 +36,15 @@ def get_detalhes_processos_url(processos_ids: list[str]) -> UrlsResult:
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 async def extract_detalhes_processos_senado(
-    ids_processos: list[str], lote_id: int, use_files: bool
+    ids_processos: list[str], lote_id: int, use_files: bool, ignore_tasks: list[str]
 ) -> list[dict] | None:
     logger = get_run_logger()
 
+    if TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS} foi ignorada"
+        )
+        return
     if use_files:
         logger.warning(
             f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS} irá retornar os dados à partir do arquivo em disco."

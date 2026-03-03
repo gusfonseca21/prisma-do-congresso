@@ -43,10 +43,19 @@ def despesas_senadores_urls(start_date: date, end_date: date) -> UrlsResult:
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 async def extract_despesas_senado(
-    start_date: date, end_date: date, lote_id: int, use_files: bool
-) -> list[dict]:
+    start_date: date,
+    end_date: date,
+    lote_id: int,
+    use_files: bool,
+    ignore_tasks: list[str],
+) -> list[dict] | None:
     logger = get_run_logger()
 
+    if TasksNames.EXTRACT_SENADO_DESPESAS_SENADORES in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.EXTRACT_SENADO_DESPESAS_SENADORES} foi ignorada"
+        )
+        return
     if use_files:
         logger.warning(
             f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_DESPESAS_SENADORES} irá retornar os dados à partir do arquivo em disco."

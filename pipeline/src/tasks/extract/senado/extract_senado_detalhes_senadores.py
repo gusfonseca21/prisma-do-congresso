@@ -37,16 +37,27 @@ def detalhes_senadores_urls(senadores_ids: list[str]) -> UrlsResult:
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 async def extract_detalhes_senadores_senado(
-    ids_senadores: list[str], lote_id: int, use_files: bool
+    ids_senadores: list[str] | None,
+    lote_id: int,
+    use_files: bool,
+    ignore_tasks: list[str],
 ) -> list[dict] | None:
     logger = get_run_logger()
 
+    if TasksNames.EXTRACT_SENADO_DETALHES_SENADORES in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_DEPUTADOS} foi ignorada")
+        return
     if use_files:
         logger.warning(
             f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_DETALHES_SENADORES} irá retornar os dados à partir do arquivo em disco."
         )
         jsons = load_ndjson(ExtractOutDir.SENADO.DETALHES_SENADORES)
         return jsons
+    if not ids_senadores:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_SENADO_DETALHES_SENADORES}' pois o argumento do parâmetro 'ids_senadores' é nulo"
+        )
+        return
 
     urls = detalhes_senadores_urls(ids_senadores)
 

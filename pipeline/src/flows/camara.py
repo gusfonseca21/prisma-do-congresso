@@ -386,5 +386,7 @@ def run_camara_flow(
     ignore_tasks: list[str],
     lote_id: int,
     use_files: bool,
+    ignore_flows: list[str],
 ):
-    camara_flow(start_date, end_date, ignore_tasks, lote_id, use_files)
+    if FlowsNames.CAMARA.value not in ignore_flows:
+        camara_flow(start_date, end_date, ignore_tasks, lote_id, use_files)

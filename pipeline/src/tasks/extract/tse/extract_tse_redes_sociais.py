@@ -28,11 +28,13 @@ def cache_by_year(_ctx, params):
     persist_result=True,
 )
 def extract_redes_sociais(
-    year: int,
-    uf: str,
-    lote_id: int,
+    year: int, uf: str, lote_id: int, ignore_tasks: list[str]
 ) -> str | None:
     logger = get_run_logger()
+
+    if TasksNames.EXTRACT_TSE_REDES_SOCIAIS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.EXTRACT_TSE_REDES_SOCIAIS} foi ignorada")
+        return
 
     url = f"{APP_SETTINGS.TSE.BASE_URL}consulta_cand/rede_social_candidato_{year}_{uf}.zip"
 

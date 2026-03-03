@@ -72,7 +72,7 @@ def pipeline(
         # "extract_senado_detalhes_processos",
         # "extract_senado_votacoes",
     ],
-    ignore_flows: list[str] = [],
+    ignore_flows: list[str] = ["camara"],
     message: str | None = None,
     use_files: bool = False,
 ):
@@ -94,26 +94,38 @@ def pipeline(
 
     futures = []
 
-    if FlowsNames.TSE.value not in ignore_flows:
-        futures.append(
-            run_tse_flow.submit(
-                start_date, refresh_cache, ignore_tasks, lote_id, use_files
-            )
+    futures.append(
+        run_tse_flow.submit(
+            start_date=start_date,
+            refresh_cache=refresh_cache,
+            ignore_tasks=ignore_tasks,
+            lote_id=lote_id,
+            use_files=use_files,
+            ignore_flows=ignore_flows,
         )
+    )
 
-    if FlowsNames.CAMARA.value not in ignore_flows:
-        futures.append(
-            run_camara_flow.submit(
-                start_date, end_date, ignore_tasks, lote_id, use_files
-            )
+    futures.append(
+        run_camara_flow.submit(
+            start_date=start_date,
+            end_date=end_date,
+            ignore_tasks=ignore_tasks,
+            lote_id=lote_id,
+            use_files=use_files,
+            ignore_flows=ignore_flows,
         )
+    )
 
-    if FlowsNames.SENADO.value not in ignore_flows:
-        futures.append(
-            run_senado_flow.submit(
-                start_date, end_date, ignore_tasks, lote_id, use_files
-            )
+    futures.append(
+        run_senado_flow.submit(
+            start_date=start_date,
+            end_date=end_date,
+            ignore_tasks=ignore_tasks,
+            lote_id=lote_id,
+            use_files=use_files,
+            ignore_flows=ignore_flows,
         )
+    )
 
     ## Bloquea a execução do código até que todos os flows sejam finalizados
     states = resolve_futures_to_states(futures)

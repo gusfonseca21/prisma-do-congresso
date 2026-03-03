@@ -33,9 +33,14 @@ def get_ids_senadores(json_exercicio: dict, json_afastados: dict) -> list[int]:
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
-def extract_senadores_senado(lote_id: int, use_files: bool) -> list[int]:
+def extract_senadores_senado(
+    lote_id: int, use_files: bool, ignore_tasks: list[str]
+) -> list[int] | None:
     logger = get_run_logger()
 
+    if TasksNames.EXTRACT_SENADO_SENADORES in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.EXTRACT_SENADO_SENADORES} foi ignorada")
+        return
     if use_files:
         logger.warning(
             f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_SENADORES} irá retornar os dados à partir do arquivo em disco."

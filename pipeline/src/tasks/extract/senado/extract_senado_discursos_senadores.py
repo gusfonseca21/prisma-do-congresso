@@ -56,15 +56,26 @@ async def extract_discursos_senado(
     end_date: date,
     lote_id: int,
     use_files: bool,
+    ignore_tasks: list[str],
 ) -> list[dict] | None:
     logger = get_run_logger()
 
+    if TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES} foi ignorada"
+        )
+        return
     if use_files:
         logger.warning(
             f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES} irá retornar os dados à partir do arquivo em disco."
         )
         jsons = load_ndjson(ExtractOutDir.SENADO.DISCURSOS_SENADORES)
         return jsons
+    if not ids_senadores:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES}' pois o argumento do parâmetro 'ids_senadores' é nulo"
+        )
+        return
 
     urls = discursos_senadores_urls(ids_senadores, start_date, end_date)
 

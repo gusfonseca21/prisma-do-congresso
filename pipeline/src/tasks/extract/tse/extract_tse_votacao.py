@@ -27,11 +27,12 @@ def cache_by_year(_ctx, params):
     log_prints=True,
     persist_result=True,
 )
-def extract_votacao(
-    year: int,
-    lote_id: int,
-) -> str | None:
+def extract_votacao(year: int, lote_id: int, ignore_tasks: list[str]) -> str | None:
     logger = get_run_logger()
+
+    if TasksNames.EXTRACT_TSE_VOTACAO in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.EXTRACT_TSE_VOTACAO} foi ignorada")
+        return
 
     url = f"{APP_SETTINGS.TSE.BASE_URL}votacao_candidato_munzona/votacao_candidato_munzona_{year}.zip"
 
