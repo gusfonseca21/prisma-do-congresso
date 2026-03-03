@@ -2,11 +2,10 @@ from pathlib import Path
 from typing import cast
 
 from prefect import get_run_logger, task
-from prefect.artifacts import create_table_artifact
 
 from config.loader import load_config
-from config.parameters import TasksNames
-from utils.io import fetch_json, save_json
+from config.parameters import ExtractOutDir, TasksNames
+from utils.io import fetch_json, load_json, save_json
 
 APP_SETTINGS = load_config()
 
@@ -18,6 +17,13 @@ def deputados_url(legislatura: dict) -> str:
     )
 
 
+def get_ids_deputados(json: dict) -> list[int]:
+    ids_deputados = set()  # Retirar os ids duplicados. O JSON possui vários registros para os mesmos deputados
+    ids_deputados_raw = [deputado.get("id") for deputado in json.get("dados", [])]
+    ids_deputados.update(ids_deputados_raw)
+    return list(ids_deputados)
+
+
 @task(
     task_run_name=TasksNames.EXTRACT_CAMARA_DEPUTADOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
@@ -25,16 +31,18 @@ def deputados_url(legislatura: dict) -> str:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def extract_deputados_camara(
-    legislatura: dict | None,
-    lote_id: int,
-    ignore_tasks: list[str],
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
+    legislatura: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> list[int] | None:
     logger = get_run_logger()
 
     if TasksNames.EXTRACT_CAMARA_DEPUTADOS in ignore_tasks:
         logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_DEPUTADOS} foi ignorada")
         return
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_DEPUTADOS} irá retornar os dados à partir do arquivo em disco."
+        )
+        return get_ids_deputados(load_json(ExtractOutDir.CAMARA.DEPUTADOS))
     if not legislatura:
         logger.warning(
             f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DEPUTADOS}' pois o argumento do parâmetro 'legislatura' é nulo"
@@ -42,36 +50,10 @@ def extract_deputados_camara(
         return
 
     url = deputados_url(legislatura)
-    dest = Path(out_dir) / "deputados.json"
-    logger.info(f"Câmara: buscando Deputados de {url} -> {dest}")
+    logger.info(f"Câmara: buscando Deputados de {url}")
     json = fetch_json(url=url, max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES)
     json = cast(dict, json)
 
-    create_table_artifact(
-        key="deputados",
-        table=generate_artifact(json),
-        description="Deputados em uma Legislatura",
-    )
+    _dest_path = save_json(json, Path(ExtractOutDir.CAMARA.DEPUTADOS))
 
-    _dest_path = save_json(json, dest)
-
-    ids_deputados = set()  # Retirar os ids duplicados. O JSON possui vários registros para os mesmos deputados
-    ids_deputados_raw = [deputado.get("id") for deputado in json.get("dados", [])]
-    ids_deputados.update(ids_deputados_raw)
-
-    return list(ids_deputados)
-
-
-def generate_artifact(json: dict):
-    artifact_data = []
-    for i, deputado in enumerate(json.get("dados", [])):
-        artifact_data.append(
-            {
-                "index": i,
-                "id": deputado.get("id"),
-                "nome": deputado.get("nome"),
-                "partido": deputado.get("siglaPartido"),
-                "uf": deputado.get("siglaUf"),
-            }
-        )
-    return artifact_data
+    return get_ids_deputados(json)

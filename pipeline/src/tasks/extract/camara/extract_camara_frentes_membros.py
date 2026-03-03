@@ -1,15 +1,14 @@
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from prefect import get_run_logger, task
-from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
-from utils.io import save_ndjson
+from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
@@ -41,18 +40,23 @@ async def extract_frentes_membros_camara(
     frentes_ids: list[str] | None,
     lote_id: int,
     ignore_tasks: list[str],
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> str | None:
+    use_files: bool,
+) -> list[dict] | None:
     logger = get_run_logger()
 
-    if not frentes_ids:
-        logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_FRENTES_MEMBROS}' pois o argumento do parâmetro 'frentes_ids' é nulo"
-        )
-        return
     if TasksNames.EXTRACT_CAMARA_FRENTES_MEMBROS in ignore_tasks:
         logger.warning(
             f"A Task {TasksNames.EXTRACT_CAMARA_FRENTES_MEMBROS} foi ignorada"
+        )
+        return
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_FRENTES_MEMBROS} irá retornar os dados à partir do arquivo em disco."
+        )
+        return load_ndjson(ExtractOutDir.CAMARA.FRENTES_MEMBROS)
+    if not frentes_ids:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_FRENTES_MEMBROS}' pois o argumento do parâmetro 'frentes_ids' é nulo"
         )
         return
 
@@ -70,26 +74,6 @@ async def extract_frentes_membros_camara(
         lote_id=lote_id,
     )
 
-    await acreate_table_artifact(
-        key="frentes-membros",
-        table=generate_artifact(jsons),
-        description="Total de membros encontrados nas frentes.",
-    )
+    save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.FRENTES_MEMBROS))
 
-    dest = Path(out_dir) / "frentes_membros.ndjson"
-    return save_ndjson(cast(list[dict], jsons), dest)
-
-
-def generate_artifact(jsons: Any):
-    artifact_data = []
-    for i, json in enumerate(jsons):
-        json = cast(dict, json)
-        link_self = next(
-            link["href"] for link in json.get("links", []) if link.get("rel") == "self"
-        )
-        id_frente = link_self.split("/")[-2]
-        membros = json.get("dados", [])  # type: ignore
-        artifact_data.append(
-            {"index": i, "id_frente": id_frente, "numero_membros": len(membros)}
-        )
-    return artifact_data
+    return cast(list[dict], jsons)

@@ -51,7 +51,11 @@ from utils.logs import save_logs
     log_prints=True,
 )
 def camara_flow(
-    start_date: date, end_date: date, ignore_tasks: list[str], lote_id: int
+    start_date: date,
+    end_date: date,
+    ignore_tasks: list[str],
+    lote_id: int,
+    use_files: bool,
 ):
     logger = get_run_logger()
     logger.info(f"Iniciando execução da Flow da Câmara - Lote {lote_id}")
@@ -60,7 +64,10 @@ def camara_flow(
 
     ## EXTRACT LEGISLATURA
     extract_camara_legislatura_f = extract_legislatura(
-        start_date=start_date, lote_id=lote_id, ignore_tasks=ignore_tasks
+        start_date=start_date,
+        lote_id=lote_id,
+        ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
 
     ## LOAD LEGISLATURA
@@ -76,6 +83,7 @@ def camara_flow(
         legislatura=extract_camara_legislatura_f,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_partidos_f.result()  # type: ignore
 
@@ -84,6 +92,7 @@ def camara_flow(
         partidos_ids=extract_camara_partidos_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_detalhes_partidos_f.result()  # type: ignore
 
@@ -95,11 +104,12 @@ def camara_flow(
     )
     futures.append(load_camara_partidos_f)
 
-    ## EXTRACT DEPUTADOS
+    # ## EXTRACT DEPUTADOS
     extract_camara_deputados_f = extract_deputados_camara.submit(
         legislatura=extract_camara_legislatura_f,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_deputados_f = extract_camara_deputados_f.result()  # type: ignore
 
@@ -108,6 +118,7 @@ def camara_flow(
         deputados_ids=extract_camara_deputados_f,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_detalhes_deputados_f.result()  # type: ignore
 
@@ -124,6 +135,7 @@ def camara_flow(
         lote_id=lote_id,
         deputados_ids=extract_camara_deputados_f,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_historico_deputados_f.result()  # type: ignore
 
@@ -141,11 +153,12 @@ def camara_flow(
             lote_id=lote_id,
             deputados_ids=extract_camara_deputados_f,
             ignore_tasks=ignore_tasks,
+            use_files=use_files,
         )
     )
     extract_camara_mandatos_externos_deputados_f.result()  # type: ignore
 
-    ## LOAD MANDATOS EXTERNOS DEPUTADOS
+    # LOAD MANDATOS EXTERNOS DEPUTADOS
     load_camara_mandatos_externos_deputados_f = (
         load_camara_mandatos_externos_deputados.submit(
             lote_id=lote_id,
@@ -162,6 +175,7 @@ def camara_flow(
         lote_id=lote_id,
         deputados_ids=extract_camara_deputados_f,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_ocupacoes_deputados_f.result()  # type: ignore
 
@@ -178,6 +192,7 @@ def camara_flow(
         lote_id=lote_id,
         deputados_ids=extract_camara_deputados_f,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_profissoes_deputados_f.result()  # type: ignore
 
@@ -196,6 +211,7 @@ def camara_flow(
         end_date=end_date,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     futures.append(extract_camara_assiduidade_plenario_f)
 
@@ -207,6 +223,7 @@ def camara_flow(
             end_date=end_date,
             lote_id=lote_id,
             ignore_tasks=ignore_tasks,
+            use_files=use_files,
         )
     )
     futures.append(extract_camara_assiduidade_comissoes_f)
@@ -216,6 +233,7 @@ def camara_flow(
         legislatura=extract_camara_legislatura_f,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_frentes_f.result()  # type: ignore
 
@@ -224,6 +242,7 @@ def camara_flow(
         frentes_ids=extract_camara_frentes_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_detalhes_frentes_f.result()  # type: ignore
 
@@ -232,6 +251,7 @@ def camara_flow(
         frentes_ids=extract_camara_frentes_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_frentes_membros_f.result()  # type: ignore
 
@@ -242,6 +262,7 @@ def camara_flow(
         end_date=end_date,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_discursos_deputados_f.result()  # type: ignore
 
@@ -251,6 +272,7 @@ def camara_flow(
         end_date=end_date,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_proposicoes_f.result()  # type: ignore
 
@@ -259,6 +281,7 @@ def camara_flow(
         proposicoes_ids=extract_camara_proposicoes_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_detalhes_proposicoes_f.result()  # type: ignore
 
@@ -267,6 +290,7 @@ def camara_flow(
         proposicoes_ids=extract_camara_proposicoes_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_autores_proposicoes_f.result()  # type: ignore
 
@@ -276,6 +300,7 @@ def camara_flow(
         end_date=end_date,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_votacoes_f.result()  # type: ignore
 
@@ -284,6 +309,7 @@ def camara_flow(
         votacoes_ids=extract_camara_votacoes_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_detalhes_votacoes_f.result()  # type: ignore
 
@@ -292,6 +318,7 @@ def camara_flow(
         votacoes_ids=extract_camara_votacoes_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_orientacoes_votacoes_f.result()  # type: ignore
 
@@ -300,6 +327,7 @@ def camara_flow(
         votacoes_ids=extract_camara_votacoes_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_votos_votacoes_f.result()  # type: ignore
 
@@ -311,6 +339,7 @@ def camara_flow(
         legislatura=extract_camara_legislatura_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_despesas_deputados_f.result()  # type: ignore
 
@@ -319,6 +348,7 @@ def camara_flow(
         legislatura=extract_camara_legislatura_f,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_legislaturas_lideres_f.result()  # type: ignore
 
@@ -327,6 +357,7 @@ def camara_flow(
         legislatura=extract_camara_legislatura_f,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        use_files=use_files,
     )
     extract_camara_legislaturas_mesa_f.result()
 
@@ -350,6 +381,10 @@ def camara_flow(
     description="Task que permite executar o Flow da Câmara de forma concorrente em relação às outras flows.",
 )
 def run_camara_flow(
-    start_date: date, end_date: date, ignore_tasks: list[str], lote_id: int
+    start_date: date,
+    end_date: date,
+    ignore_tasks: list[str],
+    lote_id: int,
+    use_files: bool,
 ):
-    camara_flow(start_date, end_date, ignore_tasks, lote_id)
+    camara_flow(start_date, end_date, ignore_tasks, lote_id, use_files)

@@ -1,14 +1,12 @@
 from datetime import date
-from pathlib import Path
 from typing import Any
 
 from prefect import get_run_logger, task
-from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from utils.fetch_many_jsons import fetch_many_jsons
-from utils.io import save_json
+from utils.io import load_json, save_json
 
 APP_SETTINGS = load_config()
 
@@ -39,12 +37,15 @@ def get_processos_url(start_date: date, end_date: date, logger: Any) -> list[str
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 async def extract_processos_senado(
-    start_date: date,
-    end_date: date,
-    lote_id: int,
-    out_dir: str | Path = APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR,
-):
+    start_date: date, end_date: date, lote_id: int, use_files: bool
+) -> list[str] | None:
     logger = get_run_logger()
+
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_PROCESSOS} irá retornar os dados à partir do arquivo em disco."
+        )
+        return get_processos_ids(load_json(ExtractOutDir.SENADO.PROCESSOS))
 
     url = get_processos_url(start_date, end_date, logger)
 
@@ -61,19 +62,9 @@ async def extract_processos_senado(
         lote_id=lote_id,
     )
 
-    await acreate_table_artifact(
-        key="processos-senado",
-        table=[{"num_processos": len(json[0])}],
-        description="Proposições Senado",
-    )
+    save_json(json, ExtractOutDir.SENADO.PROCESSOS)
 
-    dest = Path(out_dir) / "processos.json"
-
-    save_json(json, dest)
-
-    ids = get_processos_ids(json)
-
-    return ids
+    return get_processos_ids(json)
 
 
 def get_processos_ids(json: Any) -> list[str]:

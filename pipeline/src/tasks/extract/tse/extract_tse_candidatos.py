@@ -4,7 +4,7 @@ from pathlib import Path
 from prefect import get_run_logger, task
 
 from config.loader import CACHE_POLICY_MAP, load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from utils.io import download_stream
 
 APP_SETTINGS = load_config()
@@ -30,19 +30,18 @@ def cache_by_year(_ctx, params):
 def extract_candidatos(
     year: int,
     lote_id: int,
-    out_dir: Path | str = APP_SETTINGS.TSE.OUTPUT_EXTRACT_DIR,
 ) -> str | None:
     logger = get_run_logger()
 
     url = f"{APP_SETTINGS.TSE.BASE_URL}consulta_cand/consulta_cand_{year}.zip"
 
-    dir_dest_path = Path(out_dir) / "candidatos" / str(year)
-
-    file_dest_path = dir_dest_path / f"{year}.zip"
-
     logger.info(
         f"Fazendo download da lista de candidatos do TSE da eleição de {year}: {url}"
     )
+
+    dir_dest_path = Path(ExtractOutDir.TSE.CANDIDATOS) / str(year)
+
+    file_dest_path = dir_dest_path / f"{year}.zip"
 
     _tmp_zip_dest_path = download_stream(
         url=url,

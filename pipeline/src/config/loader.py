@@ -21,7 +21,11 @@ class FlowConfig(BaseModel):
     LOG_DB_LEVEL: int
 
 
-class AllEndpoints(BaseModel):
+class LoadConfig(BaseModel):
+    USE_FILES: bool
+
+
+class AllEndpointsConfig(BaseModel):
     FETCH_MAX_RETRIES: int
     FETCH_RETRY_DELAY: int
 
@@ -57,7 +61,8 @@ class SenadoConfig(BaseModel):
 
 class AppConfig(BaseModel):
     FLOW: FlowConfig
-    ALLENDPOINTS: AllEndpoints
+    ALLENDPOINTS: AllEndpointsConfig
+    LOAD: LoadConfig
     TSE: TSEConfig
     CAMARA: CamaraConfig
     SENADO: SenadoConfig

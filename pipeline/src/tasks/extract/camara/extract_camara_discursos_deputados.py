@@ -1,17 +1,15 @@
 from datetime import date, timedelta
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from prefect import get_run_logger, task
-from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
-from utils.io import save_ndjson
-from utils.url_utils import get_path_parameter_value
+from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
@@ -52,18 +50,23 @@ async def extract_discursos_deputados_camara(
     end_date: date,
     lote_id: int,
     ignore_tasks: list[str],
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> str | None:
+    use_files: bool,
+) -> list[dict] | None:
     logger = get_run_logger()
 
-    if not deputados_ids:
-        logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS}' pois o argumento do parâmetro 'deputados_ids' é nulo"
-        )
-        return
     if TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS in ignore_tasks:
         logger.warning(
             f"A Task {TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS} foi ignorada"
+        )
+        return
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS} irá retornar os dados à partir do arquivo em disco."
+        )
+        return load_ndjson(ExtractOutDir.CAMARA.DISCURSOS)
+    if not deputados_ids:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS}' pois o argumento do parâmetro 'deputados_ids' é nulo"
         )
         return
 
@@ -81,35 +84,6 @@ async def extract_discursos_deputados_camara(
         lote_id=lote_id,
     )
 
-    await acreate_table_artifact(
-        key="discursos-deputados",
-        table=generate_artifact(jsons),
-        description="Discursos de deputados",
-    )
+    save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.DISCURSOS))
 
-    dest = Path(out_dir) / "discursos.ndjson"
-    return save_ndjson(cast(list[dict], jsons), dest)
-
-
-def generate_artifact(jsons: Any):
-    artifact_data = []
-    for i, json in enumerate(jsons):
-        json = cast(dict, json)
-        discursos = json.get("dados", [])  # type: ignore
-        links = {link["rel"]: link["href"] for link in json["links"]}
-
-        # Pegando o id do deputado
-        deputado_id = get_path_parameter_value(
-            url=links.get("self", ""), param_name="deputados", default_value=None
-        )
-
-        # Aqui next é usado pois não precisa varrer a lista inteira, ele para no primeiro que encontrar
-        row = next((row for row in artifact_data if row["id"] == deputado_id), None)
-
-        if row:  # Se já tiver um registro, atualiza o número de discursos
-            row["num_discursos"] += len(discursos)
-        else:  # Se não, cria novo registro
-            artifact_data.append(
-                {"index": i, "id": deputado_id, "num_discursos": len(discursos)}
-            )
-    return artifact_data
+    return cast(list[dict], jsons)

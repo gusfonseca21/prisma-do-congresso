@@ -1,14 +1,12 @@
 from datetime import date
-from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from prefect import get_run_logger, task
-from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from utils.fetch_many_jsons import fetch_many_jsons
-from utils.io import save_ndjson
+from utils.io import load_ndjson, save_ndjson
 from utils.url_utils import generate_date_urls_senado
 
 APP_SETTINGS = load_config()
@@ -32,12 +30,16 @@ def get_votacoes_urls(start_date: date, end_date: date) -> list[str] | None:
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 async def extract_votacoes_senado(
-    start_date: date,
-    end_date: date,
-    lote_id: int,
-    out_dir: str | Path = APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR,
-):
+    start_date: date, end_date: date, lote_id: int, use_files: bool
+) -> list[dict] | None:
     logger = get_run_logger()
+
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_VOTACOES} irá retornar os dados à partir do arquivo em disco."
+        )
+        jsons = load_ndjson(ExtractOutDir.SENADO.VOTACOES)
+        return jsons
 
     urls = get_votacoes_urls(start_date, end_date)
 
@@ -57,22 +59,6 @@ async def extract_votacoes_senado(
         lote_id=lote_id,
     )
 
-    await acreate_table_artifact(
-        key="votacoes-senado",
-        table=generate_artifact(jsons),
-        description="Votações Senado",
-    )
+    save_ndjson(cast(list[dict], jsons), ExtractOutDir.SENADO.VOTACOES)
 
-    dest = Path(out_dir) / "votacoes_senado.ndjson"
-
-    return save_ndjson(cast(list[dict], jsons), dest)
-
-
-def generate_artifact(jsons: Any):
-    count = 0
-
-    for j in jsons:
-        if len(j):
-            count += len(j)
-
-    return [{"num_votacoes": count}]
+    return cast(list[dict], jsons)

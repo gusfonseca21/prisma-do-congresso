@@ -4,11 +4,11 @@ from typing import cast
 from prefect import get_run_logger, task
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
-from utils.io import save_ndjson
+from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
@@ -40,8 +40,8 @@ async def extract_camara_detalhes_frentes(
     frentes_ids: list[str] | None,
     lote_id: int,
     ignore_tasks: list[str],
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> str | None:
+    use_files: bool,
+) -> list[dict] | None:
     logger = get_run_logger()
 
     if not frentes_ids:
@@ -49,6 +49,11 @@ async def extract_camara_detalhes_frentes(
             f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DETALHES_FRENTES}' pois o argumento do parâmetro 'frentes_ids' é nulo"
         )
         return
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_DETALHES_FRENTES} irá retornar os dados à partir do arquivo em disco."
+        )
+        return load_ndjson(ExtractOutDir.CAMARA.DETALHES_FRENTES)
     if TasksNames.EXTRACT_CAMARA_DETALHES_FRENTES in ignore_tasks:
         logger.warning(
             f"A Task {TasksNames.EXTRACT_CAMARA_DETALHES_FRENTES} foi ignorada"
@@ -69,5 +74,6 @@ async def extract_camara_detalhes_frentes(
         lote_id=lote_id,
     )
 
-    dest = Path(out_dir) / "frentes_detalhes.ndjson"
-    return save_ndjson(cast(list[dict], jsons), dest)
+    save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.DETALHES_FRENTES))
+
+    return cast(list[dict], jsons)

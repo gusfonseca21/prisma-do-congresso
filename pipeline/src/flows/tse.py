@@ -21,7 +21,11 @@ from utils.logs import save_logs
     log_prints=True,
 )
 def tse_flow(
-    start_date: date, refresh_cache: bool, ignore_tasks: list[str], lote_id: int
+    start_date: date,
+    refresh_cache: bool,
+    ignore_tasks: list[str],
+    lote_id: int,
+    use_files: bool,
 ):
     logger = get_run_logger()
     logger.info(f"Iniciando execução da Flow do TSE - Lote {lote_id}")
@@ -95,6 +99,10 @@ def tse_flow(
     description="Task que permite executar o Flow do TSE de forma concorrente em relação às outras flows.",
 )
 def run_tse_flow(
-    start_date: date, refresh_cache: bool, ignore_tasks: list[str], lote_id: int
+    start_date: date,
+    refresh_cache: bool,
+    ignore_tasks: list[str],
+    lote_id: int,
+    use_files: bool,
 ):
-    tse_flow(start_date, refresh_cache, ignore_tasks, lote_id)
+    tse_flow(start_date, refresh_cache, ignore_tasks, lote_id, use_files)

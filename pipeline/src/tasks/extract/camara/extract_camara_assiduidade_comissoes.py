@@ -7,7 +7,7 @@ from prefect import get_run_logger, task
 from selectolax.parser import HTMLParser
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.io import fetch_html_many_async, save_htmls_in_zip
@@ -49,21 +49,26 @@ async def extract_camara_assiduidade_comissoes(
     end_date: date,
     lote_id: int,
     ignore_tasks: list[str],
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
+    use_files: bool,
 ) -> str | None:
     """
     Baixa páginas HTML com os dados sobre a assiduidade dos Deputados em Comissões
     """
     logger = get_run_logger()
 
-    if not deputados_ids:
-        logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES}' pois o argumento do parâmetro 'deputados_ids' é nulo"
-        )
-        return
     if TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES in ignore_tasks:
         logger.warning(
             f"A Task {TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES} foi ignorada"
+        )
+        return
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES} irá retornar os dados à partir do arquivo em disco."
+        )
+        return load_ndjson()  # CONTINUAR AQUI RETORNAR OS JSONS
+    if not deputados_ids:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES}' pois o argumento do parâmetro 'deputados_ids' é nulo"
         )
         return
 
@@ -114,8 +119,8 @@ async def extract_camara_assiduidade_comissoes(
             else:
                 logger.warning(f"O href {href} não é string")
 
-    dest = Path(out_dir) / "assiduidade_comissoes.zip"
-
-    dest_path = save_htmls_in_zip(htmls_list, dest)
+    dest_path = save_htmls_in_zip(
+        htmls_list, Path(ExtractOutDir.CAMARA.ASSIDUIDADE_COMISSOES)
+    )
 
     return str(dest_path)

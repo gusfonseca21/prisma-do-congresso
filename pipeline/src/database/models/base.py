@@ -28,6 +28,7 @@ class PipelineParams:
     ignore_tasks: list[str]
     ignore_flows: list[str]
     message: str | None
+    use_files: bool
 
 
 # Atenção, não é utilizado para Migrations
@@ -81,6 +82,7 @@ class Lote(Base):
     resetar_cache = sa.Column(sa.Boolean, nullable=False)
     mensagem = sa.Column(sa.Text, nullable=True)
     urls_nao_baixadas = sa.Column(sa.Boolean, nullable=False, server_default=sa.false())
+    use_files = sa.Column(sa.Boolean, nullable=False, server_default=sa.false())
 
 
 class ErrosExtract(Base):

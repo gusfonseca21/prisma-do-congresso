@@ -1,15 +1,14 @@
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from prefect import get_run_logger, task
-from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
-from utils.io import save_ndjson
+from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
@@ -41,18 +40,23 @@ async def extract_orientacoes_votacoes_camara(
     votacoes_ids: list[str] | None,
     lote_id: int,
     ignore_tasks: list[str],
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> str | None:
+    use_files: bool,
+) -> list[dict] | None:
     logger = get_run_logger()
 
-    if not votacoes_ids:
-        logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_ORIENTACOES_VOTACOES}' pois o argumento do parâmetro 'votacoes_ids' é nulo"
-        )
-        return
     if TasksNames.EXTRACT_CAMARA_ORIENTACOES_VOTACOES in ignore_tasks:
         logger.warning(
             f"A Task {TasksNames.EXTRACT_CAMARA_ORIENTACOES_VOTACOES} foi ignorada"
+        )
+        return
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_ORIENTACOES_VOTACOES} irá retornar os dados à partir do arquivo em disco."
+        )
+        return load_ndjson(ExtractOutDir.CAMARA.ORIENTACOES_VOTACOES)
+    if not votacoes_ids:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_ORIENTACOES_VOTACOES}' pois o argumento do parâmetro 'votacoes_ids' é nulo"
         )
         return
 
@@ -70,21 +74,8 @@ async def extract_orientacoes_votacoes_camara(
         lote_id=lote_id,
     )
 
-    await acreate_table_artifact(
-        key="orientacoes-votacoes-camara",
-        table=generate_artifact(jsons),
-        description="Orientações Votações da Câmara",
+    save_ndjson(
+        cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.ORIENTACOES_VOTACOES)
     )
 
-    dest = Path(out_dir) / "orientacoes_votacoes_camara.ndjson"
-
-    return save_ndjson(cast(list[dict], jsons), dest)
-
-
-def generate_artifact(jsons: Any):
-    num_orientacoes = 0
-    for j in jsons:
-        for orientacao in j.get("dados", []):
-            if len(orientacao):
-                num_orientacoes += 1
-    return [{"total_votacoes_com_orientacao": f"{num_orientacoes}/{len(jsons)}"}]
+    return cast(list[dict], jsons)

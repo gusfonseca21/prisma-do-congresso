@@ -9,6 +9,9 @@ LOG_DB_LEVEL = 30
 FETCH_MAX_RETRIES=10
 FETCH_RETRY_DELAY=3
 
+[LOAD] # Configurações para os módulos de Load
+USE_FILES=true
+
 [TSE]
 BASE_URL = "https://cdn.tse.jus.br/estatistica/sead/odsele/"
 OUTPUT_EXTRACT_DIR = "output/extract/tse"

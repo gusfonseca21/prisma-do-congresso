@@ -1,14 +1,13 @@
 from datetime import date, timedelta
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from prefect import get_run_logger, task
-from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from utils.fetch_many_jsons import fetch_many_jsons
-from utils.io import save_ndjson
+from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
@@ -37,6 +36,10 @@ def generate_urls(start_date: date, end_date: date) -> list[str]:
     return urls
 
 
+def get_ids_votacoes(jsons: list[dict]) -> list[str]:
+    return list({str(p.get("id")) for j in jsons for p in j.get("dados", [])})  # type: ignore
+
+
 @task(
     task_run_name=TasksNames.EXTRACT_CAMARA_VOTACOES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
@@ -48,13 +51,18 @@ async def extract_votacoes_camara(
     end_date: date,
     lote_id: int,
     ignore_tasks: list[str],
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
+    use_files: bool,
 ) -> list[str] | None:
     logger = get_run_logger()
 
     if TasksNames.EXTRACT_CAMARA_VOTACOES in ignore_tasks:
         logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_VOTACOES} foi ignorada")
         return
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_VOTACOES} irá retornar os dados à partir do arquivo em disco."
+        )
+        return get_ids_votacoes(load_ndjson(ExtractOutDir.CAMARA.VOTACOES))
 
     urls = generate_urls(start_date, end_date)
 
@@ -71,23 +79,8 @@ async def extract_votacoes_camara(
         lote_id=lote_id,
     )
 
-    dest = Path(out_dir) / "votacoes.ndjson"
-    save_ndjson(cast(list[dict], jsons), dest)
+    save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.VOTACOES))
 
-    await acreate_table_artifact(
-        key="votacoes-camara",
-        table=[generate_artifact(jsons)],
-        description="Votações da Câmara",
-    )
+    ids_votacoes = get_ids_votacoes(cast(list[dict], jsons))
 
-    ids_votacoes = {str(p.get("id")) for j in jsons for p in j.get("dados", [])}  # type: ignore
-
-    return list(ids_votacoes)
-
-
-def generate_artifact(jsons: Any) -> dict:
-    total_votacoes = 0
-    for j in jsons:
-        downloaded_votacoes = len(j.get("dados", []))
-        total_votacoes += downloaded_votacoes
-    return {"total_proposicoes": total_votacoes}
+    return ids_votacoes

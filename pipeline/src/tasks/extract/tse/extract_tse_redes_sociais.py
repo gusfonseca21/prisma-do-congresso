@@ -4,7 +4,7 @@ from pathlib import Path
 from prefect import get_run_logger, task
 
 from config.loader import CACHE_POLICY_MAP, load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from utils.io import download_stream
 
 APP_SETTINGS = load_config()
@@ -31,15 +31,14 @@ def extract_redes_sociais(
     year: int,
     uf: str,
     lote_id: int,
-    out_dir: Path | str = APP_SETTINGS.TSE.OUTPUT_EXTRACT_DIR,
 ) -> str | None:
     logger = get_run_logger()
 
     url = f"{APP_SETTINGS.TSE.BASE_URL}consulta_cand/rede_social_candidato_{year}_{uf}.zip"
 
-    dir_dest_path = Path(out_dir) / "redes_sociais" / str(year)
+    dir_dest_path = Path(ExtractOutDir.TSE.REDES_SOCIAIS) / str(year)
 
-    file_dest_path = dir_dest_path / f"{uf}-{year}.zip"
+    file_dest_path = dir_dest_path / f"{uf}_{year}.zip"
 
     logger.info(
         f"Fazendo download das tabelas de redes sociais dos candidatos do estado {uf} da eleição de {year}: {url}"

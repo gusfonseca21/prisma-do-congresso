@@ -2,14 +2,13 @@ from pathlib import Path
 from typing import cast
 
 from prefect import get_run_logger, task
-from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
-from utils.io import save_ndjson
+from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
@@ -41,18 +40,23 @@ async def extract_detalhes_votacoes_camara(
     votacoes_ids: list[str] | None,
     lote_id: int,
     ignore_tasks: list[str],
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> str | None:
+    use_files: bool,
+) -> list[dict] | None:
     logger = get_run_logger()
 
-    if not votacoes_ids:
-        logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DETALHES_VOTACOES}' pois o argumento do parâmetro 'votacoes_ids' é nulo"
-        )
-        return
     if TasksNames.EXTRACT_CAMARA_DETALHES_VOTACOES in ignore_tasks:
         logger.warning(
             f"A Task {TasksNames.EXTRACT_CAMARA_DETALHES_VOTACOES} foi ignorada"
+        )
+        return
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_DETALHES_VOTACOES} irá retornar os dados à partir do arquivo em disco."
+        )
+        return load_ndjson(ExtractOutDir.CAMARA.DETALHES_VOTACOES)
+    if not votacoes_ids:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DETALHES_VOTACOES}' pois o argumento do parâmetro 'votacoes_ids' é nulo"
         )
         return
 
@@ -70,12 +74,6 @@ async def extract_detalhes_votacoes_camara(
         lote_id=lote_id,
     )
 
-    await acreate_table_artifact(
-        key="detalhes-votacoes-camara",
-        table=[{"total_votacoes": len(jsons)}],
-        description="Detalhes Votações da Câmara",
-    )
+    save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.DETALHES_VOTACOES))
 
-    dest = Path(out_dir) / "detalhes_votacoes_camara.ndjson"
-
-    return save_ndjson(cast(list[dict], jsons), dest)
+    return cast(list[dict], jsons)

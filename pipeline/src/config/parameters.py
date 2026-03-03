@@ -1,5 +1,9 @@
 from enum import Enum
 
+from config.loader import load_config
+
+APP_SETTINGS = load_config()
+
 
 class FlowsNames(str, Enum):
     PIPELINE = "pipeline"
@@ -60,3 +64,102 @@ class TasksNames:
     EXTRACT_SENADO_PROCESSOS = "extract_senado_processos"
     EXTRACT_SENADO_DETALHES_PROCESSOS = "extract_senado_detalhes_processos"
     EXTRACT_SENADO_VOTACOES = "extract_senado_votacoes"
+
+
+class ExtractOutDir:
+    class TSE:
+        # Esses endpoints serão baixados em zip e depois extraídos na localização aqui definida
+        CANDIDATOS = (
+            f"{APP_SETTINGS.TSE.OUTPUT_EXTRACT_DIR}/candidatos"  # COMPLEMENTO: /year
+        )
+        PRESTACAO_CONTAS = f"{APP_SETTINGS.TSE.OUTPUT_EXTRACT_DIR}/prestacao_contas"  # COMPLEMENTO: /year
+        REDES_SOCIAIS = (
+            f"{APP_SETTINGS.TSE.OUTPUT_EXTRACT_DIR}/redes_sociais"  # COMPLEMENTO: /year
+        )
+        VOTACOES = (
+            f"{APP_SETTINGS.TSE.OUTPUT_EXTRACT_DIR}/votacoes"  # COMPLEMENTO: /year
+        )
+
+    class CAMARA:
+        LEGISLATURA = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/legislatura.json"
+        PARTIDOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/partidos.ndjson"
+        DETALHES_PARTIDOS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/detalhes_partidos.ndjson"
+        )
+        DEPUTADOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/deputados.json"
+        DETALHES_DEPUTADOS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/detalhes_deputados.ndjson"
+        )
+        HISTORICO_DEPUTADOS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/historico_deputados.ndjson"
+        )
+        MANDATOS_EXTERNOS_DEPUTADOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/mandatos_externos_deputados.ndjson"
+        OCUPACOES_DEPUTADOS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/ocupacoes_deputados.ndjson"
+        )
+        PROFISSOES_DEPUTADOS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/profissoes_deputados.ndjson"
+        )
+        ASSIDUIDADE_PLENARIO = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/assiduidade_plenario.zip"
+        )
+        ASSIDUIDADE_COMISSOES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/assiduidade_comissoes.zip"
+        )
+        FRENTES = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/frentes.ndjson"
+        FRENTES_MEMBROS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/frentes_membros.ndjson"
+        )
+        DETALHES_FRENTES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/detalhes_frentes.ndjson"
+        )
+        DISCURSOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/discursos.ndjson"
+        PROPOSICOES = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/proposicoes.ndjson"
+        DETALHES_PROPOSICOES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/detalhes_proposicoes.ndjson"
+        )
+        AUTORES_PROPOSICOES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/autores_proposicoes.ndjson"
+        )
+        VOTACOES = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/votacoes.ndjson"
+        DETALHES_VOTACOES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/detalhes_votacoes.ndjson"
+        )
+        ORIENTACOES_VOTACOES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/orientacoes_votacoes.ndjson"
+        )
+        VOTOS_VOTACOES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/votos_votacoes.ndjson"
+        )
+        DESPESAS_DEPUTADOS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/despesas_deputados.ndjson"
+        )
+        LEGISLATURAS_LIDERES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/legislaturas_lideres.ndjson"
+        )
+        LEGISLATURAS_MESA = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/legislaturas_mesa.json"
+        )
+
+    class SENADO:
+        COLEGIADOS = f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/colegiados.json"
+        SENADORES_EXERCICIO = (
+            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/senadores_exercicio.json"
+        )
+        SENADORES_AFASTADOS = (
+            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/senadores_afastados.json"
+        )
+        DETALHES_SENADORES = (
+            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/detalhes_senadores.ndjson"
+        )
+        DISCURSOS_SENADORES = (
+            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/discursos_senadores.ndjson"
+        )
+        DESPESAS_SENADORES = (
+            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/despesas_senadores.ndjson"
+        )
+        PROCESSOS = f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/processos.json"
+        DETALHES_PROCESSOS = (
+            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/detalhes_processos.ndjson"
+        )
+        VOTACOES = f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/votacoes.ndjson"

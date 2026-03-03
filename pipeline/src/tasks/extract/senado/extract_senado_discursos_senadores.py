@@ -1,16 +1,14 @@
 from datetime import date, timedelta
-from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from prefect import get_run_logger, task
-from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
-from utils.io import save_ndjson
+from utils.io import load_ndjson, save_ndjson
 from utils.url_utils import generate_date_urls_senado
 
 APP_SETTINGS = load_config()
@@ -57,9 +55,16 @@ async def extract_discursos_senado(
     start_date: date,
     end_date: date,
     lote_id: int,
-    out_dir: str | Path = APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR,
-):
+    use_files: bool,
+) -> list[dict] | None:
     logger = get_run_logger()
+
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES} irá retornar os dados à partir do arquivo em disco."
+        )
+        jsons = load_ndjson(ExtractOutDir.SENADO.DISCURSOS_SENADORES)
+        return jsons
 
     urls = discursos_senadores_urls(ids_senadores, start_date, end_date)
 
@@ -76,53 +81,6 @@ async def extract_discursos_senado(
         lote_id=lote_id,
     )
 
-    await acreate_table_artifact(
-        key="discursos-senadores",
-        table=generate_artifact(jsons),
-        description="Discursos Senadores",
-    )
+    save_ndjson(cast(list[dict], jsons), ExtractOutDir.SENADO.DISCURSOS_SENADORES)
 
-    dest = Path(out_dir) / "discursos_senadores.ndjson"
-
-    return save_ndjson(cast(list[dict], jsons), dest)
-
-
-def generate_artifact(jsons: Any):
-    artifact_data = []
-
-    for i, json in enumerate(jsons):
-        senador = (
-            json.get("DiscursosParlamentar", {})
-            .get("Parlamentar", {})
-            .get("IdentificacaoParlamentar")
-        )
-
-        senador_id = senador.get("CodigoParlamentar", None)
-
-        discursos = (
-            json.get("DiscursosParlamentar", {})
-            .get("Parlamentar", {})
-            .get("Pronunciamentos", [])
-        )
-
-        if discursos is not None:
-            discursos = discursos.get("Pronunciamento", [])
-        else:
-            discursos = []
-
-        if not any(item["id"] == senador_id for item in artifact_data):
-            artifact_data.append(
-                {
-                    "index": i,
-                    "id": senador_id,
-                    "nome": senador.get("NomeParlamentar", None),
-                    "num_discursos": len(discursos),
-                }
-            )
-        else:
-            for item in artifact_data:
-                if item.get("id") == senador_id:
-                    item["num_discursos"] += len(discursos)
-                    break
-
-    return artifact_data
+    return cast(list[dict], jsons)

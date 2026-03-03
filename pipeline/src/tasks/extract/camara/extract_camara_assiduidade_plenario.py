@@ -8,7 +8,7 @@ from prefect.artifacts import acreate_table_artifact
 from selectolax.parser import HTMLParser
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.io import fetch_html_many_async, save_htmls_in_zip
@@ -50,21 +50,26 @@ async def extract_camara_assiduidade_plenario(
     end_date: date,
     lote_id: int,
     ignore_tasks: list[str],
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
+    use_files: bool,
 ) -> str | None:
     """
     Baixa páginas HTML com os dados sobre a assiduidade dos Deputados em Plenário
     """
     logger = get_run_logger()
 
-    if not deputados_ids:
-        logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO}' pois o argumento do parâmetro 'deputados_ids' é nulo"
-        )
-        return
     if TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO in ignore_tasks:
         logger.warning(
             f"A Task {TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO} foi ignorada"
+        )
+        return
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO} irá retornar os dados à partir do arquivo em disco."
+        )
+        return load_ndjson()  # CONTINUAR AQUI DEPOIS RETORNANDO OS HTMLS
+    if not deputados_ids:
+        logger.warning(
+            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO}' pois o argumento do parâmetro 'deputados_ids' é nulo"
         )
         return
 
@@ -109,24 +114,6 @@ async def extract_camara_assiduidade_plenario(
                         htmls_list.append(
                             {"deputado_id": deputado_id, "ano": year, "html": html}
                         )
-
-                        tables = tree.css("table.table.table-bordered")
-                        name = tree.css_first("h1.titulo-internal")
-                        name_text = name.text(strip=True) if name else None
-                        artifact_row = {
-                            "id": deputado_id,
-                            "nome": name_text,
-                            "ano": year,
-                        }
-                        if tables:
-                            artifact_row["possui_dados"] = "Sim"
-                        else:
-                            artifact_row["possui_dados"] = "Não"
-                        artifact_data.append(artifact_row)
-                    else:
-                        logger.warning(
-                            "Não foram encontrados dados suficientes na página HTML"
-                        )
             else:
                 logger.warning(f"O href {href} não é string")
 
@@ -136,8 +123,8 @@ async def extract_camara_assiduidade_plenario(
         description="Assiduidade de deputados Plenário",
     )
 
-    dest = Path(out_dir) / "assiduidade_plenario.zip"
-
-    dest_path = save_htmls_in_zip(htmls_list, dest)
+    dest_path = save_htmls_in_zip(
+        htmls_list, Path(ExtractOutDir.CAMARA.ASSIDUIDADE_PLENARIO)
+    )
 
     return str(dest_path)

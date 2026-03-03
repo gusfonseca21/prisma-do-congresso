@@ -3,14 +3,13 @@ from pathlib import Path
 from typing import cast
 
 from prefect import get_run_logger, task
-from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
-from utils.io import save_ndjson
+from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
@@ -110,10 +109,20 @@ async def extract_despesas_camara(
     end_date: date,
     lote_id: int,
     ignore_tasks: list[str],
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
-) -> str | None:
+    use_files: bool,
+) -> list[dict] | None:
     logger = get_run_logger()
 
+    if TasksNames.EXTRACT_CAMARA_DESPESAS_DEPUTADOS in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.EXTRACT_CAMARA_DESPESAS_DEPUTADOS} foi ignorada"
+        )
+        return
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_DESPESAS_DEPUTADOS} irá retornar os dados à partir do arquivo em disco."
+        )
+        return load_ndjson(ExtractOutDir.CAMARA.DESPESAS_DEPUTADOS)
     if not legislatura:
         logger.warning(
             f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DESPESAS_DEPUTADOS}' pois o argumento do parâmetro 'legislatura' é nulo"
@@ -122,11 +131,6 @@ async def extract_despesas_camara(
     if not deputados_ids:
         logger.warning(
             f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DESPESAS_DEPUTADOS}' pois o argumento do parâmetro 'deputados_ids' é nulo"
-        )
-        return
-    if TasksNames.EXTRACT_CAMARA_DESPESAS_DEPUTADOS in ignore_tasks:
-        logger.warning(
-            f"A Task {TasksNames.EXTRACT_CAMARA_DESPESAS_DEPUTADOS} foi ignorada"
         )
         return
 
@@ -144,14 +148,6 @@ async def extract_despesas_camara(
         lote_id=lote_id,
     )
 
-    # Gerando artefato para validação dos dados
-    artifact_data = [{"Total de registros": len(jsons)}]
+    save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.DESPESAS_DEPUTADOS))
 
-    await acreate_table_artifact(
-        key="despesas-deputados",
-        table=artifact_data,
-        description="Despesas de deputados",
-    )
-
-    dest = Path(out_dir) / "despesas.ndjson"
-    return save_ndjson(cast(list[dict], jsons), dest)
+    return cast(list[dict], jsons)

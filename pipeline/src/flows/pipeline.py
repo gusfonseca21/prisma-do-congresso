@@ -33,31 +33,30 @@ def pipeline(
         ### EXTTRACT ###
         # "extract_camara_partidos",
         # "extract_camara_detalhes_partidos",
-        "extract_camara_detalhes_deputados",
-        "extract_camara_historico_deputados",
-        "extract_camara_mandatos_externos_deputados",
-        "extract_camara_ocupacoes_deputados",
-        "extract_camara_profissoes_deputados",
-        #
+        # "extract_camara_detalhes_deputados",
+        # "extract_camara_historico_deputados",
+        # "extract_camara_mandatos_externos_deputados",
+        # "extract_camara_ocupacoes_deputados",
+        # "extract_camara_profissoes_deputados",
         "extract_camara_assiduidade_plenario",
         "extract_camara_assiduidade_comissoes",
-        "extract_camara_frentes",
-        "extract_camara_detalhes_frentes",
-        "extract_camara_frentes_membros",
-        "extract_camara_discursos_deputados",
-        "extract_camara_proposicoes",
-        "extract_camara_detalhes_proposicoes",
-        "extract_camara_autores_proposicoes",
-        "extract_camara_despesas_deputados",
-        "extract_camara_votacoes",
-        "extract_camara_detalhes_votacoes",
-        "extract_camara_orientacoes_votacoes",
-        "extract_camara_votos_votacoes",
-        "extract_camara_legislaturas_lideres",
-        "extract_camara_legislaturas_mesa",
+        # "extract_camara_frentes",
+        # "extract_camara_detalhes_frentes",
+        # "extract_camara_frentes_membros",
+        # "extract_camara_discursos_deputados",
+        # "extract_camara_proposicoes",
+        # "extract_camara_detalhes_proposicoes",
+        # "extract_camara_autores_proposicoes",
+        # "extract_camara_votacoes",
+        # "extract_camara_detalhes_votacoes",
+        # "extract_camara_orientacoes_votacoes",
+        # "extract_camara_votos_votacoes",
+        # "extract_camara_legislaturas_lideres",
+        # "extract_camara_legislaturas_mesa",
+        # "extract_camara_despesas_deputados",
         ### LOAD ###
-        # "load_camara_legislatura",
-        # "load_camara_partidos",
+        "load_camara_legislatura",
+        "load_camara_partidos",
         "load_camara_deputados",
         "load_camara_historico_deputados",
         "load_camara_mandatos_externos_deputados",
@@ -73,8 +72,9 @@ def pipeline(
         # "extract_senado_detalhes_processos",
         # "extract_senado_votacoes",
     ],
-    ignore_flows: list[str] = ["tse", "senado"],
+    ignore_flows: list[str] = [],
     message: str | None = None,
+    use_files: bool = False,
 ):
     logger = get_run_logger()
     logger.info("Iniciando Pipeline ETL.")
@@ -87,6 +87,7 @@ def pipeline(
             ignore_tasks=ignore_tasks,
             ignore_flows=ignore_flows,
             message=message,
+            use_files=use_files,
         ),
     )
     logger.info(f"Lote {lote_id} iniciou.")
@@ -95,17 +96,23 @@ def pipeline(
 
     if FlowsNames.TSE.value not in ignore_flows:
         futures.append(
-            run_tse_flow.submit(start_date, refresh_cache, ignore_tasks, lote_id)
+            run_tse_flow.submit(
+                start_date, refresh_cache, ignore_tasks, lote_id, use_files
+            )
         )
 
     if FlowsNames.CAMARA.value not in ignore_flows:
         futures.append(
-            run_camara_flow.submit(start_date, end_date, ignore_tasks, lote_id)
+            run_camara_flow.submit(
+                start_date, end_date, ignore_tasks, lote_id, use_files
+            )
         )
 
     if FlowsNames.SENADO.value not in ignore_flows:
         futures.append(
-            run_senado_flow.submit(start_date, end_date, ignore_tasks, lote_id)
+            run_senado_flow.submit(
+                start_date, end_date, ignore_tasks, lote_id, use_files
+            )
         )
 
     ## Bloquea a execução do código até que todos os flows sejam finalizados

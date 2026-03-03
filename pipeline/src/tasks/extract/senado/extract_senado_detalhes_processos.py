@@ -1,15 +1,13 @@
-from pathlib import Path
 from typing import cast
 
 from prefect import get_run_logger, task
-from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
-from utils.io import save_ndjson
+from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
@@ -38,11 +36,16 @@ def get_detalhes_processos_url(processos_ids: list[str]) -> UrlsResult:
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 async def extract_detalhes_processos_senado(
-    ids_processos: list[str],
-    lote_id: int,
-    out_dir: str | Path = APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR,
-):
+    ids_processos: list[str], lote_id: int, use_files: bool
+) -> list[dict] | None:
     logger = get_run_logger()
+
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS} irá retornar os dados à partir do arquivo em disco."
+        )
+        jsons = load_ndjson(ExtractOutDir.SENADO.DETALHES_PROCESSOS)
+        return jsons
 
     urls = get_detalhes_processos_url(ids_processos)
 
@@ -59,12 +62,6 @@ async def extract_detalhes_processos_senado(
         lote_id=lote_id,
     )
 
-    await acreate_table_artifact(
-        key="detalhes-processos",
-        table=[{"num_processos": len(jsons)}],
-        description="Detalhes de Processos",
-    )
+    save_ndjson(cast(list[dict], jsons), ExtractOutDir.SENADO.DETALHES_PROCESSOS)
 
-    dest = Path(out_dir) / "detalhes_processos.ndjson"
-
-    return save_ndjson(cast(list[dict], jsons), dest)
+    return cast(list[dict], jsons)

@@ -1,15 +1,14 @@
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from prefect import get_run_logger, task
-from prefect.artifacts import acreate_table_artifact
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
-from utils.io import save_ndjson
+from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
@@ -41,7 +40,7 @@ async def extract_camara_detalhes_partidos(
     partidos_ids: list[int] | None,
     lote_id: int,
     ignore_tasks: list[str],
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
+    use_files: bool,
 ) -> list[dict] | None:
     logger = get_run_logger()
 
@@ -50,6 +49,11 @@ async def extract_camara_detalhes_partidos(
             f"A Task {TasksNames.EXTRACT_CAMARA_DETALHES_PARTIDOS} foi ignorada"
         )
         return
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_DETALHES_PARTIDOS} irá retornar os dados à partir do arquivo em disco."
+        )
+        return load_ndjson(ExtractOutDir.CAMARA.DETALHES_PARTIDOS)
     if not partidos_ids:
         logger.warning(
             f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DETALHES_PARTIDOS}' pois o argumento do parâmetro 'partidos_ids' é nulo"
@@ -72,24 +76,6 @@ async def extract_camara_detalhes_partidos(
         lote_id=lote_id,
     )
 
-    await acreate_table_artifact(
-        key="detalhes-partidos-camara",
-        table=generate_artifact(jsons),
-        description="Detalhes de Partidos da Câmara",
-    )
-
-    dest = Path(out_dir) / "detalhes_partidos.ndjson"
-    save_ndjson(cast(list[dict], jsons), dest)
+    save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.DETALHES_PARTIDOS))
 
     return cast(list[dict], jsons)
-
-
-def generate_artifact(jsons: Any):
-    artifact_data = []
-    for i, json in enumerate(jsons):
-        json = cast(dict, json)
-        partido = json.get("dados", [])  # type: ignore
-        artifact_data.append(
-            {"index": i, "id": partido.get("id", None), "sigla": partido.get("partido")}
-        )
-    return artifact_data

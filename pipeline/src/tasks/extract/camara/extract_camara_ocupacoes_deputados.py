@@ -4,11 +4,11 @@ from typing import cast
 from prefect import get_run_logger, task
 
 from config.loader import load_config
-from config.parameters import TasksNames
+from config.parameters import ExtractOutDir, TasksNames
 from database.models.base import UrlsResult
 from database.repository.erros_extract import verify_not_downloaded_urls_in_task_db
 from utils.fetch_many_jsons import fetch_many_jsons
-from utils.io import save_ndjson
+from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
@@ -40,7 +40,7 @@ async def extract_camara_ocupacoes_deputados(
     deputados_ids: list[int] | None,
     lote_id: int,
     ignore_tasks: list[str],
-    out_dir: str | Path = APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR,
+    use_files: bool,
 ) -> list[dict] | None:
     logger = get_run_logger()
 
@@ -49,6 +49,11 @@ async def extract_camara_ocupacoes_deputados(
             f"A Task {TasksNames.EXTRACT_CAMARA_OCUPACOES_DEPUTADOS} foi ignorada"
         )
         return
+    if use_files:
+        logger.warning(
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_OCUPACOES_DEPUTADOS} irá retornar os dados à partir do arquivo em disco."
+        )
+        return load_ndjson(ExtractOutDir.CAMARA.OCUPACOES_DEPUTADOS)
     if not deputados_ids:
         logger.warning(
             f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_OCUPACOES_DEPUTADOS}' pois o argumento do parâmetro 'legislatura' é nulo"
@@ -69,8 +74,6 @@ async def extract_camara_ocupacoes_deputados(
         lote_id=lote_id,
     )
 
-    dest = Path(out_dir) / "ocupacoes_deputados.ndjson"
-
-    save_ndjson(cast(list[dict], jsons), dest)
+    save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.OCUPACOES_DEPUTADOS))
 
     return cast(list[dict], jsons)

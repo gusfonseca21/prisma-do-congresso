@@ -26,6 +26,7 @@ def start_lote_in_db(
                 tasks_ignoradas=seialize_params_list(params.ignore_tasks),
                 flows_ignoradas=seialize_params_list(params.ignore_flows),
                 mensagem=params.message,
+                use_files=params.use_files,
             )
             .returning(lote.c.id)
         )
