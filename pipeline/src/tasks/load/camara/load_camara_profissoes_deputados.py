@@ -11,6 +11,7 @@ from database.repository.camara.repository_camara_deputados import (
 from utils.url_utils import get_path_parameter_value
 
 APP_SETTINGS = load_config()
+logger = get_run_logger()
 
 
 @task(
@@ -22,9 +23,6 @@ APP_SETTINGS = load_config()
 def load_camara_profissoes_deputados(
     lote_id: int, profissoes: list[dict] | None, ignore_tasks: list[str]
 ):
-    logger = get_run_logger()
-
-    logger.info("Carregando Profissões de Deputados da Câmara no Banco de Dados")
 
     if TasksNames.LOAD_CAMARA_PROFISSOES_DEPUTADOS in ignore_tasks:
         logger.warning(
@@ -36,6 +34,8 @@ def load_camara_profissoes_deputados(
             f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_PROFISSOES_DEPUTADOS}' pois o argumento do parâmetro 'profissoes' é nulo"
         )
         return
+
+    logger.info("Carregando Profissões de Deputados da Câmara no Banco de Dados")
 
     profissoes_data: list[CamaraDeputadosProfissoesArg] = []
 

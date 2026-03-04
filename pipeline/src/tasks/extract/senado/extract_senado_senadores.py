@@ -7,6 +7,7 @@ from config.parameters import ExtractOutDir, TasksNames
 from utils.io import fetch_json, load_json, save_json
 
 APP_SETTINGS = load_config()
+logger = get_run_logger()
 
 
 def get_ids_senadores(json_exercicio: dict, json_afastados: dict) -> list[int]:
@@ -36,7 +37,6 @@ def get_ids_senadores(json_exercicio: dict, json_afastados: dict) -> list[int]:
 def extract_senadores_senado(
     lote_id: int, use_files: bool, ignore_tasks: list[str]
 ) -> list[int] | None:
-    logger = get_run_logger()
 
     if TasksNames.EXTRACT_SENADO_SENADORES in ignore_tasks:
         logger.warning(f"A Task {TasksNames.EXTRACT_SENADO_SENADORES} foi ignorada")

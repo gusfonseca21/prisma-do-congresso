@@ -10,6 +10,7 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
+logger = get_run_logger()
 
 
 def generate_urls(start_date: date, end_date: date) -> list[str]:
@@ -53,7 +54,6 @@ async def extract_votacoes_camara(
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[str] | None:
-    logger = get_run_logger()
 
     if TasksNames.EXTRACT_CAMARA_VOTACOES in ignore_tasks:
         logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_VOTACOES} foi ignorada")

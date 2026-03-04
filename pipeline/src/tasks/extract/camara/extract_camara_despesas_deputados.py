@@ -12,6 +12,7 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
+logger = get_run_logger()
 
 
 def urls_despesas(
@@ -34,6 +35,9 @@ def urls_despesas(
     )
 
     if not_downloaded_urls:
+        logger.warning(
+            f"A Tasks {TasksNames.EXTRACT_CAMARA_DESPESAS_DEPUTADOS} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+        )
         urls.update([error.url for error in not_downloaded_urls])
 
     for id_deputado in deputados_ids:
@@ -111,7 +115,6 @@ async def extract_despesas_camara(
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
-    logger = get_run_logger()
 
     if TasksNames.EXTRACT_CAMARA_DESPESAS_DEPUTADOS in ignore_tasks:
         logger.warning(

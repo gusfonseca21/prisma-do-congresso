@@ -11,6 +11,7 @@ from database.repository.camara.repository_camara_deputados import (
 from utils.url_utils import get_path_parameter_value
 
 APP_SETTINGS = load_config()
+logger = get_run_logger()
 
 
 @task(
@@ -22,7 +23,6 @@ APP_SETTINGS = load_config()
 def load_camara_mandatos_externos_deputados(
     lote_id: int, mandatos_externos: list[dict] | None, ignore_tasks: list[str]
 ):
-    logger = get_run_logger()
 
     if TasksNames.LOAD_CAMARA_MANDATOS_EXTERNOS_DEPUTADOS in ignore_tasks:
         logger.warning(

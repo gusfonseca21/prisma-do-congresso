@@ -14,6 +14,7 @@ from database.repository.erros_extract import verify_not_downloaded_urls_in_task
 from utils.io import fetch_html_many_async, save_htmls_in_zip
 
 APP_SETTINGS = load_config()
+logger = get_run_logger()
 
 
 def assiduidade_urls(
@@ -25,6 +26,9 @@ def assiduidade_urls(
     )
 
     if not_downloaded_urls:
+        logger.warning(
+            f"A Tasks {TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+        )
         urls.update([error.url for error in not_downloaded_urls])
 
     for id in deputados_ids:
@@ -55,8 +59,6 @@ async def extract_camara_assiduidade_plenario(
     """
     Baixa páginas HTML com os dados sobre a assiduidade dos Deputados em Plenário
     """
-    logger = get_run_logger()
-
     if TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO in ignore_tasks:
         logger.warning(
             f"A Task {TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO} foi ignorada"

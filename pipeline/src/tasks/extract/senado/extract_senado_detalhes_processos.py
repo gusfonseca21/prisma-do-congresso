@@ -10,6 +10,7 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
+logger = get_run_logger()
 
 
 def get_detalhes_processos_url(processos_ids: list[str]) -> UrlsResult:
@@ -19,6 +20,9 @@ def get_detalhes_processos_url(processos_ids: list[str]) -> UrlsResult:
     )
 
     if not_downloaded_urls:
+        logger.warning(
+            f"A Tasks {TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+        )
         urls.update([error.url for error in not_downloaded_urls])
 
     for id in processos_ids:
@@ -38,7 +42,6 @@ def get_detalhes_processos_url(processos_ids: list[str]) -> UrlsResult:
 async def extract_detalhes_processos_senado(
     ids_processos: list[str], lote_id: int, use_files: bool, ignore_tasks: list[str]
 ) -> list[dict] | None:
-    logger = get_run_logger()
 
     if TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS in ignore_tasks:
         logger.warning(

@@ -10,6 +10,8 @@ from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
+logger = get_run_logger()
+
 
 def partidos_url(legislatura: dict) -> str:
     id_legislatura = legislatura.get("dados", [])[0].get("id")
@@ -33,7 +35,6 @@ def get_partidos_ids(jsons: list[dict]) -> list[int]:
 async def extract_camara_partidos(
     legislatura: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> list[int] | None:
-    logger = get_run_logger()
 
     if TasksNames.EXTRACT_CAMARA_PARTIDOS in ignore_tasks:
         logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_PARTIDOS} foi ignorada")

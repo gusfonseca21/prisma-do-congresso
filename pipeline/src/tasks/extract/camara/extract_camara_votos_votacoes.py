@@ -11,6 +11,7 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
+logger = get_run_logger()
 
 
 def votos_votacoes_urls(votacoes_ids: list[str]) -> UrlsResult:
@@ -20,6 +21,9 @@ def votos_votacoes_urls(votacoes_ids: list[str]) -> UrlsResult:
     )
 
     if not_downloaded_urls:
+        logger.warning(
+            f"A Tasks {TasksNames.EXTRACT_CAMARA_VOTOS_VOTACOES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+        )
         urls.update([error.url for error in not_downloaded_urls])
 
     for id in votacoes_ids:
@@ -42,7 +46,6 @@ async def extract_votos_votacoes_camara(
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
-    logger = get_run_logger()
 
     if TasksNames.EXTRACT_CAMARA_VOTOS_VOTACOES in ignore_tasks:
         logger.warning(

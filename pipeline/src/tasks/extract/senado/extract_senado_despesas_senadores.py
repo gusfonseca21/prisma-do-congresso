@@ -11,6 +11,7 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
+logger = get_run_logger()
 
 
 def despesas_senadores_urls(start_date: date, end_date: date) -> UrlsResult:
@@ -20,6 +21,9 @@ def despesas_senadores_urls(start_date: date, end_date: date) -> UrlsResult:
     )
 
     if not_downloaded_urls:
+        logger.warning(
+            f"A Tasks {TasksNames.EXTRACT_SENADO_DESPESAS_SENADORES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+        )
         urls.update([error.url for error in not_downloaded_urls])
 
     # Os Senadores têm até 3 meses para apresentar as notas fiscais
@@ -49,7 +53,6 @@ async def extract_despesas_senado(
     use_files: bool,
     ignore_tasks: list[str],
 ) -> list[dict] | None:
-    logger = get_run_logger()
 
     if TasksNames.EXTRACT_SENADO_DESPESAS_SENADORES in ignore_tasks:
         logger.warning(

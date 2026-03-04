@@ -9,6 +9,7 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
+logger = get_run_logger()
 
 
 def frentes_url(id_legislatura: int) -> str:
@@ -33,7 +34,6 @@ def get_ids_frentes(jsons: list[dict]) -> list[str]:
 async def extract_frentes_camara(
     legislatura: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> list[str] | None:
-    logger = get_run_logger()
 
     if TasksNames.EXTRACT_CAMARA_FRENTES in ignore_tasks:
         logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_FRENTES} foi ignorada")

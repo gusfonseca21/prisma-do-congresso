@@ -8,6 +8,7 @@ from config.parameters import ExtractOutDir, TasksNames
 from utils.io import fetch_json, load_json, save_json
 
 APP_SETTINGS = load_config()
+logger = get_run_logger()
 
 
 def mesa_url(legislatura: dict) -> str:
@@ -24,7 +25,6 @@ def mesa_url(legislatura: dict) -> str:
 def extract_camara_legislaturas_mesa(
     legislatura: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> dict | None:
-    logger = get_run_logger()
 
     if TasksNames.EXTRACT_CAMARA_LEGISLATURAS_MESA in ignore_tasks:
         logger.warning(

@@ -3,14 +3,15 @@ from datetime import date
 from prefect import get_run_logger, task
 
 from config.loader import load_config
-from config.parameters import ExtractOutDir, TasksNames
+from config.parameters import TasksNames
 from database.models.camara.camara_legislatura import CamaraLegislaturaArg
 from database.repository.camara.repository_camara_legislatura import (
     insert_camara_legislatura_db,
 )
-from utils.io import load_json
 
 APP_SETTINGS = load_config()
+
+logger = get_run_logger()
 
 
 @task(
@@ -22,7 +23,6 @@ APP_SETTINGS = load_config()
 def load_camara_legislatura(
     lote_id: int, legislatura: dict | None, ignore_tasks: list[str]
 ):
-    logger = get_run_logger()
 
     if TasksNames.LOAD_CAMARA_LEGISLATURA in ignore_tasks:
         logger.warning(f"A Task {TasksNames.LOAD_CAMARA_LEGISLATURA} foi ignorada")

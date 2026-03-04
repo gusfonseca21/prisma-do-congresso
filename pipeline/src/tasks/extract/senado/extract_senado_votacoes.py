@@ -10,6 +10,7 @@ from utils.io import load_ndjson, save_ndjson
 from utils.url_utils import generate_date_urls_senado
 
 APP_SETTINGS = load_config()
+logger = get_run_logger()
 
 
 def get_votacoes_urls(start_date: date, end_date: date) -> list[str] | None:
@@ -36,7 +37,6 @@ async def extract_votacoes_senado(
     use_files: bool,
     ignore_tasks: list[str],
 ) -> list[dict] | None:
-    logger = get_run_logger()
 
     if TasksNames.EXTRACT_SENADO_VOTACOES in ignore_tasks:
         logger.warning(f"A Task {TasksNames.EXTRACT_SENADO_VOTACOES} foi ignorada")

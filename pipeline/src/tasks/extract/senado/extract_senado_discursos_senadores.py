@@ -12,6 +12,7 @@ from utils.io import load_ndjson, save_ndjson
 from utils.url_utils import generate_date_urls_senado
 
 APP_SETTINGS = load_config()
+logger = get_run_logger()
 
 
 def discursos_senadores_urls(
@@ -23,6 +24,9 @@ def discursos_senadores_urls(
     )
 
     if not_downloaded_urls:
+        logger.warning(
+            f"A Tasks {TasksNames.EXTRACT_CAMARA_DETALHES_PARTIDOS} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+        )
         urls.update([error.url for error in not_downloaded_urls])
 
     # Baixar discursos até 1 mês atrás (podem demorar a entrarem no sistema)
@@ -58,7 +62,6 @@ async def extract_discursos_senado(
     use_files: bool,
     ignore_tasks: list[str],
 ) -> list[dict] | None:
-    logger = get_run_logger()
 
     if TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES in ignore_tasks:
         logger.warning(
