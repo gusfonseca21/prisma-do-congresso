@@ -9,7 +9,6 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_json, save_json
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
 def get_processos_url(start_date: date, end_date: date, logger: Any) -> list[str]:
@@ -44,6 +43,7 @@ async def extract_processos_senado(
     use_files: bool,
     ignore_tasks: list[str],
 ) -> list[str] | None:
+    logger = get_run_logger()
 
     if TasksNames.SENADO.EXTRACT.PROCESSOS in ignore_tasks:
         logger.warning(f"A Task {TasksNames.SENADO.EXTRACT.PROCESSOS} foi ignorada")

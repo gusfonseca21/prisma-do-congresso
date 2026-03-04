@@ -1,6 +1,8 @@
+from logging import Logger
 from typing import cast
 
 from prefect import get_run_logger, task
+from prefect.logging.loggers import LoggingAdapter
 
 from config.loader import load_config
 from config.parameters import ExtractOutDir, TasksNames
@@ -10,10 +12,11 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
-def get_detalhes_processos_url(processos_ids: list[str]) -> UrlsResult:
+def get_detalhes_processos_url(
+    processos_ids: list[str], logger: Logger | LoggingAdapter
+) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
         TasksNames.SENADO.EXTRACT.DETALHES_PROCESSOS
@@ -42,6 +45,7 @@ def get_detalhes_processos_url(processos_ids: list[str]) -> UrlsResult:
 async def extract_detalhes_processos_senado(
     ids_processos: list[str], lote_id: int, use_files: bool, ignore_tasks: list[str]
 ) -> list[dict] | None:
+    logger = get_run_logger()
 
     if TasksNames.SENADO.EXTRACT.DETALHES_PROCESSOS in ignore_tasks:
         logger.warning(

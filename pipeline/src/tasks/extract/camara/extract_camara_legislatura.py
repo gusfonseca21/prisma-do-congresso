@@ -9,8 +9,6 @@ from utils.io import fetch_json, load_json, save_json
 
 APP_SETTINGS = load_config()
 
-logger = get_run_logger()
-
 
 @task(
     task_run_name=TasksNames.CAMARA.EXTRACT.LEGISLATURA,
@@ -21,6 +19,8 @@ logger = get_run_logger()
 def extract_legislatura(
     start_date: date, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> dict | None:
+    logger = get_run_logger()
+
     if TasksNames.CAMARA.EXTRACT.LEGISLATURA in ignore_tasks:
         logger.warning(f"A Task {TasksNames.CAMARA.EXTRACT.LEGISLATURA} foi ignorada")
         return

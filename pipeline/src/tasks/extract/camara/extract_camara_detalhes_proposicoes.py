@@ -1,7 +1,9 @@
+from logging import Logger
 from pathlib import Path
 from typing import cast
 
 from prefect import get_run_logger, task
+from prefect.logging.loggers import LoggingAdapter
 
 from config.loader import load_config
 from config.parameters import ExtractOutDir, TasksNames
@@ -11,10 +13,11 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
-def detalhes_proposicoes_urls(proposicoes_ids: list[int]) -> UrlsResult:
+def detalhes_proposicoes_urls(
+    proposicoes_ids: list[int], logger: Logger | LoggingAdapter
+) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
         TasksNames.CAMARA.EXTRACT.DETALHES_PROPOSICOES
@@ -22,7 +25,7 @@ def detalhes_proposicoes_urls(proposicoes_ids: list[int]) -> UrlsResult:
 
     if not_downloaded_urls:
         logger.warning(
-            f"A Tasks {TasksNames.EXTRACT_CAMARA_DETALHES_PARTIDOS} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+            f"A Tasks {TasksNames.CAMARA.EXTRACT.DETALHES_PROPOSICOES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
         )
         urls.update([error.url for error in not_downloaded_urls])
 
@@ -46,6 +49,7 @@ async def extract_detalhes_proposicoes_camara(
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
+    logger = get_run_logger()
 
     if TasksNames.CAMARA.EXTRACT.DETALHES_PROPOSICOES in ignore_tasks:
         logger.warning(
@@ -63,7 +67,7 @@ async def extract_detalhes_proposicoes_camara(
         )
         return
 
-    urls = detalhes_proposicoes_urls(proposicoes_ids)
+    urls = detalhes_proposicoes_urls(proposicoes_ids, logger)
 
     logger.info(f"Baixando detalhes de {len(urls)} URLs de Proposições da Câmara")
 

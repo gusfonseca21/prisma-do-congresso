@@ -1,7 +1,9 @@
 from datetime import date, timedelta
+from logging import Logger
 from typing import cast
 
 from prefect import get_run_logger, task
+from prefect.logging.loggers import LoggingAdapter
 
 from config.loader import load_config
 from config.parameters import ExtractOutDir, TasksNames
@@ -11,10 +13,11 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
-def despesas_senadores_urls(start_date: date, end_date: date) -> UrlsResult:
+def despesas_senadores_urls(
+    start_date: date, end_date: date, logger: Logger | LoggingAdapter
+) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
         TasksNames.SENADO.EXTRACT.DESPESAS_SENADORES
@@ -53,6 +56,7 @@ async def extract_despesas_senado(
     use_files: bool,
     ignore_tasks: list[str],
 ) -> list[dict] | None:
+    logger = get_run_logger()
 
     if TasksNames.SENADO.EXTRACT.DESPESAS_SENADORES in ignore_tasks:
         logger.warning(
@@ -66,7 +70,7 @@ async def extract_despesas_senado(
         jsons = load_ndjson(ExtractOutDir.SENADO.DESPESAS_SENADORES)
         return jsons
 
-    urls = despesas_senadores_urls(start_date, end_date)
+    urls = despesas_senadores_urls(start_date, end_date, logger)
 
     logger.info(f"Baixando despesas de senadores de {len(urls)} urls")
 

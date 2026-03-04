@@ -1,7 +1,9 @@
+from logging import Logger
 from pathlib import Path
 from typing import cast
 
 from prefect import get_run_logger, task
+from prefect.logging.loggers import LoggingAdapter
 
 from config.loader import load_config
 from config.parameters import ExtractOutDir, TasksNames
@@ -11,10 +13,11 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
-def autores_proposicoes_urls(proposicoes_ids: list[int]) -> UrlsResult:
+def autores_proposicoes_urls(
+    proposicoes_ids: list[int], logger: Logger | LoggingAdapter
+) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
         TasksNames.CAMARA.EXTRACT.AUTORES_PROPOSICOES
@@ -46,6 +49,7 @@ async def extract_autores_proposicoes_camara(
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
+    logger = get_run_logger()
 
     if TasksNames.CAMARA.EXTRACT.AUTORES_PROPOSICOES in ignore_tasks:
         logger.warning(
@@ -63,7 +67,7 @@ async def extract_autores_proposicoes_camara(
         )
         return
 
-    urls = autores_proposicoes_urls(proposicoes_ids)
+    urls = autores_proposicoes_urls(proposicoes_ids, logger)
 
     logger.info(f"Baixando autores de {len(urls)} proposições da Câmara")
 

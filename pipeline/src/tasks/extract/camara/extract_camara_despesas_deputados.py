@@ -1,8 +1,10 @@
 from datetime import date
+from logging import Logger
 from pathlib import Path
 from typing import cast
 
 from prefect import get_run_logger, task
+from prefect.logging.loggers import LoggingAdapter
 
 from config.loader import load_config
 from config.parameters import ExtractOutDir, TasksNames
@@ -12,11 +14,13 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
 def urls_despesas(
-    deputados_ids: list[int], start_date: date, end_date: date
+    deputados_ids: list[int],
+    start_date: date,
+    end_date: date,
+    logger: Logger | LoggingAdapter,
 ) -> UrlsResult:
     """
     Gera URLs para cada deputado no período entre start_date e end_date.
@@ -115,6 +119,7 @@ async def extract_despesas_camara(
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
+    logger = get_run_logger()
 
     if TasksNames.CAMARA.EXTRACT.DESPESAS_DEPUTADOS in ignore_tasks:
         logger.warning(
@@ -137,7 +142,7 @@ async def extract_despesas_camara(
         )
         return
 
-    urls = urls_despesas(deputados_ids, start_date, end_date)
+    urls = urls_despesas(deputados_ids, start_date, end_date, logger)
     logger.info(f"Câmara: buscando despesas de {len(urls)} URLs")
 
     jsons = await fetch_many_jsons(

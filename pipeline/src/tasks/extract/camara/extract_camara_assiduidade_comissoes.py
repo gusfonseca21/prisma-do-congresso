@@ -1,9 +1,11 @@
 import re
 from datetime import date
+from logging import Logger
 from pathlib import Path
 from typing import cast
 
 from prefect import get_run_logger, task
+from prefect.logging.loggers import LoggingAdapter
 from selectolax.parser import HTMLParser
 
 from config.loader import load_config
@@ -13,11 +15,13 @@ from database.repository.erros_extract import verify_not_downloaded_urls_in_task
 from utils.io import fetch_html_many_async, save_htmls_in_zip
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
 def assiduidade_urls(
-    deputados_ids: list[int], start_date: date, end_date: date
+    deputados_ids: list[int],
+    start_date: date,
+    end_date: date,
+    logger: Logger | LoggingAdapter,
 ) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
@@ -55,6 +59,8 @@ async def extract_camara_assiduidade_comissoes(
     ignore_tasks: list[str],
     use_files: bool,
 ) -> str | None:
+    logger = get_run_logger()
+
     """
     Baixa páginas HTML com os dados sobre a assiduidade dos Deputados em Comissões
     """
@@ -74,7 +80,7 @@ async def extract_camara_assiduidade_comissoes(
         )
         return
 
-    urls = assiduidade_urls(deputados_ids, start_date, end_date)
+    urls = assiduidade_urls(deputados_ids, start_date, end_date, logger)
 
     logger.info(
         f"Câmara: buscando Assiduidade Comissões de {len(deputados_ids)} deputados."

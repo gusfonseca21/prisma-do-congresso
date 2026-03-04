@@ -9,8 +9,6 @@ from utils.io import fetch_json, load_json, save_json
 
 APP_SETTINGS = load_config()
 
-logger = get_run_logger()
-
 
 def deputados_url(legislatura: dict) -> str:
     id_legislatura = legislatura.get("dados", [])[0].get("id")
@@ -35,6 +33,7 @@ def get_ids_deputados(json: dict) -> list[int]:
 def extract_deputados_camara(
     legislatura: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> list[int] | None:
+    logger = get_run_logger()
 
     if TasksNames.CAMARA.EXTRACT.DEPUTADOS in ignore_tasks:
         logger.warning(f"A Task {TasksNames.CAMARA.EXTRACT.DEPUTADOS} foi ignorada")

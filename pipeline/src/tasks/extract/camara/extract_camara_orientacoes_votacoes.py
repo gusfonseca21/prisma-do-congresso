@@ -1,7 +1,9 @@
+from logging import Logger
 from pathlib import Path
 from typing import cast
 
 from prefect import get_run_logger, task
+from prefect.logging.loggers import LoggingAdapter
 
 from config.loader import load_config
 from config.parameters import ExtractOutDir, TasksNames
@@ -11,10 +13,11 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
-def orientacoes_votacoes_urls(votacoes_ids: list[str]) -> UrlsResult:
+def orientacoes_votacoes_urls(
+    votacoes_ids: list[str], logger: Logger | LoggingAdapter
+) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
         TasksNames.CAMARA.EXTRACT.ORIENTACOES_VOTACOES
@@ -46,6 +49,7 @@ async def extract_orientacoes_votacoes_camara(
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
+    logger = get_run_logger()
 
     if TasksNames.CAMARA.EXTRACT.ORIENTACOES_VOTACOES in ignore_tasks:
         logger.warning(
@@ -63,7 +67,7 @@ async def extract_orientacoes_votacoes_camara(
         )
         return
 
-    urls = orientacoes_votacoes_urls(votacoes_ids)
+    urls = orientacoes_votacoes_urls(votacoes_ids, logger)
 
     logger.info(f"Baixando orientações de votações da Câmara de {len(urls)} URLs")
 

@@ -7,7 +7,6 @@ from config.parameters import ExtractOutDir, TasksNames
 from utils.io import fetch_json, load_json, save_json
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
 @task(
@@ -19,6 +18,7 @@ logger = get_run_logger()
 def extract_colegiados(
     lote_id: int, use_files: bool, ignore_tasks: list[str]
 ) -> dict | None:
+    logger = get_run_logger()
 
     if TasksNames.SENADO.EXTRACT.COLEGIADOS in ignore_tasks:
         logger.warning(f"A Task {TasksNames.SENADO.EXTRACT.COLEGIADOS} foi ignorada")

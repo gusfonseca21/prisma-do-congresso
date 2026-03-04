@@ -9,7 +9,6 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
 def lideres_url(legislatura: dict) -> str:
@@ -26,6 +25,7 @@ def lideres_url(legislatura: dict) -> str:
 async def extract_camara_legislaturas_lideres(
     legislatura: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> list[dict] | None:
+    logger = get_run_logger()
 
     if TasksNames.CAMARA.EXTRACT.LEGISLATURAS_LIDERES in ignore_tasks:
         logger.warning(

@@ -1,7 +1,9 @@
+from logging import Logger
 from pathlib import Path
 from typing import cast
 
 from prefect import get_run_logger, task
+from prefect.logging.loggers import LoggingAdapter
 
 from config.loader import load_config
 from config.parameters import ExtractOutDir, TasksNames
@@ -11,10 +13,11 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
-def profissoes_deputados_urls(deputados_ids: list[int]) -> UrlsResult:
+def profissoes_deputados_urls(
+    deputados_ids: list[int], logger: Logger | LoggingAdapter
+) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
         TasksNames.CAMARA.EXTRACT.PROFISSOES_DEPUTADOS
@@ -46,6 +49,8 @@ async def extract_camara_profissoes_deputados(
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
+    logger = get_run_logger()
+
     if TasksNames.CAMARA.EXTRACT.PROFISSOES_DEPUTADOS in ignore_tasks:
         logger.warning(
             f"A Task {TasksNames.CAMARA.EXTRACT.PROFISSOES_DEPUTADOS} foi ignorada"
@@ -62,7 +67,7 @@ async def extract_camara_profissoes_deputados(
         )
         return
 
-    urls = profissoes_deputados_urls(deputados_ids)
+    urls = profissoes_deputados_urls(deputados_ids, logger)
     logger.info(f"Baixando dados de Profissões de {len(urls['urls_to_download'])} URLs")
 
     jsons = await fetch_many_jsons(

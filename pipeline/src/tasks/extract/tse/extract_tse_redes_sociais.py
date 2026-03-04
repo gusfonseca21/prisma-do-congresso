@@ -8,7 +8,6 @@ from config.parameters import ExtractOutDir, TasksNames
 from utils.io import download_stream
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
 def cache_by_year(_ctx, params):
@@ -31,6 +30,7 @@ def cache_by_year(_ctx, params):
 def extract_redes_sociais(
     year: int, uf: str, lote_id: int, ignore_tasks: list[str]
 ) -> str | None:
+    logger = get_run_logger()
 
     if TasksNames.TSE.EXTRACT.REDES_SOCIAIS in ignore_tasks:
         logger.warning(f"A Task {TasksNames.TSE.EXTRACT.REDES_SOCIAIS} foi ignorada")

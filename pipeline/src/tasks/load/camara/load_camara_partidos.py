@@ -11,7 +11,6 @@ from database.repository.camara.repository_camara_partidos import (
 from utils.url_utils import get_path_parameter_value
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
 @task(
@@ -23,6 +22,7 @@ logger = get_run_logger()
 def load_camara_partidos(
     lote_id: int, partidos: list[dict] | None, ignore_tasks: list[str]
 ):
+    logger = get_run_logger()
 
     if TasksNames.CAMARA.LOAD.PARTIDOS in ignore_tasks:
         logger.warning(f"A Task {TasksNames.CAMARA.LOAD.PARTIDOS} foi ignorada")

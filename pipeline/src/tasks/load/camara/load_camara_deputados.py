@@ -14,7 +14,6 @@ from database.repository.camara.repository_camara_deputados import (
 from database.repository.camara.repository_camara_partidos import get_partidos_siglas_db
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
 @task(
@@ -26,6 +25,7 @@ logger = get_run_logger()
 def load_camara_deputados(
     lote_id: int, deputados: list[dict] | None, ignore_tasks: list[str]
 ):
+    logger = get_run_logger()
 
     if TasksNames.CAMARA.LOAD.DEPUTADOS in ignore_tasks:
         logger.warning(f"A Task {TasksNames.CAMARA.LOAD.DEPUTADOS} foi ignorada")

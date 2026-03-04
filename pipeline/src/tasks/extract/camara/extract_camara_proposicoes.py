@@ -9,7 +9,6 @@ from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
 def get_ids_proposicoes(jsons: list[dict]) -> list[int]:
@@ -29,6 +28,7 @@ async def extract_proposicoes_camara(
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[int] | None:
+    logger = get_run_logger()
 
     if TasksNames.CAMARA.EXTRACT.PROPOSICOES in ignore_tasks:
         logger.warning(f"A Task {TasksNames.CAMARA.EXTRACT.PROPOSICOES} foi ignorada")

@@ -8,7 +8,6 @@ from config.parameters import ExtractOutDir, TasksNames
 from utils.io import download_stream
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
 def cache_by_year(_ctx, params):
@@ -29,6 +28,7 @@ def cache_by_year(_ctx, params):
     persist_result=True,
 )
 def extract_candidatos(year: int, lote_id: int, ignore_tasks: list[str]) -> str | None:
+    logger = get_run_logger()
 
     if TasksNames.TSE.EXTRACT.CANDIDATOS in ignore_tasks:
         logger.warning(f"A Task {TasksNames.TSE.EXTRACT.CANDIDATOS} foi ignorada")

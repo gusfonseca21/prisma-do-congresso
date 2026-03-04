@@ -1,10 +1,12 @@
 import re
 from datetime import date
+from logging import Logger
 from pathlib import Path
 from typing import cast
 
 from prefect import get_run_logger, task
 from prefect.artifacts import acreate_table_artifact
+from prefect.logging.loggers import LoggingAdapter
 from selectolax.parser import HTMLParser
 
 from config.loader import load_config
@@ -14,11 +16,13 @@ from database.repository.erros_extract import verify_not_downloaded_urls_in_task
 from utils.io import fetch_html_many_async, save_htmls_in_zip
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
 def assiduidade_urls(
-    deputados_ids: list[int], start_date: date, end_date: date
+    deputados_ids: list[int],
+    start_date: date,
+    end_date: date,
+    logger: Logger | LoggingAdapter,
 ) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
@@ -59,6 +63,8 @@ async def extract_camara_assiduidade_plenario(
     """
     Baixa páginas HTML com os dados sobre a assiduidade dos Deputados em Plenário
     """
+    logger = get_run_logger()
+
     if TasksNames.CAMARA.EXTRACT.ASSIDUIDADE_PLENARIO in ignore_tasks:
         logger.warning(
             f"A Task {TasksNames.CAMARA.EXTRACT.ASSIDUIDADE_PLENARIO} foi ignorada"
@@ -75,7 +81,7 @@ async def extract_camara_assiduidade_plenario(
         )
         return
 
-    urls = assiduidade_urls(deputados_ids, start_date, end_date)
+    urls = assiduidade_urls(deputados_ids, start_date, end_date, logger)
 
     logger.info(
         f"Câmara: buscando Assiduidade Plenário de {len(deputados_ids)} deputados."

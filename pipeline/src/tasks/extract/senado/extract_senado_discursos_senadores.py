@@ -1,7 +1,9 @@
 from datetime import date, timedelta
+from logging import Logger
 from typing import cast
 
 from prefect import get_run_logger, task
+from prefect.logging.loggers import LoggingAdapter
 
 from config.loader import load_config
 from config.parameters import ExtractOutDir, TasksNames
@@ -12,11 +14,13 @@ from utils.io import load_ndjson, save_ndjson
 from utils.url_utils import generate_date_urls_senado
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
 def discursos_senadores_urls(
-    senadores_ids: list[str], start_date: date, end_date: date
+    senadores_ids: list[str],
+    start_date: date,
+    end_date: date,
+    logger: Logger | LoggingAdapter,
 ) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
@@ -25,7 +29,7 @@ def discursos_senadores_urls(
 
     if not_downloaded_urls:
         logger.warning(
-            f"A Tasks {TasksNames.EXTRACT_CAMARA_DETALHES_PARTIDOS} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+            f"A Tasks {TasksNames.SENADO.EXTRACT.DISCURSOS_SENADORES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
         )
         urls.update([error.url for error in not_downloaded_urls])
 
@@ -62,6 +66,7 @@ async def extract_discursos_senado(
     use_files: bool,
     ignore_tasks: list[str],
 ) -> list[dict] | None:
+    logger = get_run_logger()
 
     if TasksNames.SENADO.EXTRACT.DISCURSOS_SENADORES in ignore_tasks:
         logger.warning(
@@ -80,7 +85,7 @@ async def extract_discursos_senado(
         )
         return
 
-    urls = discursos_senadores_urls(ids_senadores, start_date, end_date)
+    urls = discursos_senadores_urls(ids_senadores, start_date, end_date, logger)
 
     logger.info(f"Baixando discursos de {len(urls)} urls")
 

@@ -1,7 +1,9 @@
+from logging import Logger
 from pathlib import Path
 from typing import cast
 
 from prefect import get_run_logger, task
+from prefect.logging.loggers import LoggingAdapter
 
 from config.loader import load_config
 from config.parameters import ExtractOutDir, TasksNames
@@ -12,10 +14,10 @@ from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
-logger = get_run_logger()
 
-
-def detalhes_partidos_urls(partidos_ids: list[int]) -> UrlsResult:
+def detalhes_partidos_urls(
+    partidos_ids: list[int], logger: Logger | LoggingAdapter
+) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
         TasksNames.CAMARA.EXTRACT.DETALHES_PARTIDOS
@@ -47,6 +49,8 @@ async def extract_camara_detalhes_partidos(
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
+    logger = get_run_logger()
+
     if TasksNames.CAMARA.EXTRACT.DETALHES_PARTIDOS in ignore_tasks:
         logger.warning(
             f"A Task {TasksNames.CAMARA.EXTRACT.DETALHES_PARTIDOS} foi ignorada"
@@ -65,7 +69,7 @@ async def extract_camara_detalhes_partidos(
 
     logger.info("Iniciando Download de Detalhes Partidos Câmara")
 
-    urls = detalhes_partidos_urls(partidos_ids)
+    urls = detalhes_partidos_urls(partidos_ids, logger)
     logger.info(f"Baixando detalhes de {len(urls)} partidos da Câmara")
 
     jsons = await fetch_many_jsons(

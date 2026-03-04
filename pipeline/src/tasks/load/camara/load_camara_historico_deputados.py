@@ -13,7 +13,6 @@ from database.repository.camara.repository_camara_deputados import (
 )
 
 APP_SETTINGS = load_config()
-logger = get_run_logger()
 
 
 @task(
@@ -25,6 +24,7 @@ logger = get_run_logger()
 def load_camara_historico_deputados(
     lote_id: int, historico_deputados: list[dict] | None, ignore_tasks: list[str]
 ):
+    logger = get_run_logger()
 
     if TasksNames.CAMARA.LOAD.HISTORICO_DEPUTADOS in ignore_tasks:
         logger.warning(
