@@ -52,17 +52,10 @@ def insert_camara_partidos_db(data: list[CamaraPartidosArg]):
 
         rows = result.fetchall()
 
-        for row in rows[:3]:
-            print(row.xmax, type(row.xmax))
-
         total = len(data)
         inserted = sum(1 for row in rows if int(row.xmax) == 0)
         updated = sum(1 for row in rows if int(row.xmax) != 0)
         ignored = total - len(rows)
-
-        print(
-            f"rows: {len(rows)}, inserted: {inserted}, updated: {updated}, ignored: {ignored}"
-        )
 
         insert_log_linhas_db(
             id_lote=data[0].id_lote,

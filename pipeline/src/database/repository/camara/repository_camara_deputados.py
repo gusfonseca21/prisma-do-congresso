@@ -200,7 +200,10 @@ def insert_camara_mandatos_externos_deputados_db(
 
         stmt_mandatos_externos = stmt_mandatos_externos.on_conflict_do_update(
             index_elements=["id_deputado", "cargo", "ano_inicio"],
-            set_={"ano_fim": stmt_mandatos_externos.excluded.ano_fim},
+            set_={
+                "ano_fim": stmt_mandatos_externos.excluded.ano_fim,
+                "id_lote": stmt_mandatos_externos.excluded.id_lote,
+            },
             where=and_(
                 stmt_mandatos_externos.excluded.ano_fim.isnot(None),
                 mandatos_externos.c.ano_fim.is_(None),
@@ -252,7 +255,10 @@ def insert_camara_ocupacoes_deputados_db(
 
         stmt_ocupacoes = stmt_ocupacoes.on_conflict_do_update(
             index_elements=["id_deputado", "titulo", "ano_inicio"],
-            set_={"ano_fim": stmt_ocupacoes.excluded.ano_fim},
+            set_={
+                "ano_fim": stmt_ocupacoes.excluded.ano_fim,
+                "id_lote": stmt_ocupacoes.excluded.id_lote,
+            },
             where=and_(
                 stmt_ocupacoes.excluded.ano_fim.isnot(None),
                 ocupacoes.c.ano_fim.is_(None),
