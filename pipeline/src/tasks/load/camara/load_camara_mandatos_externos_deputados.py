@@ -15,7 +15,7 @@ logger = get_run_logger()
 
 
 @task(
-    task_run_name=TasksNames.LOAD_CAMARA_MANDATOS_EXTERNOS_DEPUTADOS,
+    task_run_name=TasksNames.CAMARA.LOAD.MANDATOS_EXTERNOS_DEPUTADOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -24,14 +24,14 @@ def load_camara_mandatos_externos_deputados(
     lote_id: int, mandatos_externos: list[dict] | None, ignore_tasks: list[str]
 ):
 
-    if TasksNames.LOAD_CAMARA_MANDATOS_EXTERNOS_DEPUTADOS in ignore_tasks:
+    if TasksNames.CAMARA.LOAD.MANDATOS_EXTERNOS_DEPUTADOS in ignore_tasks:
         logger.warning(
-            f"A Task {TasksNames.LOAD_CAMARA_MANDATOS_EXTERNOS_DEPUTADOS} foi ignorada"
+            f"A Task {TasksNames.CAMARA.LOAD.MANDATOS_EXTERNOS_DEPUTADOS} foi ignorada"
         )
         return
     if not mandatos_externos:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_MANDATOS_EXTERNOS_DEPUTADOS}' pois o argumento do parâmetro 'mandatos_externos' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.LOAD.MANDATOS_EXTERNOS_DEPUTADOS}' pois o argumento do parâmetro 'mandatos_externos' é nulo"
         )
         return
 

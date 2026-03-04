@@ -17,7 +17,7 @@ logger = get_run_logger()
 
 
 @task(
-    task_run_name=TasksNames.LOAD_CAMARA_HISTORICO_DEPUTADOS,
+    task_run_name=TasksNames.CAMARA.LOAD.HISTORICO_DEPUTADOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -26,14 +26,14 @@ def load_camara_historico_deputados(
     lote_id: int, historico_deputados: list[dict] | None, ignore_tasks: list[str]
 ):
 
-    if TasksNames.LOAD_CAMARA_HISTORICO_DEPUTADOS in ignore_tasks:
+    if TasksNames.CAMARA.LOAD.HISTORICO_DEPUTADOS in ignore_tasks:
         logger.warning(
-            f"A Task {TasksNames.LOAD_CAMARA_HISTORICO_DEPUTADOS} foi ignorada"
+            f"A Task {TasksNames.CAMARA.LOAD.HISTORICO_DEPUTADOS} foi ignorada"
         )
         return
     if historico_deputados is None:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_HISTORICO_DEPUTADOS}' pois o argumento do parâmetro 'historico_deputados' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.LOAD.HISTORICO_DEPUTADOS}' pois o argumento do parâmetro 'historico_deputados' é nulo"
         )
         return
 

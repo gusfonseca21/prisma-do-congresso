@@ -32,7 +32,7 @@ def get_processos_url(start_date: date, end_date: date, logger: Any) -> list[str
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_SENADO_PROCESSOS,
+    task_run_name=TasksNames.SENADO.EXTRACT.PROCESSOS,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
@@ -45,12 +45,12 @@ async def extract_processos_senado(
     ignore_tasks: list[str],
 ) -> list[str] | None:
 
-    if TasksNames.EXTRACT_SENADO_PROCESSOS in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.EXTRACT_SENADO_PROCESSOS} foi ignorada")
+    if TasksNames.SENADO.EXTRACT.PROCESSOS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.SENADO.EXTRACT.PROCESSOS} foi ignorada")
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_PROCESSOS} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.SENADO.EXTRACT.PROCESSOS} irá retornar os dados à partir do arquivo em disco."
         )
         return get_processos_ids(load_json(ExtractOutDir.SENADO.PROCESSOS))
 
@@ -65,7 +65,7 @@ async def extract_processos_senado(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=False,
         validate_results=False,
-        task=TasksNames.EXTRACT_SENADO_PROCESSOS,
+        task=TasksNames.SENADO.EXTRACT.PROCESSOS,
         lote_id=lote_id,
     )
 

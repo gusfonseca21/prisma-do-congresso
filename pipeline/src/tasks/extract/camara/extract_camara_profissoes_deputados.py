@@ -17,12 +17,12 @@ logger = get_run_logger()
 def profissoes_deputados_urls(deputados_ids: list[int]) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
-        TasksNames.EXTRACT_CAMARA_PROFISSOES_DEPUTADOS
+        TasksNames.CAMARA.EXTRACT.PROFISSOES_DEPUTADOS
     )
 
     if not_downloaded_urls:
         logger.warning(
-            f"A Tasks {TasksNames.EXTRACT_CAMARA_PROFISSOES_DEPUTADOS} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+            f"A Tasks {TasksNames.CAMARA.EXTRACT.PROFISSOES_DEPUTADOS} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
         )
         urls.update([error.url for error in not_downloaded_urls])
 
@@ -35,7 +35,7 @@ def profissoes_deputados_urls(deputados_ids: list[int]) -> UrlsResult:
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_CAMARA_PROFISSOES_DEPUTADOS,
+    task_run_name=TasksNames.CAMARA.EXTRACT.PROFISSOES_DEPUTADOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -46,19 +46,19 @@ async def extract_camara_profissoes_deputados(
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
-    if TasksNames.EXTRACT_CAMARA_PROFISSOES_DEPUTADOS in ignore_tasks:
+    if TasksNames.CAMARA.EXTRACT.PROFISSOES_DEPUTADOS in ignore_tasks:
         logger.warning(
-            f"A Task {TasksNames.EXTRACT_CAMARA_PROFISSOES_DEPUTADOS} foi ignorada"
+            f"A Task {TasksNames.CAMARA.EXTRACT.PROFISSOES_DEPUTADOS} foi ignorada"
         )
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_PROFISSOES_DEPUTADOS} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.PROFISSOES_DEPUTADOS} irá retornar os dados à partir do arquivo em disco."
         )
         return load_ndjson(ExtractOutDir.CAMARA.PROFISSOES_DEPUTADOS)
     if not deputados_ids:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_PROFISSOES_DEPUTADOS}' pois o argumento do parâmetro 'deputados_ids' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.PROFISSOES_DEPUTADOS}' pois o argumento do parâmetro 'deputados_ids' é nulo"
         )
         return
 
@@ -72,7 +72,7 @@ async def extract_camara_profissoes_deputados(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=False,
         validate_results=True,
-        task=TasksNames.EXTRACT_CAMARA_PROFISSOES_DEPUTADOS,
+        task=TasksNames.CAMARA.EXTRACT.PROFISSOES_DEPUTADOS,
         lote_id=lote_id,
     )
 

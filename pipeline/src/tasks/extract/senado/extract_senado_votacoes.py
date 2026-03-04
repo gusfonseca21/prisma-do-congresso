@@ -25,7 +25,7 @@ def get_votacoes_urls(start_date: date, end_date: date) -> list[str] | None:
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_SENADO_VOTACOES,
+    task_run_name=TasksNames.SENADO.EXTRACT.VOTACOES,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
@@ -38,12 +38,12 @@ async def extract_votacoes_senado(
     ignore_tasks: list[str],
 ) -> list[dict] | None:
 
-    if TasksNames.EXTRACT_SENADO_VOTACOES in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.EXTRACT_SENADO_VOTACOES} foi ignorada")
+    if TasksNames.SENADO.EXTRACT.VOTACOES in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.SENADO.EXTRACT.VOTACOES} foi ignorada")
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_VOTACOES} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.SENADO.EXTRACT.VOTACOES} irá retornar os dados à partir do arquivo em disco."
         )
         jsons = load_ndjson(ExtractOutDir.SENADO.VOTACOES)
         return jsons
@@ -62,7 +62,7 @@ async def extract_votacoes_senado(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=False,
         validate_results=False,
-        task=TasksNames.EXTRACT_SENADO_VOTACOES,
+        task=TasksNames.SENADO.EXTRACT.VOTACOES,
         lote_id=lote_id,
     )
 

@@ -13,7 +13,7 @@ logger = get_run_logger()
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_CAMARA_LEGISLATURA,
+    task_run_name=TasksNames.CAMARA.EXTRACT.LEGISLATURA,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -21,12 +21,12 @@ logger = get_run_logger()
 def extract_legislatura(
     start_date: date, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> dict | None:
-    if TasksNames.EXTRACT_CAMARA_LEGISLATURA in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_LEGISLATURA} foi ignorada")
+    if TasksNames.CAMARA.EXTRACT.LEGISLATURA in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.CAMARA.EXTRACT.LEGISLATURA} foi ignorada")
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_LEGISLATURA} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.LEGISLATURA} irá retornar os dados à partir do arquivo em disco."
         )
         return load_json(ExtractOutDir.CAMARA.LEGISLATURA)
 

@@ -17,12 +17,12 @@ logger = get_run_logger()
 def frentes_detalhes_urls(frentes_ids: list[str]) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
-        TasksNames.EXTRACT_CAMARA_FRENTES_MEMBROS
+        TasksNames.CAMARA.EXTRACT.DETALHES_FRENTES
     )
 
     if not_downloaded_urls:
         logger.warning(
-            f"A Tasks {TasksNames.EXTRACT_CAMARA_FRENTES_MEMBROS} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+            f"A Tasks {TasksNames.CAMARA.EXTRACT.DETALHES_FRENTES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
         )
         urls.update([error.url for error in not_downloaded_urls])
 
@@ -35,7 +35,7 @@ def frentes_detalhes_urls(frentes_ids: list[str]) -> UrlsResult:
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_CAMARA_DETALHES_FRENTES,
+    task_run_name=TasksNames.CAMARA.EXTRACT.DETALHES_FRENTES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -49,17 +49,17 @@ async def extract_camara_detalhes_frentes(
 
     if not frentes_ids:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DETALHES_FRENTES}' pois o argumento do parâmetro 'frentes_ids' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.DETALHES_FRENTES}' pois o argumento do parâmetro 'frentes_ids' é nulo"
         )
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_DETALHES_FRENTES} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.DETALHES_FRENTES} irá retornar os dados à partir do arquivo em disco."
         )
         return load_ndjson(ExtractOutDir.CAMARA.DETALHES_FRENTES)
-    if TasksNames.EXTRACT_CAMARA_DETALHES_FRENTES in ignore_tasks:
+    if TasksNames.CAMARA.EXTRACT.DETALHES_FRENTES in ignore_tasks:
         logger.warning(
-            f"A Task {TasksNames.EXTRACT_CAMARA_DETALHES_FRENTES} foi ignorada"
+            f"A Task {TasksNames.CAMARA.EXTRACT.DETALHES_FRENTES} foi ignorada"
         )
         return
 
@@ -73,7 +73,7 @@ async def extract_camara_detalhes_frentes(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
-        task=TasksNames.EXTRACT_CAMARA_FRENTES_MEMBROS,
+        task=TasksNames.CAMARA.EXTRACT.DETALHES_FRENTES,
         lote_id=lote_id,
     )
 

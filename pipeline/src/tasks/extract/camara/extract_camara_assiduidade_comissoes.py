@@ -21,12 +21,12 @@ def assiduidade_urls(
 ) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
-        TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES
+        TasksNames.CAMARA.EXTRACT.ASSIDUIDADE_COMISSOES
     )
 
     if not_downloaded_urls:
         logger.warning(
-            f"A Tasks {TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+            f"A Tasks {TasksNames.CAMARA.EXTRACT.ASSIDUIDADE_COMISSOES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
         )
         urls.update([error.url for error in not_downloaded_urls])
 
@@ -42,7 +42,7 @@ def assiduidade_urls(
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES,
+    task_run_name=TasksNames.CAMARA.EXTRACT.ASSIDUIDADE_COMISSOES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -58,19 +58,19 @@ async def extract_camara_assiduidade_comissoes(
     """
     Baixa páginas HTML com os dados sobre a assiduidade dos Deputados em Comissões
     """
-    if TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES in ignore_tasks:
+    if TasksNames.CAMARA.EXTRACT.ASSIDUIDADE_COMISSOES in ignore_tasks:
         logger.warning(
-            f"A Task {TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES} foi ignorada"
+            f"A Task {TasksNames.CAMARA.EXTRACT.ASSIDUIDADE_COMISSOES} foi ignorada"
         )
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.ASSIDUIDADE_COMISSOES} irá retornar os dados à partir do arquivo em disco."
         )
         return load_ndjson()  # CONTINUAR AQUI RETORNAR OS JSONS
     if not deputados_ids:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES}' pois o argumento do parâmetro 'deputados_ids' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.ASSIDUIDADE_COMISSOES}' pois o argumento do parâmetro 'deputados_ids' é nulo"
         )
         return
 
@@ -86,7 +86,7 @@ async def extract_camara_assiduidade_comissoes(
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         lote_id=lote_id,
-        task=TasksNames.EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES,
+        task=TasksNames.CAMARA.EXTRACT.ASSIDUIDADE_COMISSOES,
     )
 
     href_pattern = re.compile(r"https://www\.camara\.leg\.br/deputados/\d+")

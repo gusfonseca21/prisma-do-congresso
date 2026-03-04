@@ -17,12 +17,12 @@ logger = get_run_logger()
 def autores_proposicoes_urls(proposicoes_ids: list[int]) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
-        TasksNames.EXTRACT_CAMARA_AUTORES_PROPOSICOES
+        TasksNames.CAMARA.EXTRACT.AUTORES_PROPOSICOES
     )
 
     if not_downloaded_urls:
         logger.warning(
-            f"A Tasks {TasksNames.EXTRACT_CAMARA_AUTORES_PROPOSICOES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+            f"A Tasks {TasksNames.CAMARA.EXTRACT.AUTORES_PROPOSICOES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
         )
         urls.update([error.url for error in not_downloaded_urls])
 
@@ -35,7 +35,7 @@ def autores_proposicoes_urls(proposicoes_ids: list[int]) -> UrlsResult:
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_CAMARA_AUTORES_PROPOSICOES,
+    task_run_name=TasksNames.CAMARA.EXTRACT.AUTORES_PROPOSICOES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -47,19 +47,19 @@ async def extract_autores_proposicoes_camara(
     use_files: bool,
 ) -> list[dict] | None:
 
-    if TasksNames.EXTRACT_CAMARA_AUTORES_PROPOSICOES in ignore_tasks:
+    if TasksNames.CAMARA.EXTRACT.AUTORES_PROPOSICOES in ignore_tasks:
         logger.warning(
-            f"A Task {TasksNames.EXTRACT_CAMARA_AUTORES_PROPOSICOES} foi ignorada"
+            f"A Task {TasksNames.CAMARA.EXTRACT.AUTORES_PROPOSICOES} foi ignorada"
         )
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_AUTORES_PROPOSICOES} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.AUTORES_PROPOSICOES} irá retornar os dados à partir do arquivo em disco."
         )
         return load_ndjson(ExtractOutDir.CAMARA.AUTORES_PROPOSICOES)
     if not proposicoes_ids:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_AUTORES_PROPOSICOES}' pois o argumento do parâmetro 'proposicoes_ids' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.AUTORES_PROPOSICOES}' pois o argumento do parâmetro 'proposicoes_ids' é nulo"
         )
         return
 
@@ -74,7 +74,7 @@ async def extract_autores_proposicoes_camara(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=False,
         validate_results=True,
-        task=TasksNames.EXTRACT_CAMARA_AUTORES_PROPOSICOES,
+        task=TasksNames.CAMARA.EXTRACT.AUTORES_PROPOSICOES,
         lote_id=lote_id,
     )
 

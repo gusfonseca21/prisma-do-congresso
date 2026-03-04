@@ -16,12 +16,12 @@ logger = get_run_logger()
 def get_detalhes_processos_url(processos_ids: list[str]) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
-        TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS
+        TasksNames.SENADO.EXTRACT.DETALHES_PROCESSOS
     )
 
     if not_downloaded_urls:
         logger.warning(
-            f"A Tasks {TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+            f"A Tasks {TasksNames.SENADO.EXTRACT.DETALHES_PROCESSOS} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
         )
         urls.update([error.url for error in not_downloaded_urls])
 
@@ -34,7 +34,7 @@ def get_detalhes_processos_url(processos_ids: list[str]) -> UrlsResult:
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS,
+    task_run_name=TasksNames.SENADO.EXTRACT.DETALHES_PROCESSOS,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
@@ -43,14 +43,14 @@ async def extract_detalhes_processos_senado(
     ids_processos: list[str], lote_id: int, use_files: bool, ignore_tasks: list[str]
 ) -> list[dict] | None:
 
-    if TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS in ignore_tasks:
+    if TasksNames.SENADO.EXTRACT.DETALHES_PROCESSOS in ignore_tasks:
         logger.warning(
-            f"A Task {TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS} foi ignorada"
+            f"A Task {TasksNames.SENADO.EXTRACT.DETALHES_PROCESSOS} foi ignorada"
         )
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.SENADO.EXTRACT.DETALHES_PROCESSOS} irá retornar os dados à partir do arquivo em disco."
         )
         jsons = load_ndjson(ExtractOutDir.SENADO.DETALHES_PROCESSOS)
         return jsons
@@ -66,7 +66,7 @@ async def extract_detalhes_processos_senado(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=False,
         validate_results=False,
-        task=TasksNames.EXTRACT_SENADO_DETALHES_PROCESSOS,
+        task=TasksNames.SENADO.EXTRACT.DETALHES_PROCESSOS,
         lote_id=lote_id,
     )
 

@@ -17,7 +17,7 @@ def get_ids_proposicoes(jsons: list[dict]) -> list[int]:
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_CAMARA_PROPOSICOES,
+    task_run_name=TasksNames.CAMARA.EXTRACT.PROPOSICOES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -30,12 +30,12 @@ async def extract_proposicoes_camara(
     use_files: bool,
 ) -> list[int] | None:
 
-    if TasksNames.EXTRACT_CAMARA_PROPOSICOES in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_PROPOSICOES} foi ignorada")
+    if TasksNames.CAMARA.EXTRACT.PROPOSICOES in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.CAMARA.EXTRACT.PROPOSICOES} foi ignorada")
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_PROPOSICOES} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.PROPOSICOES} irá retornar os dados à partir do arquivo em disco."
         )
         return get_ids_proposicoes(load_ndjson(ExtractOutDir.CAMARA.PROPOSICOES))
 
@@ -52,7 +52,7 @@ async def extract_proposicoes_camara(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
-        task=TasksNames.EXTRACT_CAMARA_PROPOSICOES,
+        task=TasksNames.CAMARA.EXTRACT.PROPOSICOES,
         lote_id=lote_id,
     )
 

@@ -13,57 +13,60 @@ class FlowsNames(str, Enum):
 
 
 class TasksNames:
-    # TSE
-    EXTRACT_TSE_CANDIDATOS = "extract_tse_candidatos"
-    EXTRACT_TSE_PRESTACAO_CONTAS = "extract_tse_prestacao_contas"
-    EXTRACT_TSE_REDES_SOCIAIS = "extract_tse_redes_sociais"
-    EXTRACT_TSE_VOTACAO = "extract_tse_votacao"
-    # CAMARA
-    ## EXTRACT
-    EXTRACT_CAMARA_LEGISLATURA = "extract_camara_legislatura"
-    EXTRACT_CAMARA_PARTIDOS = "extract_camara_partidos"
-    EXTRACT_CAMARA_DETALHES_PARTIDOS = "extract_camara_detalhes_partidos"
-    EXTRACT_CAMARA_DEPUTADOS = "extract_camara_deputados"
-    EXTRACT_CAMARA_DETALHES_DEPUTADOS = "extract_camara_detalhes_deputados"
-    EXTRACT_CAMARA_HISTORICO_DEPUTADOS = "extract_camara_historico_deputados"
-    EXTRACT_CAMARA_MANDATOS_EXTERNOS_DEPUTADOS = (
-        "extract_camara_mandatos_externos_deputados"
-    )
-    EXTRACT_CAMARA_OCUPACOES_DEPUTADOS = "extract_camara_ocupacoes_deputados"
-    EXTRACT_CAMARA_PROFISSOES_DEPUTADOS = "extract_camara_profissoes_deputados"
-    EXTRACT_CAMARA_ASSIDUIDADE_PLENARIO = "extract_camara_assiduidade_plenario"
-    EXTRACT_CAMARA_ASSIDUIDADE_COMISSOES = "extract_camara_assiduidade_comissoes"
-    EXTRACT_CAMARA_FRENTES = "extract_camara_frentes"
-    EXTRACT_CAMARA_DETALHES_FRENTES = "extract_camara_detalhes_frentes"
-    EXTRACT_CAMARA_FRENTES_MEMBROS = "extract_camara_frentes_membros"
-    EXTRACT_CAMARA_DISCURSOS_DEPUTADOS = "extract_camara_discursos_deputados"
-    EXTRACT_CAMARA_PROPOSICOES = "extract_camara_proposicoes"
-    EXTRACT_CAMARA_DETALHES_PROPOSICOES = "extract_camara_detalhes_proposicoes"
-    EXTRACT_CAMARA_AUTORES_PROPOSICOES = "extract_camara_autores_proposicoes"
-    EXTRACT_CAMARA_DESPESAS_DEPUTADOS = "extract_camara_despesas_deputados"
-    EXTRACT_CAMARA_VOTACOES = "extract_camara_votacoes"
-    EXTRACT_CAMARA_DETALHES_VOTACOES = "extract_camara_detalhes_votacoes"
-    EXTRACT_CAMARA_ORIENTACOES_VOTACOES = "extract_camara_orientacoes_votacoes"
-    EXTRACT_CAMARA_VOTOS_VOTACOES = "extract_camara_votos_votacoes"
-    EXTRACT_CAMARA_LEGISLATURAS_LIDERES = "extract_camara_legislaturas_lideres"
-    EXTRACT_CAMARA_LEGISLATURAS_MESA = "extract_camara_legislaturas_mesa"
-    ## LOAD
-    LOAD_CAMARA_LEGISLATURA = "load_camara_legislatura"
-    LOAD_CAMARA_PARTIDOS = "load_camara_partidos"
-    LOAD_CAMARA_DEPUTADOS = "load_camara_deputados"
-    LOAD_CAMARA_HISTORICO_DEPUTADOS = "load_camara_historico_deputados"
-    LOAD_CAMARA_MANDATOS_EXTERNOS_DEPUTADOS = "load_camara_mantados_externos_deputados"
-    LOAD_CAMARA_OCUPACOES_DEPUTADOS = "load_camara_ocupacoes_deputados"
-    LOAD_CAMARA_PROFISSOES_DEPUTADOS = "load_camara_profissoes_deputados"
-    # SENADO
-    EXTRACT_SENADO_COLEGIADOS = "extract_senado_colegiados"
-    EXTRACT_SENADO_SENADORES = "extract_senado_senadores"
-    EXTRACT_SENADO_DETALHES_SENADORES = "extract_senado_detalhes_senadores"
-    EXTRACT_SENADO_DISCURSOS_SENADORES = "extract_senado_discursos_senadores"
-    EXTRACT_SENADO_DESPESAS_SENADORES = "extract_senado_despesas_senadores"
-    EXTRACT_SENADO_PROCESSOS = "extract_senado_processos"
-    EXTRACT_SENADO_DETALHES_PROCESSOS = "extract_senado_detalhes_processos"
-    EXTRACT_SENADO_VOTACOES = "extract_senado_votacoes"
+    class TSE:
+        class EXTRACT:
+            CANDIDATOS = "extract_tse_candidatos"
+            PRESTACAO_CONTAS = "extract_tse_prestacao_contas"
+            REDES_SOCIAIS = "extract_tse_redes_sociais"
+            VOTACAO = "extract_tse_votacao"
+
+    class CAMARA:
+        class EXTRACT:
+            LEGISLATURA = "extract_camara_legislatura"
+            PARTIDOS = "extract_camara_partidos"
+            DETALHES_PARTIDOS = "extract_camara_detalhes_partidos"
+            DEPUTADOS = "extract_camara_deputados"
+            DETALHES_DEPUTADOS = "extract_camara_detalhes_deputados"
+            HISTORICO_DEPUTADOS = "extract_camara_historico_deputados"
+            MANDATOS_EXTERNOS_DEPUTADOS = "extract_camara_mandatos_externos_deputados"
+            OCUPACOES_DEPUTADOS = "extract_camara_ocupacoes_deputados"
+            PROFISSOES_DEPUTADOS = "extract_camara_profissoes_deputados"
+            ASSIDUIDADE_PLENARIO = "extract_camara_assiduidade_plenario"
+            ASSIDUIDADE_COMISSOES = "extract_camara_assiduidade_comissoes"
+            FRENTES = "extract_camara_frentes"
+            DETALHES_FRENTES = "extract_camara_detalhes_frentes"
+            FRENTES_MEMBROS = "extract_camara_frentes_membros"
+            DISCURSOS_DEPUTADOS = "extract_camara_discursos_deputados"
+            PROPOSICOES = "extract_camara_proposicoes"
+            DETALHES_PROPOSICOES = "extract_camara_detalhes_proposicoes"
+            AUTORES_PROPOSICOES = "extract_camara_autores_proposicoes"
+            DESPESAS_DEPUTADOS = "extract_camara_despesas_deputados"
+            VOTACOES = "extract_camara_votacoes"
+            DETALHES_VOTACOES = "extract_camara_detalhes_votacoes"
+            ORIENTACOES_VOTACOES = "extract_camara_orientacoes_votacoes"
+            VOTOS_VOTACOES = "extract_camara_votos_votacoes"
+            LEGISLATURAS_LIDERES = "extract_camara_legislaturas_lideres"
+            LEGISLATURAS_MESA = "extract_camara_legislaturas_mesa"
+
+        class LOAD:
+            LEGISLATURA = "load_camara_legislatura"
+            PARTIDOS = "load_camara_partidos"
+            DEPUTADOS = "load_camara_deputados"
+            HISTORICO_DEPUTADOS = "load_camara_historico_deputados"
+            MANDATOS_EXTERNOS_DEPUTADOS = "load_camara_mantados_externos_deputados"
+            OCUPACOES_DEPUTADOS = "load_camara_ocupacoes_deputados"
+            PROFISSOES_DEPUTADOS = "load_camara_profissoes_deputados"
+
+    class SENADO:
+        class EXTRACT:
+            COLEGIADOS = "extract_senado_colegiados"
+            SENADORES = "extract_senado_senadores"
+            DETALHES_SENADORES = "extract_senado_detalhes_senadores"
+            DISCURSOS_SENADORES = "extract_senado_discursos_senadores"
+            DESPESAS_SENADORES = "extract_senado_despesas_senadores"
+            PROCESSOS = "extract_senado_processos"
+            DETALHES_PROCESSOS = "extract_senado_detalhes_processos"
+            VOTACOES = "extract_senado_votacoes"
 
 
 class ExtractOutDir:

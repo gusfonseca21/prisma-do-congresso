@@ -17,12 +17,12 @@ def detalhes_senadores_urls(senadores_ids: list[str]) -> UrlsResult:
     urls = set()
 
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
-        TasksNames.EXTRACT_SENADO_DETALHES_SENADORES
+        TasksNames.SENADO.EXTRACT.DETALHES_SENADORES
     )
 
     if not_downloaded_urls:
         logger.warning(
-            f"A Tasks {TasksNames.EXTRACT_SENADO_DETALHES_SENADORES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+            f"A Tasks {TasksNames.SENADO.EXTRACT.DETALHES_SENADORES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
         )
         urls.update([error.url for error in not_downloaded_urls])
 
@@ -35,7 +35,7 @@ def detalhes_senadores_urls(senadores_ids: list[str]) -> UrlsResult:
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_SENADO_DETALHES_SENADORES,
+    task_run_name=TasksNames.SENADO.EXTRACT.DETALHES_SENADORES,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
@@ -47,18 +47,20 @@ async def extract_detalhes_senadores_senado(
     ignore_tasks: list[str],
 ) -> list[dict] | None:
 
-    if TasksNames.EXTRACT_SENADO_DETALHES_SENADORES in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_DEPUTADOS} foi ignorada")
+    if TasksNames.SENADO.EXTRACT.DETALHES_SENADORES in ignore_tasks:
+        logger.warning(
+            f"A Task {TasksNames.SENADO.EXTRACT.DETALHES_SENADORES} foi ignorada"
+        )
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_DETALHES_SENADORES} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.SENADO.EXTRACT.DETALHES_SENADORES} irá retornar os dados à partir do arquivo em disco."
         )
         jsons = load_ndjson(ExtractOutDir.SENADO.DETALHES_SENADORES)
         return jsons
     if not ids_senadores:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_SENADO_DETALHES_SENADORES}' pois o argumento do parâmetro 'ids_senadores' é nulo"
+            f"Não foi possível executar a task '{TasksNames.SENADO.EXTRACT.DETALHES_SENADORES}' pois o argumento do parâmetro 'ids_senadores' é nulo"
         )
         return
 
@@ -73,7 +75,7 @@ async def extract_detalhes_senadores_senado(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=False,
         validate_results=False,
-        task=TasksNames.EXTRACT_SENADO_DETALHES_SENADORES,
+        task=TasksNames.SENADO.EXTRACT.DETALHES_SENADORES,
         lote_id=lote_id,
     )
 

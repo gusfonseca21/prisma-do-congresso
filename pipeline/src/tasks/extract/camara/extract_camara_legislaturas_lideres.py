@@ -18,7 +18,7 @@ def lideres_url(legislatura: dict) -> str:
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_CAMARA_LEGISLATURAS_LIDERES,
+    task_run_name=TasksNames.CAMARA.EXTRACT.LEGISLATURAS_LIDERES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -27,19 +27,19 @@ async def extract_camara_legislaturas_lideres(
     legislatura: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> list[dict] | None:
 
-    if TasksNames.EXTRACT_CAMARA_LEGISLATURAS_LIDERES in ignore_tasks:
+    if TasksNames.CAMARA.EXTRACT.LEGISLATURAS_LIDERES in ignore_tasks:
         logger.warning(
-            f"A Task {TasksNames.EXTRACT_CAMARA_LEGISLATURAS_LIDERES} foi ignorada"
+            f"A Task {TasksNames.CAMARA.EXTRACT.LEGISLATURAS_LIDERES} foi ignorada"
         )
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_LEGISLATURAS_LIDERES} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.LEGISLATURAS_LIDERES} irá retornar os dados à partir do arquivo em disco."
         )
         return load_ndjson(ExtractOutDir.CAMARA.LEGISLATURAS_LIDERES)
     if not legislatura:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_LEGISLATURAS_LIDERES}' pois o argumento do parâmetro 'legislatura' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.LEGISLATURAS_LIDERES}' pois o argumento do parâmetro 'legislatura' é nulo"
         )
         return
 
@@ -54,7 +54,7 @@ async def extract_camara_legislaturas_lideres(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=True,
         validate_results=True,
-        task=TasksNames.EXTRACT_CAMARA_LEGISLATURAS_LIDERES,
+        task=TasksNames.CAMARA.EXTRACT.LEGISLATURAS_LIDERES,
         lote_id=lote_id,
     )
 

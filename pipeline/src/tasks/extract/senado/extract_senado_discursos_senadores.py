@@ -20,7 +20,7 @@ def discursos_senadores_urls(
 ) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
-        TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES
+        TasksNames.SENADO.EXTRACT.DISCURSOS_SENADORES
     )
 
     if not_downloaded_urls:
@@ -49,7 +49,7 @@ def discursos_senadores_urls(
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES,
+    task_run_name=TasksNames.SENADO.EXTRACT.DISCURSOS_SENADORES,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
@@ -63,20 +63,20 @@ async def extract_discursos_senado(
     ignore_tasks: list[str],
 ) -> list[dict] | None:
 
-    if TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES in ignore_tasks:
+    if TasksNames.SENADO.EXTRACT.DISCURSOS_SENADORES in ignore_tasks:
         logger.warning(
-            f"A Task {TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES} foi ignorada"
+            f"A Task {TasksNames.SENADO.EXTRACT.DISCURSOS_SENADORES} foi ignorada"
         )
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.SENADO.EXTRACT.DISCURSOS_SENADORES} irá retornar os dados à partir do arquivo em disco."
         )
         jsons = load_ndjson(ExtractOutDir.SENADO.DISCURSOS_SENADORES)
         return jsons
     if not ids_senadores:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES}' pois o argumento do parâmetro 'ids_senadores' é nulo"
+            f"Não foi possível executar a task '{TasksNames.SENADO.EXTRACT.DISCURSOS_SENADORES}' pois o argumento do parâmetro 'ids_senadores' é nulo"
         )
         return
 
@@ -91,7 +91,7 @@ async def extract_discursos_senado(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=False,
         validate_results=False,
-        task=TasksNames.EXTRACT_SENADO_DISCURSOS_SENADORES,
+        task=TasksNames.SENADO.EXTRACT.DISCURSOS_SENADORES,
         lote_id=lote_id,
     )
 

@@ -42,7 +42,7 @@ def get_ids_votacoes(jsons: list[dict]) -> list[str]:
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_CAMARA_VOTACOES,
+    task_run_name=TasksNames.CAMARA.EXTRACT.VOTACOES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -55,12 +55,12 @@ async def extract_votacoes_camara(
     use_files: bool,
 ) -> list[str] | None:
 
-    if TasksNames.EXTRACT_CAMARA_VOTACOES in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_VOTACOES} foi ignorada")
+    if TasksNames.CAMARA.EXTRACT.VOTACOES in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.CAMARA.EXTRACT.VOTACOES} foi ignorada")
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_VOTACOES} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.VOTACOES} irá retornar os dados à partir do arquivo em disco."
         )
         return get_ids_votacoes(load_ndjson(ExtractOutDir.CAMARA.VOTACOES))
 
@@ -75,7 +75,7 @@ async def extract_votacoes_camara(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
-        task=TasksNames.EXTRACT_CAMARA_VOTACOES,
+        task=TasksNames.CAMARA.EXTRACT.VOTACOES,
         lote_id=lote_id,
     )
 

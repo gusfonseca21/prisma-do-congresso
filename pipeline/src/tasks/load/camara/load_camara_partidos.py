@@ -15,7 +15,7 @@ logger = get_run_logger()
 
 
 @task(
-    task_run_name=TasksNames.LOAD_CAMARA_PARTIDOS,
+    task_run_name=TasksNames.CAMARA.LOAD.PARTIDOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -24,12 +24,12 @@ def load_camara_partidos(
     lote_id: int, partidos: list[dict] | None, ignore_tasks: list[str]
 ):
 
-    if TasksNames.LOAD_CAMARA_PARTIDOS in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.LOAD_CAMARA_PARTIDOS} foi ignorada")
+    if TasksNames.CAMARA.LOAD.PARTIDOS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.CAMARA.LOAD.PARTIDOS} foi ignorada")
         return
     if partidos is None:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_PARTIDOS}' pois o argumento do parâmetro 'partidos' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.LOAD.PARTIDOS}' pois o argumento do parâmetro 'partidos' é nulo"
         )
         return
 

@@ -15,7 +15,7 @@ logger = get_run_logger()
 
 
 @task(
-    task_run_name=TasksNames.LOAD_CAMARA_LEGISLATURA,
+    task_run_name=TasksNames.CAMARA.LOAD.LEGISLATURA,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -24,12 +24,12 @@ def load_camara_legislatura(
     lote_id: int, legislatura: dict | None, ignore_tasks: list[str]
 ):
 
-    if TasksNames.LOAD_CAMARA_LEGISLATURA in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.LOAD_CAMARA_LEGISLATURA} foi ignorada")
+    if TasksNames.CAMARA.LOAD.LEGISLATURA in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.CAMARA.LOAD.LEGISLATURA} foi ignorada")
         return
     if legislatura is None:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.LOAD_CAMARA_LEGISLATURA}' pois o argumento do parâmetro 'legislatura' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.LOAD.LEGISLATURA}' pois o argumento do parâmetro 'legislatura' é nulo"
         )
         return
 

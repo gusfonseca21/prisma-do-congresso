@@ -17,7 +17,7 @@ def cache_by_year(_ctx, params):
 
 @task(
     name="Extract TSE Candidatos",
-    task_run_name=TasksNames.EXTRACT_TSE_CANDIDATOS + "_{year}",
+    task_run_name=TasksNames.TSE.EXTRACT.CANDIDATOS + "_{year}",
     cache_key_fn=cache_by_year,
     description="Faz o download e gravação de tabelas de consulta de candidatos do TSE.",
     retries=APP_SETTINGS.TSE.TASK_RETRIES,
@@ -30,8 +30,8 @@ def cache_by_year(_ctx, params):
 )
 def extract_candidatos(year: int, lote_id: int, ignore_tasks: list[str]) -> str | None:
 
-    if TasksNames.EXTRACT_TSE_CANDIDATOS in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.EXTRACT_TSE_CANDIDATOS} foi ignorada")
+    if TasksNames.TSE.EXTRACT.CANDIDATOS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.TSE.EXTRACT.CANDIDATOS} foi ignorada")
         return
 
     url = f"{APP_SETTINGS.TSE.BASE_URL}consulta_cand/consulta_cand_{year}.zip"
@@ -49,7 +49,7 @@ def extract_candidatos(year: int, lote_id: int, ignore_tasks: list[str]) -> str 
         dest_path=file_dest_path,
         unzip=True,
         lote_id=lote_id,
-        task=f"{TasksNames.EXTRACT_TSE_CANDIDATOS}_{year}",
+        task=f"{TasksNames.TSE.EXTRACT.CANDIDATOS}_{year}",
     )
 
     return str(dir_dest_path)

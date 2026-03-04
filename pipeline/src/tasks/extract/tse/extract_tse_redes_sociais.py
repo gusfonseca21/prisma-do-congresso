@@ -17,7 +17,7 @@ def cache_by_year(_ctx, params):
 
 @task(
     name="Extract TSE Redes Sociais",
-    task_run_name=TasksNames.EXTRACT_TSE_REDES_SOCIAIS + "_{uf}_{year}",
+    task_run_name=TasksNames.TSE.EXTRACT.REDES_SOCIAIS + "_{uf}_{year}",
     cache_key_fn=cache_by_year,
     description="Faz o download e gravação de tabelas de redes sociais de candidatos do TSE.",
     retries=APP_SETTINGS.TSE.TASK_RETRIES,
@@ -32,8 +32,8 @@ def extract_redes_sociais(
     year: int, uf: str, lote_id: int, ignore_tasks: list[str]
 ) -> str | None:
 
-    if TasksNames.EXTRACT_TSE_REDES_SOCIAIS in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.EXTRACT_TSE_REDES_SOCIAIS} foi ignorada")
+    if TasksNames.TSE.EXTRACT.REDES_SOCIAIS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.TSE.EXTRACT.REDES_SOCIAIS} foi ignorada")
         return
 
     url = f"{APP_SETTINGS.TSE.BASE_URL}consulta_cand/rede_social_candidato_{year}_{uf}.zip"
@@ -50,7 +50,7 @@ def extract_redes_sociais(
         url=url,
         dest_path=file_dest_path,
         unzip=True,
-        task=f"{TasksNames.EXTRACT_TSE_REDES_SOCIAIS}_{uf}_{year}",
+        task=f"{TasksNames.TSE.EXTRACT.REDES_SOCIAIS}_{uf}_{year}",
         lote_id=lote_id,
     )
 

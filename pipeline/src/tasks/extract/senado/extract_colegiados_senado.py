@@ -11,7 +11,7 @@ logger = get_run_logger()
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_SENADO_COLEGIADOS,
+    task_run_name=TasksNames.SENADO.EXTRACT.COLEGIADOS,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
@@ -20,12 +20,12 @@ def extract_colegiados(
     lote_id: int, use_files: bool, ignore_tasks: list[str]
 ) -> dict | None:
 
-    if TasksNames.EXTRACT_SENADO_COLEGIADOS in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.EXTRACT_SENADO_COLEGIADOS} foi ignorada")
+    if TasksNames.SENADO.EXTRACT.COLEGIADOS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.SENADO.EXTRACT.COLEGIADOS} foi ignorada")
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_COLEGIADOS} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.SENADO.EXTRACT.COLEGIADOS} irá retornar os dados à partir do arquivo em disco."
         )
         json = load_json(ExtractOutDir.SENADO.COLEGIADOS)
         return json

@@ -27,7 +27,7 @@ def get_ids_deputados(json: dict) -> list[int]:
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_CAMARA_DEPUTADOS,
+    task_run_name=TasksNames.CAMARA.EXTRACT.DEPUTADOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -36,17 +36,17 @@ def extract_deputados_camara(
     legislatura: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> list[int] | None:
 
-    if TasksNames.EXTRACT_CAMARA_DEPUTADOS in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_DEPUTADOS} foi ignorada")
+    if TasksNames.CAMARA.EXTRACT.DEPUTADOS in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.CAMARA.EXTRACT.DEPUTADOS} foi ignorada")
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_DEPUTADOS} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.DEPUTADOS} irá retornar os dados à partir do arquivo em disco."
         )
         return get_ids_deputados(load_json(ExtractOutDir.CAMARA.DEPUTADOS))
     if not legislatura:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DEPUTADOS}' pois o argumento do parâmetro 'legislatura' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.DEPUTADOS}' pois o argumento do parâmetro 'legislatura' é nulo"
         )
         return
 

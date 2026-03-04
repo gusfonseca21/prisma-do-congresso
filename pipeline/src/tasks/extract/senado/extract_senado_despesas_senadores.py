@@ -17,12 +17,12 @@ logger = get_run_logger()
 def despesas_senadores_urls(start_date: date, end_date: date) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
-        TasksNames.EXTRACT_SENADO_DESPESAS_SENADORES
+        TasksNames.SENADO.EXTRACT.DESPESAS_SENADORES
     )
 
     if not_downloaded_urls:
         logger.warning(
-            f"A Tasks {TasksNames.EXTRACT_SENADO_DESPESAS_SENADORES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+            f"A Tasks {TasksNames.SENADO.EXTRACT.DESPESAS_SENADORES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
         )
         urls.update([error.url for error in not_downloaded_urls])
 
@@ -41,7 +41,7 @@ def despesas_senadores_urls(start_date: date, end_date: date) -> UrlsResult:
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_SENADO_DESPESAS_SENADORES,
+    task_run_name=TasksNames.SENADO.EXTRACT.DESPESAS_SENADORES,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
@@ -54,14 +54,14 @@ async def extract_despesas_senado(
     ignore_tasks: list[str],
 ) -> list[dict] | None:
 
-    if TasksNames.EXTRACT_SENADO_DESPESAS_SENADORES in ignore_tasks:
+    if TasksNames.SENADO.EXTRACT.DESPESAS_SENADORES in ignore_tasks:
         logger.warning(
-            f"A Task {TasksNames.EXTRACT_SENADO_DESPESAS_SENADORES} foi ignorada"
+            f"A Task {TasksNames.SENADO.EXTRACT.DESPESAS_SENADORES} foi ignorada"
         )
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_SENADO_DESPESAS_SENADORES} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.SENADO.EXTRACT.DESPESAS_SENADORES} irá retornar os dados à partir do arquivo em disco."
         )
         jsons = load_ndjson(ExtractOutDir.SENADO.DESPESAS_SENADORES)
         return jsons
@@ -77,7 +77,7 @@ async def extract_despesas_senado(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=False,
         validate_results=False,
-        task=TasksNames.EXTRACT_SENADO_DESPESAS_SENADORES,
+        task=TasksNames.SENADO.EXTRACT.DESPESAS_SENADORES,
         lote_id=lote_id,
     )
 

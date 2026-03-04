@@ -26,7 +26,7 @@ def get_ids_frentes(jsons: list[dict]) -> list[str]:
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_CAMARA_FRENTES,
+    task_run_name=TasksNames.CAMARA.EXTRACT.FRENTES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -35,17 +35,17 @@ async def extract_frentes_camara(
     legislatura: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> list[str] | None:
 
-    if TasksNames.EXTRACT_CAMARA_FRENTES in ignore_tasks:
-        logger.warning(f"A Task {TasksNames.EXTRACT_CAMARA_FRENTES} foi ignorada")
+    if TasksNames.CAMARA.EXTRACT.FRENTES in ignore_tasks:
+        logger.warning(f"A Task {TasksNames.CAMARA.EXTRACT.FRENTES} foi ignorada")
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_FRENTES} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.FRENTES} irá retornar os dados à partir do arquivo em disco."
         )
         return get_ids_frentes(load_ndjson(ExtractOutDir.CAMARA.FRENTES))
     if not legislatura:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_FRENTES}' pois o argumento do parâmetro 'legislatura' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.FRENTES}' pois o argumento do parâmetro 'legislatura' é nulo"
         )
         return
 
@@ -62,7 +62,7 @@ async def extract_frentes_camara(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=True,
         validate_results=True,
-        task=TasksNames.EXTRACT_CAMARA_FRENTES,
+        task=TasksNames.CAMARA.EXTRACT.FRENTES,
         lote_id=lote_id,
     )
     jsons = cast(list[dict], jsons)

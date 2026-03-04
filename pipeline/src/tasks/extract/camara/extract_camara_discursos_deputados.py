@@ -23,12 +23,12 @@ def urls_discursos(
 
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
-        TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS
+        TasksNames.CAMARA.EXTRACT.DISCURSOS_DEPUTADOS
     )
 
     if not_downloaded_urls:
         logger.warning(
-            f"A Tasks {TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+            f"A Tasks {TasksNames.CAMARA.EXTRACT.DISCURSOS_DEPUTADOS} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
         )
         urls.update([error.url for error in not_downloaded_urls])
 
@@ -43,7 +43,7 @@ def urls_discursos(
 
 
 @task(
-    task_run_name=TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS,
+    task_run_name=TasksNames.CAMARA.EXTRACT.DISCURSOS_DEPUTADOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
@@ -57,19 +57,19 @@ async def extract_discursos_deputados_camara(
     use_files: bool,
 ) -> list[dict] | None:
 
-    if TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS in ignore_tasks:
+    if TasksNames.CAMARA.EXTRACT.DISCURSOS_DEPUTADOS in ignore_tasks:
         logger.warning(
-            f"A Task {TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS} foi ignorada"
+            f"A Task {TasksNames.CAMARA.EXTRACT.DISCURSOS_DEPUTADOS} foi ignorada"
         )
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.DISCURSOS_DEPUTADOS} irá retornar os dados à partir do arquivo em disco."
         )
         return load_ndjson(ExtractOutDir.CAMARA.DISCURSOS)
     if not deputados_ids:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS}' pois o argumento do parâmetro 'deputados_ids' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.DISCURSOS_DEPUTADOS}' pois o argumento do parâmetro 'deputados_ids' é nulo"
         )
         return
 
@@ -83,7 +83,7 @@ async def extract_discursos_deputados_camara(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
-        task=TasksNames.EXTRACT_CAMARA_DISCURSOS_DEPUTADOS,
+        task=TasksNames.CAMARA.EXTRACT.DISCURSOS_DEPUTADOS,
         lote_id=lote_id,
     )
 
