@@ -36,6 +36,8 @@ from tasks.load.camara import (
     load_camara_deputados,
     load_camara_historico_deputados,
     load_camara_legislatura,
+    load_camara_legislaturas_lideres,
+    load_camara_legislaturas_mesa,
     load_camara_mandatos_externos_deputados,
     load_camara_ocupacoes_deputados,
     load_camara_partidos,
@@ -204,6 +206,40 @@ def camara_flow(
     )
     futures.append(load_camara_profissoes_deputados_f)
 
+    ## EXTRACT LÍDERES LEGISLATURA
+    extract_camara_legislaturas_lideres_f = extract_camara_legislaturas_lideres.submit(
+        legislatura=extract_camara_legislatura_f,
+        lote_id=lote_id,
+        ignore_tasks=ignore_tasks,
+        use_files=use_files,
+    )
+    extract_camara_legislaturas_lideres_f.result()  # type: ignore
+
+    ## LOAD LÍDERES LEGISLATURA
+    load_camara_legislaturas_lideres_f = load_camara_legislaturas_lideres.submit(
+        lideres=extract_camara_legislaturas_lideres_f,  # type: ignore
+        lote_id=lote_id,
+        ignore_tasks=ignore_tasks,
+    )
+    futures.append(load_camara_legislaturas_lideres_f)
+
+    ## EXTRACT MESA LEGISLATURAS
+    extract_camara_legislaturas_mesa_f = extract_camara_legislaturas_mesa.submit(
+        legislatura=extract_camara_legislatura_f,
+        lote_id=lote_id,
+        ignore_tasks=ignore_tasks,
+        use_files=use_files,
+    )
+    extract_camara_legislaturas_mesa_f.result()
+
+    ## LOAD MESA LEGISLATURAS
+    load_camara_legislaturas_mesa_f = load_camara_legislaturas_mesa.submit(
+        mesa=extract_camara_legislaturas_mesa_f,  # type: ignore
+        lote_id=lote_id,
+        ignore_tasks=ignore_tasks,
+    )
+    futures.append(load_camara_legislaturas_mesa_f)
+
     ## EXTRACT ASSIDUIDADE PLENÁRIO
     extract_camara_assiduidade_plenario_f = extract_camara_assiduidade_plenario.submit(
         deputados_ids=extract_camara_deputados_f,
@@ -342,24 +378,6 @@ def camara_flow(
         use_files=use_files,
     )
     extract_camara_despesas_deputados_f.result()  # type: ignore
-
-    ## EXTRACT LÍDERES LEGISLATURA
-    extract_camara_legislaturas_lideres_f = extract_camara_legislaturas_lideres.submit(
-        legislatura=extract_camara_legislatura_f,
-        lote_id=lote_id,
-        ignore_tasks=ignore_tasks,
-        use_files=use_files,
-    )
-    extract_camara_legislaturas_lideres_f.result()  # type: ignore
-
-    ## MESA LEGISLATURAS
-    extract_camara_legislaturas_mesa_f = extract_camara_legislaturas_mesa.submit(
-        legislatura=extract_camara_legislatura_f,
-        lote_id=lote_id,
-        ignore_tasks=ignore_tasks,
-        use_files=use_files,
-    )
-    extract_camara_legislaturas_mesa_f.result()
 
     ### FINALIZANDO FLOW ###
 

@@ -56,6 +56,8 @@ class TasksNames:
             MANDATOS_EXTERNOS_DEPUTADOS = "load_camara_mantados_externos_deputados"
             OCUPACOES_DEPUTADOS = "load_camara_ocupacoes_deputados"
             PROFISSOES_DEPUTADOS = "load_camara_profissoes_deputados"
+            LEGISLATURAS_LIDERES = "load_camara_legislaturas_lideres"
+            LEGISLATURAS_MESA = "load_camara_legislaturas_mesa"
 
     class SENADO:
         class EXTRACT:
