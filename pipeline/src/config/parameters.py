@@ -31,6 +31,10 @@ class TasksNames:
             MANDATOS_EXTERNOS_DEPUTADOS = "extract_camara_mandatos_externos_deputados"
             OCUPACOES_DEPUTADOS = "extract_camara_ocupacoes_deputados"
             PROFISSOES_DEPUTADOS = "extract_camara_profissoes_deputados"
+            LEGISLATURAS_LIDERES = "extract_camara_legislaturas_lideres"
+            LEGISLATURAS_MESA = "extract_camara_legislaturas_mesa"
+            BLOCOS = "extract_camara_blocos"
+            PARTIDOS_BLOCOS = "extract_camara_partidos_blocos"
             ASSIDUIDADE_PLENARIO = "extract_camara_assiduidade_plenario"
             ASSIDUIDADE_COMISSOES = "extract_camara_assiduidade_comissoes"
             FRENTES = "extract_camara_frentes"
@@ -45,8 +49,6 @@ class TasksNames:
             DETALHES_VOTACOES = "extract_camara_detalhes_votacoes"
             ORIENTACOES_VOTACOES = "extract_camara_orientacoes_votacoes"
             VOTOS_VOTACOES = "extract_camara_votos_votacoes"
-            LEGISLATURAS_LIDERES = "extract_camara_legislaturas_lideres"
-            LEGISLATURAS_MESA = "extract_camara_legislaturas_mesa"
 
         class LOAD:
             LEGISLATURA = "load_camara_legislatura"
@@ -58,6 +60,8 @@ class TasksNames:
             PROFISSOES_DEPUTADOS = "load_camara_profissoes_deputados"
             LEGISLATURAS_LIDERES = "load_camara_legislaturas_lideres"
             LEGISLATURAS_MESA = "load_camara_legislaturas_mesa"
+            BLOCOS = "load_camara_blocos"
+            PARTIDOS_BLOCOS = "load_camara_partidos_blocos"
 
     class SENADO:
         class EXTRACT:
@@ -105,6 +109,16 @@ class ExtractOutDir:
         PROFISSOES_DEPUTADOS = (
             f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/profissoes_deputados.ndjson"
         )
+        LEGISLATURAS_LIDERES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/legislaturas_lideres.ndjson"
+        )
+        LEGISLATURAS_MESA = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/legislaturas_mesa.json"
+        )
+        BLOCOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/blocos.ndjson"
+        PARTIDOS_BLOCOS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/partidos_blocos.ndjson"
+        )
         ASSIDUIDADE_PLENARIO = (
             f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/assiduidade_plenario.zip"
         )
@@ -138,12 +152,6 @@ class ExtractOutDir:
         )
         DESPESAS_DEPUTADOS = (
             f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/despesas_deputados.ndjson"
-        )
-        LEGISLATURAS_LIDERES = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/legislaturas_lideres.ndjson"
-        )
-        LEGISLATURAS_MESA = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/legislaturas_mesa.json"
         )
 
     class SENADO:

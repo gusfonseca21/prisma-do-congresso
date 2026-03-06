@@ -1,5 +1,11 @@
 ## IMPORTAÇÕES PARA QUE O ALEMBIC POSSA GERAR AUTOMATICAMENTE AS TABELAS
 
+from .camara_blocos import (
+    CamaraBlocos,
+    CamaraBlocosArg,
+    CamaraBlocosPartidos,
+    CamaraBlocosPartidosArg,
+)
 from .camara_deputados import (
     CamaraDeputados,
     CamaraDeputadosArg,
@@ -26,4 +32,8 @@ __all__ = [
     "CamaraDeputadosMandatosExternosArg",
     "CamaraDeputadosOcupacoes",
     "CamaraDeputadosProfissoes",
+    "CamaraBlocos",
+    "CamaraBlocosArg",
+    "CamaraBlocosPartidos",
+    "CamaraBlocosPartidosArg",
 ]

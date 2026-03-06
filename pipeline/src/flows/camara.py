@@ -9,6 +9,7 @@ from tasks.extract.camara import (
     extract_autores_proposicoes_camara,
     extract_camara_assiduidade_comissoes,
     extract_camara_assiduidade_plenario,
+    extract_camara_blocos,
     extract_camara_detalhes_frentes,
     extract_camara_detalhes_partidos,
     extract_camara_historico_deputados,
@@ -17,6 +18,7 @@ from tasks.extract.camara import (
     extract_camara_mandatos_externos_deputados,
     extract_camara_ocupacoes_deputados,
     extract_camara_partidos,
+    extract_camara_partidos_blocos,
     extract_camara_profissoes_deputados,
     extract_deputados_camara,
     extract_despesas_camara,
@@ -33,6 +35,7 @@ from tasks.extract.camara import (
     extract_votos_votacoes_camara,
 )
 from tasks.load.camara import (
+    load_camara_blocos,
     load_camara_deputados,
     load_camara_historico_deputados,
     load_camara_legislatura,
@@ -41,6 +44,7 @@ from tasks.load.camara import (
     load_camara_mandatos_externos_deputados,
     load_camara_ocupacoes_deputados,
     load_camara_partidos,
+    load_camara_partidos_blocos,
     load_camara_profissoes_deputados,
 )
 from utils.logs import save_logs
@@ -239,6 +243,40 @@ def camara_flow(
         ignore_tasks=ignore_tasks,
     )
     futures.append(load_camara_legislaturas_mesa_f)
+
+    ## EXTRACT BLOCOS
+    extract_camara_blocos_f = extract_camara_blocos.submit(
+        legislatura=extract_camara_legislatura_f,  # type: ignore
+        lote_id=lote_id,
+        ignore_tasks=ignore_tasks,
+        use_files=use_files,
+    )
+    futures.append(extract_camara_blocos_f)
+
+    ## LOAD BLOCOS
+    load_camara_blocos_f = load_camara_blocos.submit(
+        lote_id=lote_id,
+        blocos=extract_camara_blocos_f,  # type: ignore
+        ignore_tasks=ignore_tasks,
+    )
+    futures.append(load_camara_blocos_f)
+
+    ## EXTRACT PARTIDOS BLOCOS
+    extract_camara_partidos_blocos_f = extract_camara_partidos_blocos.submit(
+        blocos=extract_camara_blocos_f,  # type: ignore
+        lote_id=lote_id,
+        ignore_tasks=ignore_tasks,
+        use_files=use_files,
+    )
+    futures.append(extract_camara_partidos_blocos_f)
+
+    ## LOAD PARTIDOS BLOCOS
+    load_camara_partidos_blocos_f = load_camara_partidos_blocos.submit(
+        lote_id=lote_id,
+        partidos_blocos=extract_camara_partidos_blocos_f,  # type: ignore
+        ignore_tasks=ignore_tasks,
+    )
+    futures.append(load_camara_partidos_blocos_f)
 
     ## EXTRACT ASSIDUIDADE PLENÁRIO
     extract_camara_assiduidade_plenario_f = extract_camara_assiduidade_plenario.submit(
