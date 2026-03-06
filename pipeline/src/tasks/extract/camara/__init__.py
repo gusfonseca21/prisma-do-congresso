@@ -10,6 +10,7 @@ from .extract_camara_detalhes_partidos import extract_camara_detalhes_partidos
 from .extract_camara_detalhes_proposicoes import extract_detalhes_proposicoes_camara
 from .extract_camara_detalhes_votacoes import extract_detalhes_votacoes_camara
 from .extract_camara_discursos_deputados import extract_discursos_deputados_camara
+from .extract_camara_eventos import extract_camara_eventos
 from .extract_camara_frentes import extract_frentes_camara
 from .extract_camara_frentes_membros import extract_frentes_membros_camara
 from .extract_camara_historico_deputados import extract_camara_historico_deputados
@@ -56,4 +57,5 @@ __all__ = [
     "extract_camara_profissoes_deputados",
     "extract_camara_blocos",
     "extract_camara_partidos_blocos",
+    "extract_camara_eventos",
 ]

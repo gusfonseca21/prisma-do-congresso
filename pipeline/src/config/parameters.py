@@ -35,6 +35,7 @@ class TasksNames:
             LEGISLATURAS_MESA = "extract_camara_legislaturas_mesa"
             BLOCOS = "extract_camara_blocos"
             PARTIDOS_BLOCOS = "extract_camara_partidos_blocos"
+            EVENTOS = "extract_camara_eventos"
             ASSIDUIDADE_PLENARIO = "extract_camara_assiduidade_plenario"
             ASSIDUIDADE_COMISSOES = "extract_camara_assiduidade_comissoes"
             FRENTES = "extract_camara_frentes"
@@ -119,6 +120,7 @@ class ExtractOutDir:
         PARTIDOS_BLOCOS = (
             f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/partidos_blocos.ndjson"
         )
+        EVENTOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/eventos.ndjson"
         ASSIDUIDADE_PLENARIO = (
             f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/assiduidade_plenario.zip"
         )

@@ -12,6 +12,7 @@ from tasks.extract.camara import (
     extract_camara_blocos,
     extract_camara_detalhes_frentes,
     extract_camara_detalhes_partidos,
+    extract_camara_eventos,
     extract_camara_historico_deputados,
     extract_camara_legislaturas_lideres,
     extract_camara_legislaturas_mesa,
@@ -277,6 +278,15 @@ def camara_flow(
         ignore_tasks=ignore_tasks,
     )
     futures.append(load_camara_partidos_blocos_f)
+
+    load_extract_camara_eventos_f = extract_camara_eventos.submit(
+        start_date=start_date,
+        end_date=end_date,
+        lote_id=lote_id,
+        ignore_tasks=ignore_tasks,
+        use_files=use_files,
+    )
+    futures.append(load_extract_camara_eventos_f)
 
     ## EXTRACT ASSIDUIDADE PLENÁRIO
     extract_camara_assiduidade_plenario_f = extract_camara_assiduidade_plenario.submit(
