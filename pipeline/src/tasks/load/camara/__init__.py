@@ -11,6 +11,7 @@ from .load_camara_ocupacoes_deputados import load_camara_ocupacoes_deputados
 from .load_camara_partidos import load_camara_partidos
 from .load_camara_partidos_blocos import load_camara_partidos_blocos
 from .load_camara_profissoes_deputados import load_camara_profissoes_deputados
+from .load_camara_tipos_orgaos import load_camara_tipos_orgaos
 
 __all__ = [
     "load_camara_legislatura",
@@ -24,4 +25,5 @@ __all__ = [
     "load_camara_legislaturas_lideres",
     "load_camara_blocos",
     "load_camara_partidos_blocos",
+    "load_camara_tipos_orgaos",
 ]

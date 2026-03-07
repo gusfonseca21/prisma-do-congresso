@@ -17,6 +17,7 @@ from .camara_deputados import (
     CamaraDeputadosRedesSociaisArg,
 )
 from .camara_legislatura import CamaraLegislatura, CamaraLegislaturaArg
+from .camara_orgaos import CamaraTiposOrgaos, CamaraTiposOrgaosArg
 from .camara_partidos import CamaraPartidos, CamaraPartidosArg
 
 __all__ = [
@@ -36,4 +37,6 @@ __all__ = [
     "CamaraBlocosArg",
     "CamaraBlocosPartidos",
     "CamaraBlocosPartidosArg",
+    "CamaraTiposOrgaos",
+    "CamaraTiposOrgaosArg",
 ]

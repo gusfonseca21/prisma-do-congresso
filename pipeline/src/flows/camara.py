@@ -18,9 +18,11 @@ from tasks.extract.camara import (
     extract_camara_legislaturas_mesa,
     extract_camara_mandatos_externos_deputados,
     extract_camara_ocupacoes_deputados,
+    extract_camara_orgaos,
     extract_camara_partidos,
     extract_camara_partidos_blocos,
     extract_camara_profissoes_deputados,
+    extract_camara_tipos_orgaos,
     extract_deputados_camara,
     extract_despesas_camara,
     extract_detalhes_deputados_camara,
@@ -47,6 +49,7 @@ from tasks.load.camara import (
     load_camara_partidos,
     load_camara_partidos_blocos,
     load_camara_profissoes_deputados,
+    load_camara_tipos_orgaos,
 )
 from utils.logs import save_logs
 
@@ -279,14 +282,43 @@ def camara_flow(
     )
     futures.append(load_camara_partidos_blocos_f)
 
-    load_extract_camara_eventos_f = extract_camara_eventos.submit(
+    ## EXTRACT TIPOS ÓRGÃOS
+    extract_camara_tipos_orgaos_f = extract_camara_tipos_orgaos.submit(
+        ignore_tasks=ignore_tasks, use_files=use_files
+    )
+    futures.append(extract_camara_tipos_orgaos_f)
+
+    ## LOAD TIPO ÓRGÃOS
+    load_camara_tipos_orgaos_f = load_camara_tipos_orgaos.submit(
+        lote_id=lote_id,
+        tipos_orgaos=extract_camara_tipos_orgaos_f,  # type: ignore
+        ignore_tasks=ignore_tasks,
+    )
+    futures.append(load_camara_tipos_orgaos_f)
+
+    ## EXTRACT ORGAOS
+    extract_camara_orgaos_f = extract_camara_orgaos.submit(
         start_date=start_date,
         end_date=end_date,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
         use_files=use_files,
     )
-    futures.append(load_extract_camara_eventos_f)
+    futures.append(extract_camara_orgaos_f)
+
+    ## LOAD ORGAOS
+
+    ## EXTRACT EVENTOS
+    extract_camara_eventos_f = extract_camara_eventos.submit(
+        start_date=start_date,
+        end_date=end_date,
+        lote_id=lote_id,
+        ignore_tasks=ignore_tasks,
+        use_files=use_files,
+    )
+    futures.append(extract_camara_eventos_f)
+
+    ## LOAD EVENTOS
 
     ## EXTRACT ASSIDUIDADE PLENÁRIO
     extract_camara_assiduidade_plenario_f = extract_camara_assiduidade_plenario.submit(
