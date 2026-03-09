@@ -37,6 +37,7 @@ class TasksNames:
             PARTIDOS_BLOCOS = "extract_camara_partidos_blocos"
             TIPOS_ORGAOS = "extract_tipos_orgaos"
             ORGAOS = "extract_camara_orgaos"
+            DETALHES_ORGAOS = "extract_camara_detalhes_orgaos"
             EVENTOS = "extract_camara_eventos"
             ASSIDUIDADE_PLENARIO = "extract_camara_assiduidade_plenario"
             ASSIDUIDADE_COMISSOES = "extract_camara_assiduidade_comissoes"
@@ -67,6 +68,7 @@ class TasksNames:
             PARTIDOS_BLOCOS = "load_camara_partidos_blocos"
             TIPOS_ORGAOS = "load_camara_tipos_orgaos"
             ORGAOS = "load_camara_orgaos"
+            DETALHES_ORGAOS = "load_camara_detalhes_orgaos"
 
     class SENADO:
         class EXTRACT:
@@ -127,6 +129,9 @@ class ExtractOutDir:
         EVENTOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/eventos.ndjson"
         TIPOS_ORGAOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/tipos_orgaos.json"
         ORGAOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/orgaos.ndjson"
+        DETALHES_ORGAOS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/detalhes_orgaos.ndjson"
+        )
         ASSIDUIDADE_PLENARIO = (
             f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/assiduidade_plenario.zip"
         )
