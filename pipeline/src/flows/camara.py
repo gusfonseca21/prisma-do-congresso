@@ -41,6 +41,7 @@ from tasks.extract.camara import (
 from tasks.load.camara import (
     load_camara_blocos,
     load_camara_deputados,
+    load_camara_detalhes_orgaos,
     load_camara_historico_deputados,
     load_camara_legislatura,
     load_camara_legislaturas_lideres,
@@ -325,6 +326,14 @@ def camara_flow(
         use_files=use_files,
     )
     extract_camara_detalhes_orgaos_f.result()  # type: ignore
+
+    ## LOAD DETALHES ÓRGÃOS
+    load_camara_detalhes_orgaos_f = load_camara_detalhes_orgaos.submit(
+        detalhes_orgaos=extract_camara_detalhes_orgaos_f,  # type: ignore
+        lote_id=lote_id,
+        ignore_tasks=ignore_tasks,
+    )
+    futures.append(load_camara_detalhes_orgaos_f)
 
     ## EXTRACT EVENTOS
     extract_camara_eventos_f = extract_camara_eventos.submit(

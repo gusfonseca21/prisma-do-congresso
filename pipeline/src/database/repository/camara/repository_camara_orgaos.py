@@ -4,19 +4,22 @@ from database.engine import get_connection
 from database.models.camara.camara_orgaos import (
     CamaraOrgaos,
     CamaraOrgaosArg,
-    CamaraTiposOrgaos,
-    CamaraTiposOrgaosArg,
+    CamaraOrgaosDetalhes,
+    CamaraOrgaosDetalhesArg,
+    CamaraOrgaosTipos,
+    CamaraOrgaosTiposArg,
 )
 from database.repository.logs import insert_log_linhas_db
 
-camara_tipos_orgaos = CamaraTiposOrgaos.__table__
+camara_orgaos_tipos = CamaraOrgaosTipos.__table__
 camara_orgaos = CamaraOrgaos.__table__
+camara_orgaos_detalhes = CamaraOrgaosDetalhes.__table__
 
 
-def insert_camara_tipos_orgaos_db(data: list[CamaraTiposOrgaosArg]):
+def insert_camara_tipos_orgaos_db(data: list[CamaraOrgaosTiposArg]):
     with get_connection() as conn:
         stmt = (
-            insert(camara_tipos_orgaos)
+            insert(camara_orgaos_tipos)
             .values(
                 [
                     {
@@ -39,14 +42,14 @@ def insert_camara_tipos_orgaos_db(data: list[CamaraTiposOrgaosArg]):
 
         insert_log_linhas_db(
             id_lote=data[0].id_lote,
-            table=camara_tipos_orgaos.name,
+            table=camara_orgaos_tipos.name,
             inserted=inserted,
             updated=updated,
             ignored=ignored,
             total=total,
         )
 
-        return
+    return
 
 
 def insert_camara_orgaos_db(data: list[CamaraOrgaosArg]):
@@ -87,4 +90,44 @@ def insert_camara_orgaos_db(data: list[CamaraOrgaosArg]):
             total=total,
         )
 
-        return
+    return
+
+
+def insert_camara_detalhes_orgaos_db(data: list[CamaraOrgaosDetalhesArg]):
+    with get_connection() as conn:
+        stmt = (
+            insert(camara_orgaos_detalhes)
+            .values(
+                [
+                    {
+                        "id_lote": item.id_lote,
+                        "id_orgao": item.id_orgao,
+                        "data_inicio": item.data_inicio,
+                        "data_instalacao": item.data_instalacao,
+                        "data_fim": item.data_fim,
+                        "data_fim_original": item.data_fim_original,
+                        "url_website": item.url_website,
+                    }
+                    for item in data
+                ]
+            )
+            .on_conflict_do_nothing(index_elements=["id_orgao"])
+        )
+
+        result = conn.execute(stmt)
+
+        total = len(data)
+        inserted = result.rowcount
+        updated = 0  # Não atualiza
+        ignored = total - inserted
+
+        insert_log_linhas_db(
+            id_lote=data[0].id_lote,
+            table=camara_orgaos_detalhes.name,
+            inserted=inserted,
+            updated=updated,
+            ignored=ignored,
+            total=total,
+        )
+
+    return

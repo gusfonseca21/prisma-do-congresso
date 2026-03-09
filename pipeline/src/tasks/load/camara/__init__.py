@@ -1,5 +1,6 @@
 from .load_camara_blocos import load_camara_blocos
 from .load_camara_deputados import load_camara_deputados
+from .load_camara_detalhes_orgaos import load_camara_detalhes_orgaos
 from .load_camara_historico_deputados import load_camara_historico_deputados
 from .load_camara_legislatura import load_camara_legislatura
 from .load_camara_legislaturas_lideres import load_camara_legislaturas_lideres
@@ -28,4 +29,5 @@ __all__ = [
     "load_camara_partidos_blocos",
     "load_camara_tipos_orgaos",
     "load_camara_orgaos",
+    "load_camara_detalhes_orgaos",
 ]

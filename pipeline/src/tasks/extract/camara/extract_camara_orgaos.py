@@ -57,6 +57,18 @@ async def extract_camara_orgaos(
         lote_id=lote_id,
     )
 
+    jsons = remove_test_record(cast(list[dict], jsons))
+
     save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.ORGAOS))
 
     return cast(list[dict], jsons)
+
+
+def remove_test_record(jsons: list[dict]) -> list[dict]:
+    TEST_RECORD_ID = 539056
+    result = []
+    for j in jsons:
+        dados = j.get("dados", [])
+        cleaned_dados = [orgao for orgao in dados if orgao.get("id") != TEST_RECORD_ID]
+        result.append({**j, "dados": cleaned_dados})  # preserve all other keys
+    return result

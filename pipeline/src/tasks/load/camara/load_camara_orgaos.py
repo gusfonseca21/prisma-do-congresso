@@ -37,25 +37,21 @@ def load_camara_orgaos(
 
     data: list[CamaraOrgaosArg] = []
 
-    TEST_RECORD_ID = 539056
-
     for item in orgaos:
         d = item.get("dados", [])
         for orgao in d:
-            id_orgao = orgao.get("id")
-            if id_orgao != TEST_RECORD_ID:
-                data.append(
-                    CamaraOrgaosArg(
-                        id_lote=lote_id,
-                        id_orgao=orgao.get("id"),
-                        sigla=orgao.get("sigla"),
-                        nome=orgao.get("nome"),
-                        apelido=orgao.get("apelido"),
-                        id_tipo_orgao=orgao.get("codTipoOrgao"),
-                        nome_publicacao=orgao.get("nomePublicacao"),
-                        nome_resumido=orgao.get("nomeResumido"),
-                    )
+            data.append(
+                CamaraOrgaosArg(
+                    id_lote=lote_id,
+                    id_orgao=orgao.get("id"),
+                    sigla=orgao.get("sigla"),
+                    nome=orgao.get("nome"),
+                    apelido=orgao.get("apelido"),
+                    id_tipo_orgao=orgao.get("codTipoOrgao"),
+                    nome_publicacao=orgao.get("nomePublicacao"),
+                    nome_resumido=orgao.get("nomeResumido"),
                 )
+            )
 
     if data:
         insert_camara_orgaos_db(data=data)

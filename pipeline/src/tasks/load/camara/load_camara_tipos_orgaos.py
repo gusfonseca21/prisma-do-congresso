@@ -2,7 +2,7 @@ from prefect import get_run_logger, task
 
 from config.loader import load_config
 from config.parameters import TasksNames
-from database.models.camara.camara_orgaos import CamaraTiposOrgaosArg
+from database.models.camara.camara_orgaos import CamaraOrgaosTiposArg
 from database.repository.camara.repository_camara_orgaos import (
     insert_camara_tipos_orgaos_db,
 )
@@ -32,13 +32,13 @@ def load_camara_tipos_orgaos(
 
     logger.info("Carregando Tipos de Órgãos no Banco de Dados")
 
-    data: list[CamaraTiposOrgaosArg] = []
+    data: list[CamaraOrgaosTiposArg] = []
 
     tipos_orgaos_data = tipos_orgaos.get("dados", [])
 
     for tipo_orgao in tipos_orgaos_data:
         data.append(
-            CamaraTiposOrgaosArg(
+            CamaraOrgaosTiposArg(
                 id_lote=lote_id,
                 id_tipo_orgao=int(tipo_orgao.get("cod")),
                 nome=tipo_orgao.get("nome"),
