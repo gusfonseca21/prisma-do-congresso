@@ -40,7 +40,7 @@ def load_camara_tipos_orgaos(
         data.append(
             CamaraTiposOrgaosArg(
                 id_lote=lote_id,
-                codigo=int(tipo_orgao.get("cod")),
+                id_tipo_orgao=int(tipo_orgao.get("cod")),
                 nome=tipo_orgao.get("nome"),
             )
         )

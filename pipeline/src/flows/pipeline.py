@@ -43,7 +43,7 @@ def pipeline(
         "extract_camara_blocos",
         "extract_camara_partidos_blocos",
         # "extract_camara_tipos_orgaos",
-        "extract_camara_orgaos",
+        # "extract_camara_orgaos",
         "extract_camara_eventos",
         "extract_camara_assiduidade_plenario",
         "extract_camara_assiduidade_comissoes",
@@ -70,6 +70,7 @@ def pipeline(
         "load_camara_legislaturas_mesa",
         "load_camara_legislaturas_lideres",
         # "load_camara_tipos_orgaos",
+        # "load_camara_orgaos",
         "load_camara_blocos",
         "load_camara_partidos_blocos",
         ## ----> SENADO <----

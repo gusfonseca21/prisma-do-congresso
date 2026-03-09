@@ -13,6 +13,8 @@ APP_SETTINGS = load_config()
 
 
 def get_url(start_date: date, end_date: date) -> str:
+    ## Para download de todos os órgãos é preciso ter uma start_date mais antiga como 2023-02-01
+    # Ou irá baixar poucos ou nenhum dado
     return f"{APP_SETTINGS.CAMARA.REST_BASE_URL}orgaos?dataInicio={start_date}&dataFim={end_date}&itens=100"
 
 

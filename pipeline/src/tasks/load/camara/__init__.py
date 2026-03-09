@@ -8,6 +8,7 @@ from .load_camara_mandatos_externos_deputados import (
     load_camara_mandatos_externos_deputados,
 )
 from .load_camara_ocupacoes_deputados import load_camara_ocupacoes_deputados
+from .load_camara_orgaos import load_camara_orgaos
 from .load_camara_partidos import load_camara_partidos
 from .load_camara_partidos_blocos import load_camara_partidos_blocos
 from .load_camara_profissoes_deputados import load_camara_profissoes_deputados
@@ -26,4 +27,5 @@ __all__ = [
     "load_camara_blocos",
     "load_camara_partidos_blocos",
     "load_camara_tipos_orgaos",
+    "load_camara_orgaos",
 ]
