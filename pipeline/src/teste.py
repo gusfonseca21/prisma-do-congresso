@@ -5,16 +5,26 @@ from utils.io import load_ndjson
 
 
 def start():
-    jsons = load_ndjson(ExtractOutDir.CAMARA.DETALHES_ORGAOS)
+    jsons = load_ndjson(ExtractOutDir.CAMARA.MEMBROS_ORGAOS)
 
-    data = []
+    lista_membros = []
     for orgao in jsons:
-        data.append(orgao.get("dados", []))
+        href = orgao.get("links", [])[0].get("href")
+        for membro in orgao.get("dados", []):
+            membro["orgao"] = href
+            lista_membros.append(membro)
 
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(lista_membros)
+    duplicates = df[
+        df.duplicated(subset=["id", "orgao", "titulo", "dataInicio"], keep=False)
+    ]
 
-    print(df[df["dataInicio"].isna()])
-    # print(df)
+    print(f"DF DESDUPLICADO {len(df)}")
+    print(f"DUPLCADOS {len(duplicates)}")
+
+    print(duplicates)
+
+    df.to_csv("duplicates.csv", index=False)
 
 
 if __name__ == "__main__":

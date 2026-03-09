@@ -17,7 +17,16 @@ from .camara_deputados import (
     CamaraDeputadosRedesSociaisArg,
 )
 from .camara_legislatura import CamaraLegislatura, CamaraLegislaturaArg
-from .camara_orgaos import CamaraOrgaosTipos, CamaraOrgaosTiposArg
+from .camara_orgaos import (
+    CamaraOrgaos,
+    CamaraOrgaosArg,
+    CamaraOrgaosDetalhes,
+    CamaraOrgaosDetalhesArg,
+    CamaraOrgaosMembros,
+    CamaraOrgaosMembrosArg,
+    CamaraOrgaosTipos,
+    CamaraOrgaosTiposArg,
+)
 from .camara_partidos import CamaraPartidos, CamaraPartidosArg
 
 __all__ = [
@@ -39,4 +48,10 @@ __all__ = [
     "CamaraBlocosPartidosArg",
     "CamaraOrgaosTipos",
     "CamaraOrgaosTiposArg",
+    "CamaraOrgaos",
+    "CamaraOrgaosArg",
+    "CamaraOrgaosDetalhes",
+    "CamaraOrgaosDetalhesArg",
+    "CamaraOrgaosMembros",
+    "CamaraOrgaosMembrosArg",
 ]

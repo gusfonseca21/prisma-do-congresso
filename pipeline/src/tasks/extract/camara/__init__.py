@@ -21,6 +21,7 @@ from .extract_camara_legislaturas_mesa import extract_camara_legislaturas_mesa
 from .extract_camara_mandatos_externos_deputados import (
     extract_camara_mandatos_externos_deputados,
 )
+from .extract_camara_membros_orgaos import extract_camara_membros_orgaos
 from .extract_camara_ocupacoes_deputados import extract_camara_ocupacoes_deputados
 from .extract_camara_orgaos import extract_camara_orgaos
 from .extract_camara_orientacoes_votacoes import extract_orientacoes_votacoes_camara
@@ -64,4 +65,5 @@ __all__ = [
     "extract_camara_orgaos",
     "extract_camara_tipos_orgaos",
     "extract_camara_detalhes_orgaos",
+    "extract_camara_membros_orgaos",
 ]

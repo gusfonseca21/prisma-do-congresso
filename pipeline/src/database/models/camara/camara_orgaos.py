@@ -61,6 +61,24 @@ class CamaraOrgaosDetalhesArg(BaseModel):
     url_website: str | None
 
 
+class CamaraOrgaosMembrosArg(BaseModel):
+    """
+    id_lote: int
+    id_orgao: int
+    id_deputado: int
+    titulo: str
+    data_inicio: datetime.date
+    data_fim: datetime.date | None
+    """
+
+    id_lote: int
+    id_orgao: int
+    id_deputado: int
+    titulo: str
+    data_inicio: datetime.date
+    data_fim: datetime.date | None
+
+
 class CamaraOrgaosTipos(Base, BaseMixin):
     __tablename__ = "camara_orgaos_tipos"
 
@@ -96,3 +114,22 @@ class CamaraOrgaosDetalhes(Base, BaseMixin):
     data_fim = sa.Column(sa.DateTime(timezone=True), nullable=True)
     data_fim_original = sa.Column(sa.DateTime(timezone=True), nullable=True)
     url_website = sa.Column(sa.Text, nullable=True)
+
+
+class CamaraOrgaosMembros(Base, BaseMixin):
+    __tablename__ = "camara_orgaos_membros"
+
+    id_orgao = sa.Column(
+        sa.Integer, sa.ForeignKey("camara_orgaos.id_orgao"), nullable=False
+    )
+    id_deputado = sa.Column(
+        sa.Integer, sa.ForeignKey("camara_deputados.id_deputado"), nullable=False
+    )
+    titulo = sa.Column(sa.Text, nullable=False)
+    data_inicio = sa.Column(sa.Date, nullable=False)
+    data_fim = sa.Column(sa.Date, nullable=True)
+    __table_args__ = (
+        sa.UniqueConstraint(
+            "id_orgao", "id_deputado", "titulo", "data_inicio", name="uq_orgaos_membros"
+        ),
+    )

@@ -18,6 +18,7 @@ from tasks.extract.camara import (
     extract_camara_legislaturas_lideres,
     extract_camara_legislaturas_mesa,
     extract_camara_mandatos_externos_deputados,
+    extract_camara_membros_orgaos,
     extract_camara_ocupacoes_deputados,
     extract_camara_orgaos,
     extract_camara_partidos,
@@ -47,6 +48,7 @@ from tasks.load.camara import (
     load_camara_legislaturas_lideres,
     load_camara_legislaturas_mesa,
     load_camara_mandatos_externos_deputados,
+    load_camara_membros_orgaos,
     load_camara_ocupacoes_deputados,
     load_camara_orgaos,
     load_camara_partidos,
@@ -317,6 +319,25 @@ def camara_flow(
         ignore_tasks=ignore_tasks,
     )
     futures.append(load_camara_orgaos_f)
+
+    ## EXTRACT MEMBROS ÓRGÃOS
+    extract_camara_membros_orgaos_f = extract_camara_membros_orgaos.submit(
+        orgaos=extract_camara_orgaos_f,  # type: ignore
+        start_date=start_date,
+        end_date=end_date,
+        lote_id=lote_id,
+        ignore_tasks=ignore_tasks,
+        use_files=use_files,
+    )
+    futures.append(extract_camara_membros_orgaos_f)
+
+    ## LOAD MEMBROS ÓRGÃOS
+    load_camara_membros_orgaos_f = load_camara_membros_orgaos.submit(
+        membros_orgaos=extract_camara_membros_orgaos_f,  # type: ignore
+        lote_id=lote_id,
+        ignore_tasks=ignore_tasks,
+    )
+    futures.append(load_camara_membros_orgaos_f)
 
     ## EXTRACT DETALHES ÓRGÃOS
     extract_camara_detalhes_orgaos_f = extract_camara_detalhes_orgaos.submit(
