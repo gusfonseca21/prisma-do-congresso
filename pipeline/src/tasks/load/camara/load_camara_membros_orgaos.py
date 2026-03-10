@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Any
 
 import pandas as pd
 from prefect import get_run_logger, task
@@ -45,6 +46,8 @@ def load_camara_membros_orgaos(
     membros_orgaos: dict | None,
     legislatura: dict,
     ignore_tasks: list[str],
+    _load_orgaos: Any,
+    _load_deputados: Any,
 ):
     logger = get_run_logger()
 

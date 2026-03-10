@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Any
 
 from prefect import get_run_logger, task
 
@@ -23,7 +24,10 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_deputados(
-    lote_id: int, deputados: list[dict] | None, ignore_tasks: list[str]
+    lote_id: int,
+    deputados: list[dict] | None,
+    ignore_tasks: list[str],
+    _load_partidos: Any,
 ):
     logger = get_run_logger()
 

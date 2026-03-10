@@ -40,7 +40,9 @@ class CamaraPartidos(Base, BaseMixin):
     sigla = sa.Column(sa.String(15), unique=True, nullable=False)
     nome = sa.Column(sa.Text, nullable=False, unique=True)
     status_data = sa.Column(sa.DateTime(timezone=True), nullable=True)
-    id_legislatura = sa.Column(sa.Integer, nullable=False)
+    id_legislatura = sa.Column(
+        sa.Integer, sa.ForeignKey("camara_legislatura.id_legislatura"), nullable=False
+    )
     situacao = sa.Column(sa.Text, nullable=True)
     total_posse = sa.Column(sa.Integer, nullable=False)
     total_membros = sa.Column(sa.Integer, nullable=False)

@@ -1,3 +1,5 @@
+from typing import Any
+
 from prefect import get_run_logger, task
 
 from config.loader import load_config
@@ -21,6 +23,7 @@ def load_camara_orgaos(
     orgaos: list[dict] | None,
     _tipos_orgaos_load: None,
     ignore_tasks: list[str],
+    _load_tipos_orgaos: Any,
 ):
     logger = get_run_logger()
 

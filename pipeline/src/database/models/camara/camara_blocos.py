@@ -40,7 +40,9 @@ class CamaraBlocos(Base, BaseMixin):
 
     id_bloco = sa.Column(sa.Integer, unique=True, nullable=False)
     nome = sa.Column(sa.Text, nullable=False)
-    id_legislatura = sa.Column(sa.Integer, nullable=False)
+    id_legislatura = sa.Column(
+        sa.Integer, sa.ForeignKey("camara_legislatura.id_legislatura"), nullable=False
+    )
     federacao = sa.Column(sa.Boolean, nullable=False)
 
 

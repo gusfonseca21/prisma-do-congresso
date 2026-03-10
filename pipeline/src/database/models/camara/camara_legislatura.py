@@ -75,7 +75,9 @@ class CamaraLegislaturasLideres(Base, BaseMixin):
     id_deputado = sa.Column(
         sa.Integer, sa.ForeignKey("camara_deputados.id_deputado"), nullable=False
     )
-    id_legislatura = sa.Column(sa.Integer, nullable=False)
+    id_legislatura = sa.Column(
+        sa.Integer, sa.ForeignKey("camara_legislatura.id_legislatura"), nullable=False
+    )
     titulo = sa.Column(sa.Text, nullable=False)
     bancada_tipo = sa.Column(sa.Text, nullable=False)
     bancada_nome = sa.Column(sa.Text, nullable=False)
@@ -102,7 +104,9 @@ class CamaraLegislaturasMesa(Base, BaseMixin):
     titulo = sa.Column(sa.Text, nullable=False)
     data_inicio = sa.Column(sa.Date, nullable=False)
     data_fim = sa.Column(sa.Date, nullable=True)
-    id_legislatura = sa.Column(sa.Integer, nullable=False)
+    id_legislatura = sa.Column(
+        sa.Integer, sa.ForeignKey("camara_legislatura.id_legislatura"), nullable=False
+    )
     __table_args__ = (
         sa.UniqueConstraint(
             "id_deputado", "titulo", "data_inicio", name="uq_legislaturas_mesa"

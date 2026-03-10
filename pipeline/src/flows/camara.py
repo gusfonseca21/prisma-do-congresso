@@ -84,6 +84,7 @@ def camara_flow(
         ignore_tasks=ignore_tasks,
         use_files=use_files,
     )
+    # futures.append(extract_camara_legislatura_f)
 
     ## LOAD LEGISLATURA
     load_camara_legislatura_f = load_camara_legislatura.submit(
@@ -91,7 +92,7 @@ def camara_flow(
         legislatura=extract_camara_legislatura_f,
         ignore_tasks=ignore_tasks,
     )
-    futures.append(load_camara_legislatura_f)
+    load_camara_legislatura_f.result()
 
     ## EXTRACT PARTIDOS
     extract_camara_partidos_f = extract_camara_partidos.submit(
@@ -142,6 +143,7 @@ def camara_flow(
         lote_id=lote_id,
         deputados=cast(list[dict], extract_camara_detalhes_deputados_f),
         ignore_tasks=ignore_tasks,
+        _load_partidos=load_camara_partidos_f,
     )
     futures.append(load_camara_deputados_f)
 
@@ -159,6 +161,7 @@ def camara_flow(
         lote_id=lote_id,
         historico_deputados=cast(list[dict], extract_camara_historico_deputados_f),
         ignore_tasks=ignore_tasks,
+        _load_deputados=load_camara_deputados_f,
     )
     futures.append(load_camara_historico_deputados_f)
 
@@ -181,6 +184,7 @@ def camara_flow(
                 list[dict], extract_camara_mandatos_externos_deputados_f
             ),
             ignore_tasks=ignore_tasks,
+            load_deputados=load_camara_deputados_f,
         )
     )
     futures.append(load_camara_mandatos_externos_deputados_f)
@@ -199,6 +203,7 @@ def camara_flow(
         lote_id=lote_id,
         ocupacoes=cast(list[dict], extract_camara_ocupacoes_deputados_f),
         ignore_tasks=ignore_tasks,
+        load_deputados=load_camara_deputados_f,
     )
     futures.append(load_camara_ocupacoes_deputados_f)
 
@@ -216,6 +221,7 @@ def camara_flow(
         lote_id=lote_id,
         profissoes=cast(list[dict], extract_camara_profissoes_deputados_f),
         ignore_tasks=ignore_tasks,
+        _load_deputados=load_camara_deputados_f,
     )
     futures.append(load_camara_profissoes_deputados_f)
 
@@ -233,6 +239,7 @@ def camara_flow(
         lideres=extract_camara_legislaturas_lideres_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        _load_deputados=load_camara_deputados_f,
     )
     futures.append(load_camara_legislaturas_lideres_f)
 
@@ -250,6 +257,7 @@ def camara_flow(
         mesa=extract_camara_legislaturas_mesa_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        _load_deputados=load_camara_deputados_f,
     )
     futures.append(load_camara_legislaturas_mesa_f)
 
@@ -317,6 +325,7 @@ def camara_flow(
         orgaos=extract_camara_orgaos_f,  # type: ignore
         _tipos_orgaos_load=load_camara_tipos_orgaos_f,  # type: ignore
         ignore_tasks=ignore_tasks,
+        _load_tipos_orgaos=load_camara_tipos_orgaos_f,
     )
     futures.append(load_camara_orgaos_f)
 
@@ -337,6 +346,8 @@ def camara_flow(
         legislatura=extract_camara_legislatura_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        _load_orgaos=load_camara_orgaos_f,
+        _load_deputados=load_camara_deputados_f,
     )
     futures.append(load_camara_membros_orgaos_f)
 
@@ -354,6 +365,7 @@ def camara_flow(
         detalhes_orgaos=extract_camara_detalhes_orgaos_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
+        _load_orgaos=load_camara_orgaos_f,
     )
     futures.append(load_camara_detalhes_orgaos_f)
 

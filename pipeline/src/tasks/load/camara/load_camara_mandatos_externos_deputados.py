@@ -1,3 +1,5 @@
+from typing import Any
+
 from prefect import get_run_logger, task
 
 from config.loader import load_config
@@ -20,7 +22,10 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_mandatos_externos_deputados(
-    lote_id: int, mandatos_externos: list[dict] | None, ignore_tasks: list[str]
+    lote_id: int,
+    mandatos_externos: list[dict] | None,
+    ignore_tasks: list[str],
+    load_deputados: Any,
 ):
     logger = get_run_logger()
 

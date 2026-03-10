@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Any
 
 from prefect import get_run_logger, task
 
@@ -18,7 +19,12 @@ APP_SETTINGS = load_config()
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
-def load_camara_legislaturas_mesa(mesa: dict, lote_id: int, ignore_tasks: list[str]):
+def load_camara_legislaturas_mesa(
+    mesa: dict,
+    lote_id: int,
+    ignore_tasks: list[str],
+    _load_deputados: Any,
+):
     logger = get_run_logger()
 
     if TasksNames.CAMARA.LOAD.LEGISLATURAS_MESA in ignore_tasks:

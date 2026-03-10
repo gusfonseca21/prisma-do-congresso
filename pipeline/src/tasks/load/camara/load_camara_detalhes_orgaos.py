@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 from prefect import get_run_logger, task
 
@@ -19,7 +20,10 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_detalhes_orgaos(
-    lote_id: int, detalhes_orgaos: dict | None, ignore_tasks: list[str]
+    lote_id: int,
+    detalhes_orgaos: dict | None,
+    ignore_tasks: list[str],
+    _load_orgaos: Any,
 ):
     logger = get_run_logger()
 
