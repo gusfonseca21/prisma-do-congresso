@@ -70,7 +70,7 @@ class TasksNames:
             TIPOS_ORGAOS = "load_camara_tipos_orgaos"
             ORGAOS = "load_camara_orgaos"
             DETALHES_ORGAOS = "load_camara_detalhes_orgaos"
-            MEMBROS_ORGAOS = "extract_camara_membros_orgaos"
+            MEMBROS_ORGAOS = "load_camara_membros_orgaos"
 
     class SENADO:
         class EXTRACT:

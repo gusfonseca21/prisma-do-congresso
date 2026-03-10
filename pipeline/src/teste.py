@@ -19,12 +19,12 @@ def start():
         df.duplicated(subset=["id", "orgao", "titulo", "dataInicio"], keep=False)
     ]
 
-    print(f"DF DESDUPLICADO {len(df)}")
-    print(f"DUPLCADOS {len(duplicates)}")
+    # print(f"DF DESDUPLICADO {len(df)}")
+    # print(f"DUPLCADOS {len(duplicates)}")
 
-    print(duplicates)
+    print(len(df[df["idLegislatura"] != 57]))
 
-    df.to_csv("duplicates.csv", index=False)
+    # df.to_csv("duplicates.csv", index=False)
 
 
 if __name__ == "__main__":

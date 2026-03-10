@@ -85,7 +85,10 @@ async def extract_camara_membros_orgaos(
         return
 
     urls = get_urls(
-        orgaos=orgaos, start_date=start_date, end_date=end_date, logger=logger
+        orgaos=orgaos,
+        start_date=start_date,
+        end_date=end_date,
+        logger=logger,
     )
     logger.info(f"Baixando Membros de Órgãos de {len(urls['urls_to_download'])} URLs")
 
@@ -95,7 +98,7 @@ async def extract_camara_membros_orgaos(
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         follow_pagination=True,
-        validate_results=True,
+        validate_results=False,  # Por algum movtivo retorna um resultado a mais
         task=TasksNames.CAMARA.EXTRACT.MEMBROS_ORGAOS,
         lote_id=lote_id,
     )

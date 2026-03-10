@@ -334,6 +334,7 @@ def camara_flow(
     ## LOAD MEMBROS ÓRGÃOS
     load_camara_membros_orgaos_f = load_camara_membros_orgaos.submit(
         membros_orgaos=extract_camara_membros_orgaos_f,  # type: ignore
+        legislatura=extract_camara_legislatura_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
     )

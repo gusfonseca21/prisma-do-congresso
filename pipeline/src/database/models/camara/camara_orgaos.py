@@ -66,6 +66,7 @@ class CamaraOrgaosMembrosArg(BaseModel):
     id_lote: int
     id_orgao: int
     id_deputado: int
+    id_legislatura: int
     titulo: str
     data_inicio: datetime.date
     data_fim: datetime.date | None
@@ -74,6 +75,7 @@ class CamaraOrgaosMembrosArg(BaseModel):
     id_lote: int
     id_orgao: int
     id_deputado: int
+    id_legislatura: int
     titulo: str
     data_inicio: datetime.date
     data_fim: datetime.date | None
@@ -124,6 +126,9 @@ class CamaraOrgaosMembros(Base, BaseMixin):
     )
     id_deputado = sa.Column(
         sa.Integer, sa.ForeignKey("camara_deputados.id_deputado"), nullable=False
+    )
+    id_legislatura = sa.Column(
+        sa.Integer, sa.ForeignKey("camara_legislatura.id_legislatura"), nullable=False
     )
     titulo = sa.Column(sa.Text, nullable=False)
     data_inicio = sa.Column(sa.Date, nullable=False)

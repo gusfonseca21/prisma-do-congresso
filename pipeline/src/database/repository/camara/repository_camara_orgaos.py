@@ -145,6 +145,7 @@ def insert_camara_membros_orgaos_db(data: list[CamaraOrgaosMembrosArg]):
                     "id_lote": item.id_lote,
                     "id_orgao": item.id_orgao,
                     "id_deputado": item.id_deputado,
+                    "id_legislatura": item.id_legislatura,
                     "titulo": item.titulo,
                     "data_inicio": item.data_inicio,
                     "data_fim": item.data_fim,

@@ -1,5 +1,6 @@
 from datetime import date
 
+import pandas as pd
 from prefect import get_run_logger, task
 
 from config.loader import load_config
@@ -13,6 +14,26 @@ from utils.url_utils import get_path_parameter_value
 APP_SETTINGS = load_config()
 
 
+def deduplicate_membros(
+    data: list[CamaraOrgaosMembrosArg], legislatura: dict
+) -> list[CamaraOrgaosMembrosArg]:
+    df = pd.DataFrame([item.__dict__ for item in data])
+
+    # Por algum motivo, na Leg 57 retorna esse Deputado da legislatura 54
+    ID_LEGISLATURA_ATUAL = legislatura.get("dados", [])[0].get("id")
+
+    df_sorted = df.sort_values("data_fim", na_position="last")  # None vai pro final
+    df_sorted = pd.DataFrame(
+        df_sorted[df_sorted["id_legislatura"] == ID_LEGISLATURA_ATUAL]
+    )  # Filtrar o id de dep de leg. anterior
+    df_dedup = df_sorted.drop_duplicates(
+        subset=["id_orgao", "id_deputado", "titulo", "data_inicio"],
+        keep="first",  # mantém o primeiro = o que tem data_fim preenchida
+    )
+
+    return [CamaraOrgaosMembrosArg(**row) for row in df_dedup.to_dict(orient="records")]
+
+
 @task(
     task_run_name=TasksNames.CAMARA.LOAD.MEMBROS_ORGAOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
@@ -20,7 +41,10 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_membros_orgaos(
-    lote_id: int, membros_orgaos: dict | None, ignore_tasks: list[str]
+    lote_id: int,
+    membros_orgaos: dict | None,
+    legislatura: dict,
+    ignore_tasks: list[str],
 ):
     logger = get_run_logger()
 
@@ -49,11 +73,14 @@ def load_camara_membros_orgaos(
                     id_lote=lote_id,
                     id_orgao=id_orgao,
                     id_deputado=membro.get("id"),
+                    id_legislatura=membro.get("idLegislatura"),
                     titulo=membro.get("titulo"),
                     data_inicio=date.fromisoformat(membro.get("dataInicio")),
                     data_fim=date.fromisoformat(data_fim) if data_fim else None,
                 )
             )
+
+    data = deduplicate_membros(data, legislatura)
 
     insert_camara_membros_orgaos_db(data=data)
 
