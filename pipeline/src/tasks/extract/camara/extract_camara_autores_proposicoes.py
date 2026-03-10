@@ -76,7 +76,7 @@ async def extract_autores_proposicoes_camara(
         not_downloaded_urls=urls["not_downloaded_urls"],
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
-        follow_pagination=False,
+        follow_pagination=True,
         validate_results=True,
         task=TasksNames.CAMARA.EXTRACT.AUTORES_PROPOSICOES,
         lote_id=lote_id,

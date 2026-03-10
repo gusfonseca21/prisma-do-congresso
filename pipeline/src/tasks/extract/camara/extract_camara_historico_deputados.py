@@ -75,7 +75,7 @@ async def extract_camara_historico_deputados(
         not_downloaded_urls=urls["not_downloaded_urls"],
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
-        follow_pagination=False,
+        follow_pagination=True,
         validate_results=True,
         task=TasksNames.CAMARA.EXTRACT.HISTORICO_DEPUTADOS,
         lote_id=lote_id,

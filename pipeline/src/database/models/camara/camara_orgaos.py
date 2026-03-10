@@ -93,7 +93,7 @@ class CamaraOrgaos(Base, BaseMixin):
     __tablename__ = "camara_orgaos"
 
     id_orgao = sa.Column(sa.Integer, nullable=False, unique=True)
-    sigla = sa.Column(sa.Text, nullable=False, unique=True)
+    sigla = sa.Column(sa.Text, nullable=False, unique=False)
     nome = sa.Column(sa.Text, nullable=False, unique=False)
     apelido = sa.Column(sa.Text, nullable=False)
     id_tipo_orgao = sa.Column(
