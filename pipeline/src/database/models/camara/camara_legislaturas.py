@@ -7,13 +7,15 @@ from database.models.base import Base
 from database.models.mixins import BaseMixin
 
 
-class CamaraLegislaturaArg(BaseModel):
+class CamaraLegislaturasArg(BaseModel):
     """
+    id_lote: int
     id_legislatura: int
     data_inicio: datetime.date
     data_fim: datetime.date
     """
 
+    id_lote: int
     id_legislatura: int
     data_inicio: datetime.date
     data_fim: datetime.date
@@ -61,8 +63,8 @@ class CamaraLegislaturasMesaArg(BaseModel):
     id_legislatura: int
 
 
-class CamaraLegislatura(Base, BaseMixin):
-    __tablename__ = "camara_legislatura"
+class CamaraLegislaturas(Base, BaseMixin):
+    __tablename__ = "camara_legislaturas"
 
     id_legislatura = sa.Column(sa.Integer, nullable=False, unique=True)
     data_inicio = sa.Column(sa.Date, nullable=False)
@@ -76,7 +78,7 @@ class CamaraLegislaturasLideres(Base, BaseMixin):
         sa.Integer, sa.ForeignKey("camara_deputados.id_deputado"), nullable=False
     )
     id_legislatura = sa.Column(
-        sa.Integer, sa.ForeignKey("camara_legislatura.id_legislatura"), nullable=False
+        sa.Integer, sa.ForeignKey("camara_legislaturas.id_legislatura"), nullable=False
     )
     titulo = sa.Column(sa.Text, nullable=False)
     bancada_tipo = sa.Column(sa.Text, nullable=False)
@@ -105,7 +107,7 @@ class CamaraLegislaturasMesa(Base, BaseMixin):
     data_inicio = sa.Column(sa.Date, nullable=False)
     data_fim = sa.Column(sa.Date, nullable=True)
     id_legislatura = sa.Column(
-        sa.Integer, sa.ForeignKey("camara_legislatura.id_legislatura"), nullable=False
+        sa.Integer, sa.ForeignKey("camara_legislaturas.id_legislatura"), nullable=False
     )
     __table_args__ = (
         sa.UniqueConstraint(

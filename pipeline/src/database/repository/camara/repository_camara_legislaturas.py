@@ -2,9 +2,9 @@ import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 
 from database.engine import get_connection
-from database.models.camara.camara_legislatura import (
-    CamaraLegislatura,
-    CamaraLegislaturaArg,
+from database.models.camara.camara_legislaturas import (
+    CamaraLegislaturas,
+    CamaraLegislaturasArg,
     CamaraLegislaturasLideres,
     CamaraLegislaturasLideresArg,
     CamaraLegislaturasMesa,
@@ -12,12 +12,12 @@ from database.models.camara.camara_legislatura import (
 )
 from database.repository.logs import insert_log_linhas_db
 
-camara_legislatura = CamaraLegislatura.__table__
+camara_legislatura = CamaraLegislaturas.__table__
 camara_legislaturas_mesa = CamaraLegislaturasMesa.__table__
 camara_legislaturas_lideres = CamaraLegislaturasLideres.__table__
 
 
-def insert_camara_legislatura_db(lote_id: int, data: CamaraLegislaturaArg):
+def insert_camara_legislaturas_db(data: list[CamaraLegislaturasArg]):
     """
     Carrega os dados da Legislatura no Banco de Dados
     """
@@ -25,23 +25,28 @@ def insert_camara_legislatura_db(lote_id: int, data: CamaraLegislaturaArg):
         stmt = (
             insert(camara_legislatura)
             .values(
-                id_legislatura=data.id_legislatura,
-                id_lote=lote_id,
-                data_inicio=data.data_inicio,
-                data_fim=data.data_fim,
+                [
+                    {
+                        "id_legislatura": item.id_legislatura,
+                        "id_lote": item.id_lote,
+                        "data_inicio": item.data_inicio,
+                        "data_fim": item.data_fim,
+                    }
+                    for item in data
+                ]
             )
             .on_conflict_do_nothing(index_elements=["id_legislatura"])
         )
 
         result = conn.execute(stmt)
 
-        total = 1  # Só carrega uma legislação por vez
+        total = len(data)  # Só carrega uma legislação por vez
         inserted = result.rowcount
         updated = 0  # Não atualiza
         ignored = total - inserted
 
         insert_log_linhas_db(
-            id_lote=lote_id,
+            id_lote=data[0].id_lote,
             table=camara_legislatura.name,
             inserted=inserted,
             updated=updated,

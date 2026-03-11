@@ -128,7 +128,7 @@ class CamaraOrgaosMembros(Base, BaseMixin):
         sa.Integer, sa.ForeignKey("camara_deputados.id_deputado"), nullable=False
     )
     id_legislatura = sa.Column(
-        sa.Integer, sa.ForeignKey("camara_legislatura.id_legislatura"), nullable=False
+        sa.Integer, sa.ForeignKey("camara_legislaturas.id_legislatura"), nullable=False
     )
     titulo = sa.Column(sa.Text, nullable=False)
     data_inicio = sa.Column(sa.Date, nullable=False)

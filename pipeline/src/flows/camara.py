@@ -15,6 +15,7 @@ from tasks.extract.camara import (
     extract_camara_detalhes_partidos,
     extract_camara_eventos,
     extract_camara_historico_deputados,
+    extract_camara_legislaturas,
     extract_camara_legislaturas_lideres,
     extract_camara_legislaturas_mesa,
     extract_camara_mandatos_externos_deputados,
@@ -33,7 +34,6 @@ from tasks.extract.camara import (
     extract_discursos_deputados_camara,
     extract_frentes_camara,
     extract_frentes_membros_camara,
-    extract_legislatura,
     extract_orientacoes_votacoes_camara,
     extract_proposicoes_camara,
     extract_votacoes_camara,
@@ -44,7 +44,7 @@ from tasks.load.camara import (
     load_camara_deputados,
     load_camara_detalhes_orgaos,
     load_camara_historico_deputados,
-    load_camara_legislatura,
+    load_camara_legislaturas,
     load_camara_legislaturas_lideres,
     load_camara_legislaturas_mesa,
     load_camara_mandatos_externos_deputados,
@@ -78,25 +78,24 @@ def camara_flow(
     futures = []
 
     ## EXTRACT LEGISLATURA
-    extract_camara_legislatura_f = extract_legislatura(
-        start_date=start_date,
+    extract_camara_legislaturas_f = extract_camara_legislaturas(
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
         use_files=use_files,
     )
-    # futures.append(extract_camara_legislatura_f)
+    # futures.append(extract_camara_legislaturas_f)
 
     ## LOAD LEGISLATURA
-    load_camara_legislatura_f = load_camara_legislatura.submit(
+    load_camara_legislaturas_f = load_camara_legislaturas.submit(
         lote_id=lote_id,
-        legislatura=extract_camara_legislatura_f,
+        legislaturas=extract_camara_legislaturas_f,
         ignore_tasks=ignore_tasks,
     )
-    load_camara_legislatura_f.result()
+    load_camara_legislaturas_f.result()
 
     ## EXTRACT PARTIDOS
     extract_camara_partidos_f = extract_camara_partidos.submit(
-        legislaturas=extract_camara_legislatura_f,
+        legislaturas=extract_camara_legislaturas_f,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
         use_files=use_files,
@@ -122,7 +121,7 @@ def camara_flow(
 
     # ## EXTRACT DEPUTADOS
     extract_camara_deputados_f = extract_deputados_camara.submit(
-        legislaturas=extract_camara_legislatura_f,
+        legislaturas=extract_camara_legislaturas_f,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
         use_files=use_files,
@@ -227,7 +226,7 @@ def camara_flow(
 
     ## EXTRACT LÍDERES LEGISLATURA
     extract_camara_legislaturas_lideres_f = extract_camara_legislaturas_lideres.submit(
-        legislaturas=extract_camara_legislatura_f,
+        legislaturas=extract_camara_legislaturas_f,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
         use_files=use_files,
@@ -245,7 +244,7 @@ def camara_flow(
 
     ## EXTRACT MESA LEGISLATURAS
     extract_camara_legislaturas_mesa_f = extract_camara_legislaturas_mesa.submit(
-        legislaturas=extract_camara_legislatura_f,
+        legislaturas=extract_camara_legislaturas_f,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
         use_files=use_files,
@@ -263,7 +262,7 @@ def camara_flow(
 
     ## EXTRACT BLOCOS
     extract_camara_blocos_f = extract_camara_blocos.submit(
-        legislaturas=extract_camara_legislatura_f,  # type: ignore
+        legislaturas=extract_camara_legislaturas_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
         use_files=use_files,
@@ -343,7 +342,7 @@ def camara_flow(
     ## LOAD MEMBROS ÓRGÃOS
     load_camara_membros_orgaos_f = load_camara_membros_orgaos.submit(
         membros_orgaos=extract_camara_membros_orgaos_f,  # type: ignore
-        legislatura=extract_camara_legislatura_f,  # type: ignore
+        legislaturas=extract_camara_legislaturas_f,  # type: ignore
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
         _load_orgaos=load_camara_orgaos_f,
@@ -407,7 +406,7 @@ def camara_flow(
 
     ## EXTRACT FRENTES
     extract_camara_frentes_f = extract_frentes_camara.submit(
-        legislaturas=extract_camara_legislatura_f,
+        legislaturas=extract_camara_legislaturas_f,
         lote_id=lote_id,
         ignore_tasks=ignore_tasks,
         use_files=use_files,

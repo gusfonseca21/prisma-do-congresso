@@ -5,8 +5,8 @@ from prefect import get_run_logger, task
 
 from config.loader import load_config
 from config.parameters import TasksNames
-from database.models.camara.camara_legislatura import CamaraLegislaturasMesaArg
-from database.repository.camara.repository_camara_legislatura import (
+from database.models.camara.camara_legislaturas import CamaraLegislaturasMesaArg
+from database.repository.camara.repository_camara_legislaturas import (
     insert_camara_legislaturas_mesa_db,
 )
 

@@ -6,7 +6,9 @@ from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
 from database.models.base import Base
-from database.models.camara.camara_legislatura import CamaraLegislatura
+
+## É preciso ter o import abaixo para o Alembic detectar os outros arquivos de models
+from database.models.camara.camara_legislaturas import CamaraLegislaturas
 
 load_dotenv()
 

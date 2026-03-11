@@ -173,7 +173,7 @@ class CamaraDeputados(Base, BaseMixin):
     id_partido = sa.Column(sa.Integer, sa.ForeignKey("camara_partidos.id_partido"))
     sigla_uf = sa.Column(sa.CHAR(2), nullable=False)
     id_legislatura = sa.Column(
-        sa.Integer, sa.ForeignKey("camara_legislatura.id_legislatura"), nullable=False
+        sa.Integer, sa.ForeignKey("camara_legislaturas.id_legislatura"), nullable=False
     )
     url_foto = sa.Column(sa.Text, nullable=False)
     email = sa.Column(sa.Text, nullable=True)
@@ -215,7 +215,7 @@ class CamaraDeputadosHistorico(Base, BaseMixin):
     sigla_partido = sa.Column(sa.String(15), nullable=False)
     sigla_uf = sa.Column(sa.CHAR(2), nullable=False)
     id_legislatura = sa.Column(
-        sa.Integer, sa.ForeignKey("camara_legislatura.id_legislatura"), nullable=False
+        sa.Integer, sa.ForeignKey("camara_legislaturas.id_legislatura"), nullable=False
     )
     data_hora = sa.Column(sa.DateTime(timezone=True), nullable=False)
     situacao = sa.Column(sa.Text, nullable=True)

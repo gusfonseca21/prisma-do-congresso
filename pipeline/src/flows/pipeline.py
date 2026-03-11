@@ -62,7 +62,7 @@ def pipeline(
         "extract_camara_votos_votacoes",
         "extract_camara_despesas_deputados",
         ### LOAD ###
-        "load_camara_legislatura",
+        "load_camara_legislaturas",
         "load_camara_partidos",
         "load_camara_deputados",
         "load_camara_historico_deputados",
@@ -75,7 +75,7 @@ def pipeline(
         "load_camara_orgaos",
         "load_camara_membros_orgaos",
         "load_camara_detalhes_orgaos",
-        "load_camara_blocos",
+        # "load_camara_blocos",
         "load_camara_partidos_blocos",
         ## ----> SENADO <----
         # "extract_colegiados_senado",

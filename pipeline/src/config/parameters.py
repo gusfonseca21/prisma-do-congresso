@@ -22,7 +22,7 @@ class TasksNames:
 
     class CAMARA:
         class EXTRACT:
-            LEGISLATURA = "extract_camara_legislatura"
+            LEGISLATURAS = "extract_camara_legislaturas"
             PARTIDOS = "extract_camara_partidos"
             DETALHES_PARTIDOS = "extract_camara_detalhes_partidos"
             DEPUTADOS = "extract_camara_deputados"
@@ -56,7 +56,7 @@ class TasksNames:
             VOTOS_VOTACOES = "extract_camara_votos_votacoes"
 
         class LOAD:
-            LEGISLATURA = "load_camara_legislatura"
+            LEGISLATURAS = "load_camara_legislaturas"
             PARTIDOS = "load_camara_partidos"
             DEPUTADOS = "load_camara_deputados"
             HISTORICO_DEPUTADOS = "load_camara_historico_deputados"
@@ -99,7 +99,7 @@ class ExtractOutDir:
         )
 
     class CAMARA:
-        LEGISLATURA = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/legislatura.json"
+        LEGISLATURAS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/legislaturas.json"
         PARTIDOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/partidos.ndjson"
         DETALHES_PARTIDOS = (
             f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/detalhes_partidos.ndjson"
