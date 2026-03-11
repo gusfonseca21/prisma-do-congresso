@@ -94,7 +94,7 @@ def pipeline(
     logger = get_run_logger()
     logger.info("Iniciando Pipeline ETL.")
 
-    lote_id = start_lote_in_db(
+    id_lote = start_lote_in_db(
         start_date_extract=start_date,
         end_date_extract=end_date,
         params=PipelineParams(
@@ -105,7 +105,7 @@ def pipeline(
             use_files=use_files,
         ),
     )
-    logger.info(f"Lote {lote_id} iniciou.")
+    logger.info(f"Lote {id_lote} iniciou.")
 
     futures = []
 
@@ -114,7 +114,7 @@ def pipeline(
             start_date=start_date,
             refresh_cache=refresh_cache,
             ignore_tasks=ignore_tasks,
-            lote_id=lote_id,
+            id_lote=id_lote,
             use_files=use_files,
             ignore_flows=ignore_flows,
         )
@@ -125,7 +125,7 @@ def pipeline(
             start_date=start_date,
             end_date=end_date,
             ignore_tasks=ignore_tasks,
-            lote_id=lote_id,
+            id_lote=id_lote,
             use_files=use_files,
             ignore_flows=ignore_flows,
         )
@@ -136,7 +136,7 @@ def pipeline(
             start_date=start_date,
             end_date=end_date,
             ignore_tasks=ignore_tasks,
-            lote_id=lote_id,
+            id_lote=id_lote,
             use_files=use_files,
             ignore_flows=ignore_flows,
         )
@@ -147,13 +147,13 @@ def pipeline(
 
     all_flows_ok = all(s.is_completed() for s in states)  # type:ignore
 
-    lote_id_end = end_lote_in_db(lote_id, all_flows_ok)
-    logger.info(f"Lote {lote_id_end} finalizou com sucesso")
+    id_lote_end = end_lote_in_db(id_lote, all_flows_ok)
+    logger.info(f"Lote {id_lote_end} finalizou com sucesso")
 
     save_logs(
         flow_run_name=FlowsNames.PIPELINE.value,
         flow_run_id=flow_run.id,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     return

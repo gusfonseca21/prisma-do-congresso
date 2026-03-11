@@ -11,7 +11,7 @@ lote = Lote.__table__
 
 
 def insert_extract_error_db(
-    lote_id: int, task: str, status_code: int | None, message: str | None, url: str
+    id_lote: int, task: str, status_code: int | None, message: str | None, url: str
 ):
     """
     Cria um novo registro na tabela erros_extract de uma URL que não pôde ser baixada.
@@ -21,7 +21,7 @@ def insert_extract_error_db(
         stmt_error = (
             insert(erros_extract)
             .values(
-                lote_id=lote_id,
+                id_lote=id_lote,
                 task=task,
                 status_code=status_code,
                 mensagem=message,
@@ -34,7 +34,7 @@ def insert_extract_error_db(
         # Atualizar tabela de Lote
         stmt_lote = (
             update(lote)
-            .where(lote.c.id == lote_id)
+            .where(lote.c.id == id_lote)
             .where(lote.c.urls_nao_baixadas.is_(False))
             .values(urls_nao_baixadas=True)
         )
@@ -58,7 +58,7 @@ def verify_not_downloaded_urls_in_task_db(task: str) -> list[ErrorExtract]:
         return [ErrorExtract(id=row.id, url=row.url) for row in rows]
 
 
-def update_not_downloaded_urls_db(error_id: int, lote_id: int):
+def update_not_downloaded_urls_db(error_id: int, id_lote: int):
     """
     Atualiza o registro no banco de dados da URL que havia falhado na hora de baixar.
     Atualiza a coluna "baixado" e "data_baixado"
@@ -70,7 +70,7 @@ def update_not_downloaded_urls_db(error_id: int, lote_id: int):
             .values(
                 baixado=True,
                 data_hora_baixado=datetime.now(timezone.utc),
-                lote_baixado=lote_id,
+                lote_baixado=id_lote,
             )
         )
 

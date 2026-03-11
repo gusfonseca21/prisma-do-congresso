@@ -19,7 +19,7 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_blocos(
-    legislaturas: dict, lote_id: int, ignore_tasks: list[str], use_files: bool
+    legislaturas: dict, id_lote: int, ignore_tasks: list[str], use_files: bool
 ) -> list[dict] | None:
     logger = get_run_logger()
 
@@ -50,7 +50,7 @@ async def extract_camara_blocos(
         follow_pagination=True,
         validate_results=True,
         task=TasksNames.CAMARA.EXTRACT.BLOCOS,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
     jsons = cast(list[dict], jsons)
 

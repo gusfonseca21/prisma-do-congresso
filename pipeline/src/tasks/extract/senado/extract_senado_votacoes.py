@@ -32,7 +32,7 @@ def get_votacoes_urls(start_date: date, end_date: date) -> list[str] | None:
 async def extract_votacoes_senado(
     start_date: date,
     end_date: date,
-    lote_id: int,
+    id_lote: int,
     use_files: bool,
     ignore_tasks: list[str],
 ) -> list[dict] | None:
@@ -63,7 +63,7 @@ async def extract_votacoes_senado(
         follow_pagination=False,
         validate_results=False,
         task=TasksNames.SENADO.EXTRACT.VOTACOES,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     save_ndjson(cast(list[dict], jsons), ExtractOutDir.SENADO.VOTACOES)

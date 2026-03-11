@@ -18,7 +18,7 @@ def insert_log_db(logs: list[InsertLogDB]):
         stmt = insert(logs_t).values(
             [
                 {
-                    "lote_id": log.lote_id,
+                    "id_lote": log.id_lote,
                     "data_hora": log.timestamp,
                     "level": log.level,
                     "flow_run_name": log.flow_run_name,

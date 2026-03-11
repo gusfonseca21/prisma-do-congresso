@@ -114,7 +114,7 @@ async def extract_despesas_camara(
     deputados_ids: list[int] | None,
     start_date: date,
     end_date: date,
-    lote_id: int,
+    id_lote: int,
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
@@ -147,7 +147,7 @@ async def extract_despesas_camara(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
         task=TasksNames.CAMARA.EXTRACT.DESPESAS_DEPUTADOS,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.DESPESAS_DEPUTADOS))

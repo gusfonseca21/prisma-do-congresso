@@ -34,7 +34,7 @@ def get_ids_senadores(json_exercicio: dict, json_afastados: dict) -> list[int]:
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 def extract_senadores_senado(
-    lote_id: int, use_files: bool, ignore_tasks: list[str]
+    id_lote: int, use_files: bool, ignore_tasks: list[str]
 ) -> list[int] | None:
     logger = get_run_logger()
 

@@ -20,7 +20,7 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_partidos(
-    lote_id: int,
+    id_lote: int,
     partidos: list[dict] | None,
     ignore_tasks: list[str],
 ):
@@ -59,7 +59,7 @@ def load_camara_partidos(
 
         partidos_data.append(
             CamaraPartidosArg(
-                id_lote=lote_id,
+                id_lote=id_lote,
                 id_partido=p.get("id"),
                 sigla=p.get("sigla"),
                 nome=p.get("nome"),

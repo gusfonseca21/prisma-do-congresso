@@ -27,7 +27,7 @@ def cache_by_year(_ctx, params):
     log_prints=True,
     persist_result=True,
 )
-def extract_votacao(year: int, lote_id: int, ignore_tasks: list[str]) -> str | None:
+def extract_votacao(year: int, id_lote: int, ignore_tasks: list[str]) -> str | None:
     logger = get_run_logger()
 
     if TasksNames.TSE.EXTRACT.VOTACAO in ignore_tasks:
@@ -49,7 +49,7 @@ def extract_votacao(year: int, lote_id: int, ignore_tasks: list[str]) -> str | N
         dest_path=file_dest_path,
         unzip=True,
         task=f"{TasksNames.TSE.EXTRACT.VOTACAO}_{year}",
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     return str(dir_dest_path)

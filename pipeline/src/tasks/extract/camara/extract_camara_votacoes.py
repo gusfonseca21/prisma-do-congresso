@@ -49,7 +49,7 @@ def get_ids_votacoes(jsons: list[dict]) -> list[str]:
 async def extract_votacoes_camara(
     start_date: date,
     end_date: date,
-    lote_id: int,
+    id_lote: int,
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[str] | None:
@@ -76,7 +76,7 @@ async def extract_votacoes_camara(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
         task=TasksNames.CAMARA.EXTRACT.VOTACOES,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.VOTACOES))

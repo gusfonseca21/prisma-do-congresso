@@ -28,7 +28,7 @@ def get_url(start_date: date, end_date: date) -> str:
 async def extract_camara_orgaos(
     start_date: date,
     end_date: date,
-    lote_id: int,
+    id_lote: int,
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
@@ -55,7 +55,7 @@ async def extract_camara_orgaos(
         follow_pagination=True,
         validate_results=True,  # Em caso de baixar dados dos anos anteriores, necessário remover
         task=TasksNames.CAMARA.EXTRACT.ORGAOS,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     jsons = remove_test_record(cast(list[dict], jsons))

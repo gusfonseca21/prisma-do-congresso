@@ -20,7 +20,7 @@ def get_url() -> str:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def extract_camara_legislaturas(
-    lote_id: int, ignore_tasks: list[str], use_files: bool
+    id_lote: int, ignore_tasks: list[str], use_files: bool
 ) -> dict | None:
     logger = get_run_logger()
 

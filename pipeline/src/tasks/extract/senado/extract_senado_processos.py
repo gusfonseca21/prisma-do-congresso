@@ -39,7 +39,7 @@ def get_processos_url(start_date: date, end_date: date, logger: Any) -> list[str
 async def extract_processos_senado(
     start_date: date,
     end_date: date,
-    lote_id: int,
+    id_lote: int,
     use_files: bool,
     ignore_tasks: list[str],
 ) -> list[str] | None:
@@ -66,7 +66,7 @@ async def extract_processos_senado(
         follow_pagination=False,
         validate_results=False,
         task=TasksNames.SENADO.EXTRACT.PROCESSOS,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     save_json(json, ExtractOutDir.SENADO.PROCESSOS)

@@ -34,7 +34,7 @@ def ensure_dir(path: str | Path) -> Path:
 # Download de arquivos zip em streaming por conta dos arquivos pesados
 def download_stream(
     url: str,
-    lote_id: int,
+    id_lote: int,
     task: str,
     dest_path: str | Path,
     unzip: bool = False,
@@ -84,7 +84,7 @@ def download_stream(
 
                 try:
                     insert_extract_error_db(
-                        lote_id=lote_id,
+                        id_lote=id_lote,
                         task=task,
                         status_code=status_code,
                         message=str(e),
@@ -202,7 +202,7 @@ def merge_ndjson(inputs: list[str | Path], dest: str | Path) -> str:
 async def fetch_html_many_async(
     urls: list[str],
     not_downloaded_urls: list[ErrorExtract],
-    lote_id: int,
+    id_lote: int,
     task: str,
     out_dir: str | Path | None = None,
     limit: int = 10,
@@ -249,7 +249,7 @@ async def fetch_html_many_async(
                     if failed_urls:
                         try:
                             update_url_not_downloaded(
-                                lote_id=lote_id, url=u, failed_urls=failed_urls
+                                id_lote=id_lote, url=u, failed_urls=failed_urls
                             )
                         except Exception as e:
                             logger.critical(
@@ -278,7 +278,7 @@ async def fetch_html_many_async(
 
                         try:
                             insert_extract_error_db(
-                                lote_id=lote_id,
+                                id_lote=id_lote,
                                 task=task,
                                 status_code=status_code,
                                 message=str(e),
@@ -302,7 +302,7 @@ async def fetch_html_many_async(
 
 
 def update_url_not_downloaded(
-    lote_id: int, url: str, failed_urls: dict[str, ErrorExtract]
+    id_lote: int, url: str, failed_urls: dict[str, ErrorExtract]
 ):
     """
     Atualiza no banco de dados o registro da URL que não havia sido baixada
@@ -310,7 +310,7 @@ def update_url_not_downloaded(
 
     if url in failed_urls:
         error = failed_urls[url]
-        update_not_downloaded_urls_db(lote_id=lote_id, error_id=error.id)
+        update_not_downloaded_urls_db(id_lote=id_lote, error_id=error.id)
 
 
 def save_htmls_in_zip(records: list[dict], zip_path: str | Path):

@@ -21,7 +21,7 @@ APP_SETTINGS = load_config()
 )
 def load_camara_legislaturas_lideres(
     lideres: list[dict],
-    lote_id: int,
+    id_lote: int,
     ignore_tasks: list[str],
     _load_deputados: Any,
 ):
@@ -54,7 +54,7 @@ def load_camara_legislaturas_lideres(
 
             lider_data.append(
                 CamaraLegislaturasLideresArg(
-                    id_lote=lote_id,
+                    id_lote=id_lote,
                     id_deputado=parlamentar.get("id"),
                     id_legislatura=parlamentar.get("idLegislatura"),
                     titulo=lider.get("titulo"),

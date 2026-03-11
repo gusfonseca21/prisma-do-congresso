@@ -19,7 +19,7 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_legislaturas(
-    lote_id: int, legislaturas: dict | None, ignore_tasks: list[str]
+    id_lote: int, legislaturas: dict | None, ignore_tasks: list[str]
 ):
     logger = get_run_logger()
 
@@ -39,7 +39,7 @@ def load_camara_legislaturas(
     for legislatura in legislatura_data:
         data.append(
             CamaraLegislaturasArg(
-                id_lote=lote_id,
+                id_lote=id_lote,
                 id_legislatura=legislatura.get("id"),
                 data_inicio=date.fromisoformat(legislatura.get("dataInicio")),
                 data_fim=date.fromisoformat(legislatura.get("dataFim")),

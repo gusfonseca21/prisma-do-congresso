@@ -24,7 +24,7 @@ def lideres_url(legislaturas: dict) -> str:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_legislaturas_lideres(
-    legislaturas: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
+    legislaturas: dict | None, id_lote: int, ignore_tasks: list[str], use_files: bool
 ) -> list[dict] | None:
     logger = get_run_logger()
 
@@ -56,7 +56,7 @@ async def extract_camara_legislaturas_lideres(
         follow_pagination=True,
         validate_results=True,
         task=TasksNames.CAMARA.EXTRACT.LEGISLATURAS_LIDERES,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     save_ndjson(

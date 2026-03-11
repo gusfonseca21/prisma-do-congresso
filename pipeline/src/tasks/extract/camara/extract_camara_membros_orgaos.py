@@ -62,7 +62,7 @@ async def extract_camara_membros_orgaos(
     orgaos: list[dict] | None,
     start_date: date,
     end_date: date,
-    lote_id: int,
+    id_lote: int,
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
@@ -100,7 +100,7 @@ async def extract_camara_membros_orgaos(
         follow_pagination=True,
         validate_results=False,  # Por algum movtivo retorna um resultado a mais
         task=TasksNames.CAMARA.EXTRACT.MEMBROS_ORGAOS,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.MEMBROS_ORGAOS))

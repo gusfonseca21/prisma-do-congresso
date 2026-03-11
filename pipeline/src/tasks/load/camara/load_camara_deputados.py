@@ -24,7 +24,7 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_deputados(
-    lote_id: int,
+    id_lote: int,
     deputados: list[dict] | None,
     ignore_tasks: list[str],
     _load_partidos: Any,
@@ -67,7 +67,7 @@ def load_camara_deputados(
 
         deputados_data.append(
             CamaraDeputadosArg(
-                id_lote=lote_id,
+                id_lote=id_lote,
                 id_deputado=id_deputado,
                 nome_civil=dados.get("nomeCivil"),
                 nome=ultimo_status.get("nome"),
@@ -101,12 +101,12 @@ def load_camara_deputados(
         for url in redes_sociais:
             redes_sociais_data.append(
                 CamaraDeputadosRedesSociaisArg(
-                    id_lote=lote_id, id_deputado=id_deputado, url=url
+                    id_lote=id_lote, id_deputado=id_deputado, url=url
                 )
             )
 
     insert_camara_deputados_db(
-        lote_id=lote_id,
+        id_lote=id_lote,
         deputados_data=deputados_data,
         redes_sociais_data=redes_sociais_data,
     )

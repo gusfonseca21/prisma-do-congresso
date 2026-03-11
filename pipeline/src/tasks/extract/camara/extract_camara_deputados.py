@@ -32,7 +32,7 @@ def get_ids_deputados(json: dict) -> list[int]:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def extract_deputados_camara(
-    legislaturas: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
+    legislaturas: dict | None, id_lote: int, ignore_tasks: list[str], use_files: bool
 ) -> list[int] | None:
     logger = get_run_logger()
 

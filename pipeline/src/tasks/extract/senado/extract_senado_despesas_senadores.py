@@ -52,7 +52,7 @@ def despesas_senadores_urls(
 async def extract_despesas_senado(
     start_date: date,
     end_date: date,
-    lote_id: int,
+    id_lote: int,
     use_files: bool,
     ignore_tasks: list[str],
 ) -> list[dict] | None:
@@ -82,7 +82,7 @@ async def extract_despesas_senado(
         follow_pagination=False,
         validate_results=False,
         task=TasksNames.SENADO.EXTRACT.DESPESAS_SENADORES,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     save_ndjson(cast(list[dict], jsons), ExtractOutDir.SENADO.DESPESAS_SENADORES)

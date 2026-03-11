@@ -22,7 +22,7 @@ async def fetch_many_jsons(
     urls: list[str],
     not_downloaded_urls: list[ErrorExtract],
     task: str,
-    lote_id: int,
+    id_lote: int,
     out_dir: str | Path | None = None,
     limit: int = 10,
     timeout: float = 30.0,
@@ -46,7 +46,7 @@ async def fetch_many_jsons(
         client: httpx.AsyncClient,
         stats: dict,
         task: str,
-        lote_id: int,
+        id_lote: int,
     ):
         while True:  # Mantém o consumidor da fila vivo para processar outras urls
             url = await queue.get()
@@ -98,7 +98,7 @@ async def fetch_many_jsons(
                             if failed_urls:
                                 try:
                                     update_url_not_downloaded(
-                                        lote_id=lote_id,
+                                        id_lote=id_lote,
                                         url=url,
                                         failed_urls=failed_urls,
                                     )
@@ -141,7 +141,7 @@ async def fetch_many_jsons(
                                 )
 
                                 insert_extract_error_db(
-                                    lote_id=lote_id,
+                                    id_lote=id_lote,
                                     task=task,
                                     status_code=status_code,
                                     message=str(e),
@@ -176,7 +176,7 @@ async def fetch_many_jsons(
                     client,
                     stats,
                     task,
-                    lote_id,
+                    id_lote,
                 )
             )
             for _ in range(
@@ -268,7 +268,7 @@ def validate(
 
 
 def update_url_not_downloaded(
-    lote_id: int, url: str, failed_urls: dict[str, ErrorExtract]
+    id_lote: int, url: str, failed_urls: dict[str, ErrorExtract]
 ):
     """
     Atualiza no banco de dados o registro da URL que não havia sido baixada
@@ -276,4 +276,4 @@ def update_url_not_downloaded(
 
     if url in failed_urls:
         error = failed_urls[url]
-        update_not_downloaded_urls_db(lote_id=lote_id, error_id=error.id)
+        update_not_downloaded_urls_db(id_lote=id_lote, error_id=error.id)

@@ -20,7 +20,7 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_detalhes_orgaos(
-    lote_id: int,
+    id_lote: int,
     detalhes_orgaos: dict | None,
     ignore_tasks: list[str],
     _load_orgaos: Any,
@@ -49,7 +49,7 @@ def load_camara_detalhes_orgaos(
 
         data.append(
             CamaraOrgaosDetalhesArg(
-                id_lote=lote_id,
+                id_lote=id_lote,
                 id_orgao=detalhes_orgao_data.get("id"),
                 data_inicio=datetime.fromisoformat(data_inicio),
                 data_instalacao=datetime.fromisoformat(data_instalacao)

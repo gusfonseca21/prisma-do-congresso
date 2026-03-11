@@ -29,7 +29,7 @@ profissoes = CamaraDeputadosProfissoes.__table__
 
 
 def insert_camara_deputados_db(
-    lote_id: int,
+    id_lote: int,
     deputados_data: list[CamaraDeputadosArg],
     redes_sociais_data: list[CamaraDeputadosRedesSociaisArg],
 ):
@@ -38,7 +38,7 @@ def insert_camara_deputados_db(
         stmt_deputado = insert(deputados).values(
             [
                 {
-                    "id_lote": lote_id,
+                    "id_lote": id_lote,
                     "id_deputado": deputado.id_deputado,
                     "nome_civil": deputado.nome_civil,
                     "nome": deputado.nome,

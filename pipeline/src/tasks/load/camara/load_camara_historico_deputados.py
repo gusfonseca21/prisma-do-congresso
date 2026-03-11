@@ -23,7 +23,7 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_historico_deputados(
-    lote_id: int,
+    id_lote: int,
     historico_deputados: list[dict] | None,
     ignore_tasks: list[str],
     _load_deputados: Any,
@@ -55,7 +55,7 @@ def load_camara_historico_deputados(
 
             historico_deputados_data.append(
                 CamaraDeputadosHistoricoArg(
-                    id_lote=lote_id,
+                    id_lote=id_lote,
                     id_deputado=historico.get("id"),
                     nome=historico.get("nome"),
                     nome_eleitoral=historico.get("nomeEleitoral"),

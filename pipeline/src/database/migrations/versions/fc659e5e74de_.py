@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: b39177f54bc7
+Revision ID: fc659e5e74de
 Revises: 
-Create Date: 2026-03-11 16:26:44.513382
+Create Date: 2026-03-11 17:58:20.581751
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'b39177f54bc7'
+revision: str = 'fc659e5e74de'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -68,7 +68,7 @@ def upgrade() -> None:
     )
     op.create_table('erros_extract',
     sa.Column('id', sa.Integer(), sa.Identity(always=False, start=1, cycle=False), nullable=False),
-    sa.Column('lote_id', sa.Integer(), nullable=False),
+    sa.Column('id_lote', sa.Integer(), nullable=False),
     sa.Column('task', sa.String(length=50), nullable=False),
     sa.Column('data_hora', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('status_code', sa.Integer(), nullable=True),
@@ -77,7 +77,7 @@ def upgrade() -> None:
     sa.Column('baixado', sa.Boolean(), server_default=sa.text('false'), nullable=False),
     sa.Column('data_hora_baixado', sa.DateTime(timezone=True), nullable=True),
     sa.Column('lote_baixado', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['lote_id'], ['lote.id'], name=op.f('fk_erros_extract_lote_id')),
+    sa.ForeignKeyConstraint(['id_lote'], ['lote.id'], name=op.f('fk_erros_extract_id_lote')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_erros_extract')),
     sa.UniqueConstraint('url', name=op.f('uq_erros_extract_url'))
     )
@@ -94,13 +94,13 @@ def upgrade() -> None:
     )
     op.create_table('logs',
     sa.Column('id', sa.Integer(), sa.Identity(always=False, start=1, cycle=False), nullable=False),
-    sa.Column('lote_id', sa.Integer(), nullable=False),
+    sa.Column('id_lote', sa.Integer(), nullable=False),
     sa.Column('data_hora', sa.DateTime(timezone=True), nullable=True),
     sa.Column('level', sa.String(length=24), nullable=False),
     sa.Column('flow_run_name', sa.String(length=256), nullable=False),
     sa.Column('task_run_name', sa.String(length=256), nullable=True),
     sa.Column('mensagem', sa.Text(), nullable=False),
-    sa.ForeignKeyConstraint(['lote_id'], ['lote.id'], name=op.f('fk_logs_lote_id')),
+    sa.ForeignKeyConstraint(['id_lote'], ['lote.id'], name=op.f('fk_logs_id_lote')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_logs'))
     )
     op.create_table('camara_blocos',

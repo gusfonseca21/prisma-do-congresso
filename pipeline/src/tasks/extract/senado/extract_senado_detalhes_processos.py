@@ -43,7 +43,7 @@ def get_detalhes_processos_url(
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 async def extract_detalhes_processos_senado(
-    ids_processos: list[str], lote_id: int, use_files: bool, ignore_tasks: list[str]
+    ids_processos: list[str], id_lote: int, use_files: bool, ignore_tasks: list[str]
 ) -> list[dict] | None:
     logger = get_run_logger()
 
@@ -71,7 +71,7 @@ async def extract_detalhes_processos_senado(
         follow_pagination=False,
         validate_results=False,
         task=TasksNames.SENADO.EXTRACT.DETALHES_PROCESSOS,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     save_ndjson(cast(list[dict], jsons), ExtractOutDir.SENADO.DETALHES_PROCESSOS)

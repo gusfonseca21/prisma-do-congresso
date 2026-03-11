@@ -27,7 +27,7 @@ def cache_by_year(_ctx, params):
     log_prints=True,
     persist_result=True,
 )
-def extract_candidatos(year: int, lote_id: int, ignore_tasks: list[str]) -> str | None:
+def extract_candidatos(year: int, id_lote: int, ignore_tasks: list[str]) -> str | None:
     logger = get_run_logger()
 
     if TasksNames.TSE.EXTRACT.CANDIDATOS in ignore_tasks:
@@ -48,7 +48,7 @@ def extract_candidatos(year: int, lote_id: int, ignore_tasks: list[str]) -> str 
         url=url,
         dest_path=file_dest_path,
         unzip=True,
-        lote_id=lote_id,
+        id_lote=id_lote,
         task=f"{TasksNames.TSE.EXTRACT.CANDIDATOS}_{year}",
     )
 

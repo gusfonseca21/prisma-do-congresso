@@ -33,7 +33,7 @@ def get_ids_frentes(jsons: list[dict]) -> list[str]:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_frentes_camara(
-    legislaturas: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
+    legislaturas: dict | None, id_lote: int, ignore_tasks: list[str], use_files: bool
 ) -> list[str] | None:
     logger = get_run_logger()
 
@@ -63,7 +63,7 @@ async def extract_frentes_camara(
         follow_pagination=True,
         validate_results=True,
         task=TasksNames.CAMARA.EXTRACT.FRENTES,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
     jsons = cast(list[dict], jsons)
 

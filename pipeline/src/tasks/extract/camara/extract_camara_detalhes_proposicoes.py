@@ -45,7 +45,7 @@ def detalhes_proposicoes_urls(
 )
 async def extract_detalhes_proposicoes_camara(
     proposicoes_ids: list[int] | None,
-    lote_id: int,
+    id_lote: int,
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
@@ -79,7 +79,7 @@ async def extract_detalhes_proposicoes_camara(
         follow_pagination=False,
         validate_results=True,
         task=TasksNames.CAMARA.EXTRACT.DETALHES_PROPOSICOES,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     save_ndjson(

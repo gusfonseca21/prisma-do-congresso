@@ -24,11 +24,11 @@ def tse_flow(
     start_date: date,
     refresh_cache: bool,
     ignore_tasks: list[str],
-    lote_id: int,
+    id_lote: int,
     use_files: bool,
 ):
     logger = get_run_logger()
-    logger.info(f"Iniciando execução da Flow do TSE - Lote {lote_id}")
+    logger.info(f"Iniciando execução da Flow do TSE - Lote {id_lote}")
 
     elections_years = get_election_years(start_date.year)
 
@@ -38,7 +38,7 @@ def tse_flow(
     extract_candidatos_f = [
         extract_candidatos.with_options(refresh_cache=refresh_cache).submit(
             year=year,
-            lote_id=lote_id,
+            id_lote=id_lote,
             ignore_tasks=ignore_tasks,
         )
         for year in elections_years
@@ -49,7 +49,7 @@ def tse_flow(
     extract_prestacao_contas_f = [
         extract_prestacao_contas.with_options(refresh_cache=refresh_cache).submit(
             year=year,
-            lote_id=lote_id,
+            id_lote=id_lote,
             ignore_tasks=ignore_tasks,
         )
         for year in elections_years
@@ -61,7 +61,7 @@ def tse_flow(
         extract_redes_sociais.with_options(refresh_cache=refresh_cache).submit(
             year=year,
             uf=uf,
-            lote_id=lote_id,
+            id_lote=id_lote,
             ignore_tasks=ignore_tasks,
         )
         for year in elections_years
@@ -74,7 +74,7 @@ def tse_flow(
     extract_votacao_f = [
         extract_votacao.with_options(refresh_cache=refresh_cache).submit(
             year,
-            lote_id,
+            id_lote,
             ignore_tasks=ignore_tasks,
         )
         for year in elections_years
@@ -88,7 +88,7 @@ def tse_flow(
     save_logs(
         flow_run_name=FlowsNames.TSE.value,
         flow_run_id=flow_run.id,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     return
@@ -103,7 +103,7 @@ def run_tse_flow(
     start_date: date,
     refresh_cache: bool,
     ignore_tasks: list[str],
-    lote_id: int,
+    id_lote: int,
     use_files: bool,
     ignore_flows: list[str],
 ):
@@ -112,6 +112,6 @@ def run_tse_flow(
             start_date=start_date,
             refresh_cache=refresh_cache,
             ignore_tasks=ignore_tasks,
-            lote_id=lote_id,
+            id_lote=id_lote,
             use_files=use_files,
         )

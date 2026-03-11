@@ -45,7 +45,7 @@ def blocos_membros_urls(
 )
 async def extract_camara_partidos_blocos(
     blocos: list[dict] | None,
-    lote_id: int,
+    id_lote: int,
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
@@ -80,7 +80,7 @@ async def extract_camara_partidos_blocos(
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
         task=TasksNames.CAMARA.EXTRACT.PARTIDOS_BLOCOS,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.PARTIDOS_BLOCOS))

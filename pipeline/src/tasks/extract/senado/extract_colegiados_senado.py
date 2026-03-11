@@ -16,7 +16,7 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 def extract_colegiados(
-    lote_id: int, use_files: bool, ignore_tasks: list[str]
+    id_lote: int, use_files: bool, ignore_tasks: list[str]
 ) -> dict | None:
     logger = get_run_logger()
 

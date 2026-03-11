@@ -43,7 +43,7 @@ def deduplicate_membros(
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_membros_orgaos(
-    lote_id: int,
+    id_lote: int,
     membros_orgaos: dict | None,
     legislaturas: dict,
     ignore_tasks: list[str],
@@ -74,7 +74,7 @@ def load_camara_membros_orgaos(
             data_fim = membro.get("dataFim")
             data.append(
                 CamaraOrgaosMembrosArg(
-                    id_lote=lote_id,
+                    id_lote=id_lote,
                     id_orgao=id_orgao,
                     id_deputado=membro.get("id"),
                     id_legislatura=membro.get("idLegislatura"),

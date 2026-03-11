@@ -12,13 +12,13 @@ from database.repository.logs import insert_log_db
 APP_SETTINGS = load_config()
 
 
-def save_logs(flow_run_name: str, flow_run_id: UUID, lote_id: int):
+def save_logs(flow_run_name: str, flow_run_id: UUID, id_lote: int):
     """
     Resgata os logs das flows e as grava no banco de dados.
     """
     asyncio.run(
         async_save_logs(
-            flow_run_name=flow_run_name, flow_run_id=flow_run_id, lote_id=lote_id
+            flow_run_name=flow_run_name, flow_run_id=flow_run_id, id_lote=id_lote
         )
     )
 
@@ -26,7 +26,7 @@ def save_logs(flow_run_name: str, flow_run_id: UUID, lote_id: int):
 async def async_save_logs(
     flow_run_name: str,
     flow_run_id: UUID,
-    lote_id: int,
+    id_lote: int,
     quiet_required=5,
     sleep_required=1,
     timeout=90,
@@ -87,7 +87,7 @@ async def async_save_logs(
 
             final_logs.append(
                 InsertLogDB(
-                    lote_id=lote_id,
+                    id_lote=id_lote,
                     timestamp=log.timestamp,
                     flow_run_name=flow_run_name,
                     task_run_name=task_run_name,

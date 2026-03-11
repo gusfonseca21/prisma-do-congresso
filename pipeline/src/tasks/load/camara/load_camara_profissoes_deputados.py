@@ -21,7 +21,7 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_profissoes_deputados(
-    lote_id: int,
+    id_lote: int,
     profissoes: list[dict] | None,
     ignore_tasks: list[str],
     _load_deputados: Any,
@@ -57,7 +57,7 @@ def load_camara_profissoes_deputados(
 
             profissoes_data.append(
                 CamaraDeputadosProfissoesArg(
-                    id_lote=lote_id,
+                    id_lote=id_lote,
                     id_deputado=id_deputado,
                     data_hora=datetime.fromisoformat(data_hora) if data_hora else None,
                     titulo=profissao.get("titulo"),

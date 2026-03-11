@@ -17,7 +17,7 @@ APP_SETTINGS = load_config()
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_blocos(
-    lote_id: int, blocos: list[dict] | None, ignore_tasks: list[str]
+    id_lote: int, blocos: list[dict] | None, ignore_tasks: list[str]
 ):
     logger = get_run_logger()
 
@@ -39,7 +39,7 @@ def load_camara_blocos(
         for bloco in blocos_dados:
             blocos_data.append(
                 CamaraBlocosArg(
-                    id_lote=lote_id,
+                    id_lote=id_lote,
                     id_bloco=bloco.get("id"),
                     nome=bloco.get("nome"),
                     id_legislatura=bloco.get("idLegislatura"),

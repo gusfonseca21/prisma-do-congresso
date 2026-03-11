@@ -45,7 +45,7 @@ def historico_deputados_urls(
 )
 async def extract_camara_historico_deputados(
     deputados_ids: list[int] | None,
-    lote_id: int,
+    id_lote: int,
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
@@ -78,7 +78,7 @@ async def extract_camara_historico_deputados(
         follow_pagination=True,
         validate_results=True,
         task=TasksNames.CAMARA.EXTRACT.HISTORICO_DEPUTADOS,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.HISTORICO_DEPUTADOS))

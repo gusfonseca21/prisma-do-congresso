@@ -24,16 +24,16 @@ from utils.logs import save_logs
     log_prints=True,
 )
 def senado_flow(
-    start_date: date, end_date: date, ignore_tasks: list[str], lote_id, use_files: bool
+    start_date: date, end_date: date, ignore_tasks: list[str], id_lote, use_files: bool
 ):
     logger = get_run_logger()
-    logger.info(f"Iniciando execução da Flow do Senado - Lote {lote_id}")
+    logger.info(f"Iniciando execução da Flow do Senado - Lote {id_lote}")
 
     futures = []
 
     ## COLEGIADOS
     extract_colegiados_senado_f = extract_colegiados.submit(
-        lote_id=lote_id,
+        id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
@@ -41,7 +41,7 @@ def senado_flow(
 
     ## SENADORES
     extract_senadores_senado_f = extract_senadores_senado.submit(
-        lote_id=lote_id,
+        id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
@@ -50,7 +50,7 @@ def senado_flow(
     ## DETALHES SENADORES
     extract_detalhes_senadores_senado_f = extract_detalhes_senadores_senado.submit(
         ids_senadores=extract_senadores_senado_f,  # type: ignore
-        lote_id=lote_id,
+        id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
@@ -61,7 +61,7 @@ def senado_flow(
         ids_senadores=extract_senadores_senado_f,  # type: ignore
         start_date=start_date,
         end_date=end_date,
-        lote_id=lote_id,
+        id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
@@ -71,7 +71,7 @@ def senado_flow(
     extract_despesas_senado_f = extract_despesas_senado.submit(
         start_date=start_date,
         end_date=end_date,
-        lote_id=lote_id,
+        id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
@@ -81,7 +81,7 @@ def senado_flow(
     extract_processos_senado_f = extract_processos_senado.submit(
         start_date=start_date,
         end_date=end_date,
-        lote_id=lote_id,
+        id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
@@ -90,7 +90,7 @@ def senado_flow(
     ## DETALHES PROCESSOS
     extract_detalhes_processos_senado_f = extract_detalhes_processos_senado.submit(
         ids_processos=extract_processos_senado_f,  # type: ignore
-        lote_id=lote_id,
+        id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
@@ -100,7 +100,7 @@ def senado_flow(
     extract_votacoes_senado_f = extract_votacoes_senado.submit(
         start_date=start_date,
         end_date=end_date,
-        lote_id=lote_id,
+        id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
@@ -113,7 +113,7 @@ def senado_flow(
     save_logs(
         flow_run_name=FlowsNames.SENADO.value,
         flow_run_id=flow_run.id,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     return
@@ -128,9 +128,9 @@ def run_senado_flow(
     start_date: date,
     end_date: date,
     ignore_tasks: list[str],
-    lote_id: int,
+    id_lote: int,
     use_files: bool,
     ignore_flows: list[str],
 ):
     if FlowsNames.SENADO.value not in ignore_flows:
-        senado_flow(start_date, end_date, ignore_tasks, lote_id, use_files)
+        senado_flow(start_date, end_date, ignore_tasks, id_lote, use_files)

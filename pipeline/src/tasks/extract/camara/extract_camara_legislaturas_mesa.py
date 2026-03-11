@@ -23,7 +23,7 @@ def mesa_url(legislaturas: dict) -> str:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def extract_camara_legislaturas_mesa(
-    legislaturas: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
+    legislaturas: dict | None, id_lote: int, ignore_tasks: list[str], use_files: bool
 ) -> dict | None:
     logger = get_run_logger()
 

@@ -31,17 +31,17 @@ def start_lote_in_db(
             .returning(lote.c.id)
         )
         result = conn.execute(stmt)
-        lote_id = result.scalar()
+        id_lote = result.scalar()
 
-        if not isinstance(lote_id, int):
+        if not isinstance(id_lote, int):
             raise ValueError(
                 "Não foi retornado um Id válido da tabela de Lote na sua geração."
             )
 
-    return lote_id
+    return id_lote
 
 
-def end_lote_in_db(lote_id: int, all_flows_ok: bool) -> int:
+def end_lote_in_db(id_lote: int, all_flows_ok: bool) -> int:
     """
     Finaliza o registro da execução atual da pipeline na tabela Lote.
     Recebe o Id do Lote atual como argumento.
@@ -49,7 +49,7 @@ def end_lote_in_db(lote_id: int, all_flows_ok: bool) -> int:
     with get_connection() as conn:
         stmt = (
             update(lote)
-            .where(lote.c.id == lote_id)
+            .where(lote.c.id == id_lote)
             .values(
                 data_fim_lote=datetime.now(timezone.utc), todos_flows_ok=all_flows_ok
             )

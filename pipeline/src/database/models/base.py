@@ -40,7 +40,7 @@ class ErrorExtract:
 
 @dataclass
 class InsertLogDB:
-    lote_id: int
+    id_lote: int
     timestamp: datetime
     flow_run_name: str
     task_run_name: str | None
@@ -89,7 +89,7 @@ class ErrosExtract(Base):
     __tablename__ = "erros_extract"
 
     id = sa.Column(sa.Integer, sa.Identity(start=1, cycle=False), primary_key=True)
-    lote_id = sa.Column(sa.Integer, sa.ForeignKey("lote.id"), nullable=False)
+    id_lote = sa.Column(sa.Integer, sa.ForeignKey("lote.id"), nullable=False)
     task = sa.Column(sa.String(50), nullable=False)
     data_hora = sa.Column(
         sa.DateTime(timezone=True),
@@ -108,7 +108,7 @@ class Logs(Base):
     __tablename__ = "logs"
 
     id = sa.Column(sa.Integer, sa.Identity(start=1, cycle=False), primary_key=True)
-    lote_id = sa.Column(sa.Integer, sa.ForeignKey("lote.id"), nullable=False)
+    id_lote = sa.Column(sa.Integer, sa.ForeignKey("lote.id"), nullable=False)
     data_hora = sa.Column(sa.DateTime(timezone=True), nullable=True)
     level = sa.Column(sa.String(24), nullable=False)
     flow_run_name = sa.Column(sa.String(256), nullable=False)

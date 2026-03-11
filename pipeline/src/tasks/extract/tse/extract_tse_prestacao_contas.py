@@ -28,7 +28,7 @@ def cache_by_year(_ctx, params):
     persist_result=True,
 )
 def extract_prestacao_contas(
-    year: int, lote_id: int, ignore_tasks: list[str]
+    year: int, id_lote: int, ignore_tasks: list[str]
 ) -> str | None:
     logger = get_run_logger()
 
@@ -51,7 +51,7 @@ def extract_prestacao_contas(
         dest_path=file_dest_path,
         unzip=True,
         task=f"{TasksNames.TSE.EXTRACT.PRESTACAO_CONTAS}_{year}",
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     return str(dir_dest_path)

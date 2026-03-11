@@ -62,7 +62,7 @@ async def extract_discursos_senado(
     ids_senadores: list[str],
     start_date: date,
     end_date: date,
-    lote_id: int,
+    id_lote: int,
     use_files: bool,
     ignore_tasks: list[str],
 ) -> list[dict] | None:
@@ -97,7 +97,7 @@ async def extract_discursos_senado(
         follow_pagination=False,
         validate_results=False,
         task=TasksNames.SENADO.EXTRACT.DISCURSOS_SENADORES,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     save_ndjson(cast(list[dict], jsons), ExtractOutDir.SENADO.DISCURSOS_SENADORES)

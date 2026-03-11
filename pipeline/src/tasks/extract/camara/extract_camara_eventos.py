@@ -29,7 +29,7 @@ def get_url(start_date: date, end_date: date) -> str:
 async def extract_camara_eventos(
     start_date: date,
     end_date: date,
-    lote_id: int,
+    id_lote: int,
     ignore_tasks: list[str],
     use_files: bool,
 ) -> list[dict] | None:
@@ -56,7 +56,7 @@ async def extract_camara_eventos(
         follow_pagination=True,
         validate_results=False,  # Em caso de baixar dados dos anos anteriores, necessário remover
         task=TasksNames.CAMARA.EXTRACT.EVENTOS,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.EVENTOS))

@@ -32,7 +32,7 @@ def get_partidos_ids(jsons: list[dict]) -> list[int]:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_partidos(
-    legislaturas: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
+    legislaturas: dict | None, id_lote: int, ignore_tasks: list[str], use_files: bool
 ) -> list[int] | None:
     logger = get_run_logger()
 
@@ -63,7 +63,7 @@ async def extract_camara_partidos(
         follow_pagination=True,
         validate_results=True,
         task=TasksNames.CAMARA.EXTRACT.PARTIDOS,
-        lote_id=lote_id,
+        id_lote=id_lote,
     )
 
     _dest_path = save_ndjson(

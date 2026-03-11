@@ -55,7 +55,7 @@ async def extract_camara_assiduidade_comissoes(
     deputados_ids: list[int] | None,
     start_date: date,
     end_date: date,
-    lote_id: int,
+    id_lote: int,
     ignore_tasks: list[str],
     use_files: bool,
 ) -> str | None:
@@ -91,7 +91,7 @@ async def extract_camara_assiduidade_comissoes(
         not_downloaded_urls=urls["not_downloaded_urls"],
         limit=APP_SETTINGS.CAMARA.FETCH_LIMIT,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
-        lote_id=lote_id,
+        id_lote=id_lote,
         task=TasksNames.CAMARA.EXTRACT.ASSIDUIDADE_COMISSOES,
     )
 
