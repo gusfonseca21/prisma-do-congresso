@@ -13,7 +13,7 @@ APP_SETTINGS = load_config()
 
 
 def lideres_url(legislaturas: dict) -> str:
-    id_legislatura = get_current_legislatura(legislaturas)
+    id_legislatura = get_current_legislatura(legislaturas).id
     return f"{APP_SETTINGS.CAMARA.REST_BASE_URL}legislaturas/{id_legislatura}/lideres?itens=100"
 
 
