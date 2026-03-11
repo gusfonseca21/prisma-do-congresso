@@ -66,6 +66,9 @@ async def extract_camara_orgaos(
 
 
 def remove_test_record(jsons: list[dict]) -> list[dict]:
+    """
+    Nos dados baixados existe um registro de teste interno da Câmara.
+    """
     TEST_RECORD_ID = 539056
     result = []
     for j in jsons:

@@ -10,18 +10,19 @@ from database.models.camara.camara_orgaos import CamaraOrgaosMembrosArg
 from database.repository.camara.repository_camara_orgaos import (
     insert_camara_membros_orgaos_db,
 )
+from utils.camara import get_current_legislatura
 from utils.url_utils import get_path_parameter_value
 
 APP_SETTINGS = load_config()
 
 
 def deduplicate_membros(
-    data: list[CamaraOrgaosMembrosArg], legislatura: dict
+    data: list[CamaraOrgaosMembrosArg], legislaturas: dict
 ) -> list[CamaraOrgaosMembrosArg]:
     df = pd.DataFrame([item.__dict__ for item in data])
 
     # Por algum motivo, na Leg 57 retorna esse Deputado da legislatura 54
-    ID_LEGISLATURA_ATUAL = legislatura.get("dados", [])[0].get("id")
+    ID_LEGISLATURA_ATUAL = get_current_legislatura(legislaturas).id
 
     df_sorted = df.sort_values("data_fim", na_position="last")  # None vai pro final
     df_sorted = pd.DataFrame(
@@ -44,7 +45,7 @@ def deduplicate_membros(
 def load_camara_membros_orgaos(
     lote_id: int,
     membros_orgaos: dict | None,
-    legislatura: dict,
+    legislaturas: dict,
     ignore_tasks: list[str],
     _load_orgaos: Any,
     _load_deputados: Any,
@@ -83,7 +84,7 @@ def load_camara_membros_orgaos(
                 )
             )
 
-    data = deduplicate_membros(data, legislatura)
+    data = deduplicate_membros(data, legislaturas)
 
     insert_camara_membros_orgaos_db(data=data)
 

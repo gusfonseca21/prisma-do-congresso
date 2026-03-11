@@ -112,7 +112,6 @@ def urls_despesas(
 )
 async def extract_despesas_camara(
     deputados_ids: list[int] | None,
-    legislatura: dict | None,
     start_date: date,
     end_date: date,
     lote_id: int,
@@ -131,11 +130,6 @@ async def extract_despesas_camara(
             f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.DESPESAS_DEPUTADOS} irá retornar os dados à partir do arquivo em disco."
         )
         return load_ndjson(ExtractOutDir.CAMARA.DESPESAS_DEPUTADOS)
-    if not legislatura:
-        logger.warning(
-            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.DESPESAS_DEPUTADOS}' pois o argumento do parâmetro 'legislatura' é nulo"
-        )
-        return
     if not deputados_ids:
         logger.warning(
             f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.DESPESAS_DEPUTADOS}' pois o argumento do parâmetro 'deputados_ids' é nulo"

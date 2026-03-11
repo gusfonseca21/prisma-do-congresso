@@ -1,11 +1,40 @@
 from datetime import date, datetime
 from typing import Literal
 
-LegislaturaProps = Literal["id", "dataInicio", "dataFim"]
+from pydantic.main import BaseModel
+
+LegislaturaKeys = Literal["id", "dataInicio", "dataFim"]
+
+
+class LegislaturaReturn(BaseModel):
+    id: int
+    dataInicio: date
+    dataFim: date
+
+
+def get_current_legislatura(legislaturas: dict) -> LegislaturaReturn:
+    """
+    Retorna informações sobre a Legislatura Atual.
+    Recebe o dict extraído do endpoint de Legislaturas.
+    """
+    current_date = date.today()
+    dados = legislaturas.get("dados")
+    if not dados:
+        raise ValueError("Não foram econtrados dados no arquivo de Legislaturas")
+    for leg in dados:
+        l_start_date = date.fromisoformat(leg["dataInicio"])
+        l_end_date = date.fromisoformat(leg["dataFim"])
+        if l_start_date <= current_date and l_end_date >= current_date:
+            return LegislaturaReturn(
+                id=leg["id"],
+                dataInicio=l_start_date,
+                dataFim=l_end_date,
+            )
+    raise ValueError(f"Nenhuma Legislatura foi encontrada para a data '{current_date}'")
 
 
 def get_legislatura_data(
-    legislatura_dict: dict, property: LegislaturaProps
+    legislatura_dict: dict, property: LegislaturaKeys
 ) -> int | date:
     """
     Extrai e converte dados de uma propriedade específica relacionadas ao objeto Legislatura (CÂMARA).

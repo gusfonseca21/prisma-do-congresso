@@ -5,13 +5,14 @@ from prefect import get_run_logger, task
 
 from config.loader import load_config
 from config.parameters import ExtractOutDir, TasksNames
+from utils.camara import get_current_legislatura
 from utils.io import fetch_json, load_json, save_json
 
 APP_SETTINGS = load_config()
 
 
-def deputados_url(legislatura: dict) -> str:
-    id_legislatura = legislatura.get("dados", [])[0].get("id")
+def deputados_url(legislaturas: dict) -> str:
+    id_legislatura = get_current_legislatura(legislaturas).id
     return (
         f"{APP_SETTINGS.CAMARA.REST_BASE_URL}deputados?idLegislatura={id_legislatura}"
     )
@@ -31,7 +32,7 @@ def get_ids_deputados(json: dict) -> list[int]:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def extract_deputados_camara(
-    legislatura: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
+    legislaturas: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> list[int] | None:
     logger = get_run_logger()
 
@@ -43,13 +44,13 @@ def extract_deputados_camara(
             f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.DEPUTADOS} irá retornar os dados à partir do arquivo em disco."
         )
         return get_ids_deputados(load_json(ExtractOutDir.CAMARA.DEPUTADOS))
-    if not legislatura:
+    if not legislaturas:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.DEPUTADOS}' pois o argumento do parâmetro 'legislatura' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.DEPUTADOS}' pois o argumento do parâmetro 'legislaturas' é nulo"
         )
         return
 
-    url = deputados_url(legislatura)
+    url = deputados_url(legislaturas)
     logger.info(f"Câmara: buscando Deputados de {url}")
     json = fetch_json(url=url, max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES)
     json = cast(dict, json)

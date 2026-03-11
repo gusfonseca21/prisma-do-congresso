@@ -5,14 +5,15 @@ from prefect import get_run_logger, task
 
 from config.loader import load_config
 from config.parameters import ExtractOutDir, TasksNames
+from utils.camara import get_current_legislatura
 from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
 
-def lideres_url(legislatura: dict) -> str:
-    id_legislatura = legislatura.get("dados", [])[0].get("id")
+def lideres_url(legislaturas: dict) -> str:
+    id_legislatura = get_current_legislatura(legislaturas)
     return f"{APP_SETTINGS.CAMARA.REST_BASE_URL}legislaturas/{id_legislatura}/lideres?itens=100"
 
 
@@ -23,7 +24,7 @@ def lideres_url(legislatura: dict) -> str:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_legislaturas_lideres(
-    legislatura: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
+    legislaturas: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> list[dict] | None:
     logger = get_run_logger()
 
@@ -37,14 +38,14 @@ async def extract_camara_legislaturas_lideres(
             f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.LEGISLATURAS_LIDERES} irá retornar os dados à partir do arquivo em disco."
         )
         return load_ndjson(ExtractOutDir.CAMARA.LEGISLATURAS_LIDERES)
-    if not legislatura:
+    if not legislaturas:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.LEGISLATURAS_LIDERES}' pois o argumento do parâmetro 'legislatura' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.LEGISLATURAS_LIDERES}' pois o argumento do parâmetro 'legislaturas' é nulo"
         )
         return
 
     logger.info("Baixando Líderes Legislatura Câmara")
-    url = lideres_url(legislatura)
+    url = lideres_url(legislaturas)
     logger.info(f"Buscando Líderes Legislatura da URL {url}")
 
     jsons = await fetch_many_jsons(

@@ -5,13 +5,15 @@ from prefect import get_run_logger, task
 
 from config.loader import load_config
 from config.parameters import ExtractOutDir, TasksNames
+from utils.camara import get_current_legislatura
 from utils.fetch_many_jsons import fetch_many_jsons
 from utils.io import load_ndjson, save_ndjson
 
 APP_SETTINGS = load_config()
 
 
-def frentes_url(id_legislatura: int) -> str:
+def frentes_url(legislaturas: dict) -> str:
+    id_legislatura = get_current_legislatura(legislaturas).id
     return f"{APP_SETTINGS.CAMARA.REST_BASE_URL}/frentes?idLegislatura={id_legislatura}"
 
 
@@ -31,7 +33,7 @@ def get_ids_frentes(jsons: list[dict]) -> list[str]:
     timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_frentes_camara(
-    legislatura: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
+    legislaturas: dict | None, lote_id: int, ignore_tasks: list[str], use_files: bool
 ) -> list[str] | None:
     logger = get_run_logger()
 
@@ -43,15 +45,13 @@ async def extract_frentes_camara(
             f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.FRENTES} irá retornar os dados à partir do arquivo em disco."
         )
         return get_ids_frentes(load_ndjson(ExtractOutDir.CAMARA.FRENTES))
-    if not legislatura:
+    if not legislaturas:
         logger.warning(
             f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.FRENTES}' pois o argumento do parâmetro 'legislatura' é nulo"
         )
         return
 
-    id_legislatura = legislatura["dados"][0]["id"]
-
-    url = frentes_url(id_legislatura)
+    url = frentes_url(legislaturas)
 
     logger.info(f"Congresso: buscando Frentes de {url}")
 

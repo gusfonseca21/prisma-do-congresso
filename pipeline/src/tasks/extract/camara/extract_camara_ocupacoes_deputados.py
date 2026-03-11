@@ -63,7 +63,7 @@ async def extract_camara_ocupacoes_deputados(
         return load_ndjson(ExtractOutDir.CAMARA.OCUPACOES_DEPUTADOS)
     if not deputados_ids:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.OCUPACOES_DEPUTADOS}' pois o argumento do parâmetro 'legislatura' é nulo"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.OCUPACOES_DEPUTADOS}' pois o argumento do parâmetro 'deputados_ids' é nulo"
         )
         return
 

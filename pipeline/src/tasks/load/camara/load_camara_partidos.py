@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Any
 
 from prefect import get_run_logger, task
 
