@@ -27,7 +27,6 @@ def get_votacoes_urls(start_date: date, end_date: date) -> list[str] | None:
     task_run_name=TasksNames.SENADO.EXTRACT.VOTACOES,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 async def extract_votacoes_senado(
     start_date: date,

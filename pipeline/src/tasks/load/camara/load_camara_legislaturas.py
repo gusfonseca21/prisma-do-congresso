@@ -16,7 +16,6 @@ APP_SETTINGS = load_config()
     task_run_name=TasksNames.CAMARA.LOAD.LEGISLATURAS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_legislaturas(
     id_lote: int, legislaturas: dict | None, ignore_tasks: list[str]

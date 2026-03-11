@@ -47,7 +47,6 @@ def despesas_senadores_urls(
     task_run_name=TasksNames.SENADO.EXTRACT.DESPESAS_SENADORES,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 async def extract_despesas_senado(
     start_date: date,

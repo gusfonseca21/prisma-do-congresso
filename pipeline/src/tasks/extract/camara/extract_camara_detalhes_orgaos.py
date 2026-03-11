@@ -48,7 +48,6 @@ def get_orgaos_ids(orgaos: list[dict]) -> list[int]:
     task_run_name=TasksNames.CAMARA.EXTRACT.DETALHES_ORGAOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_detalhes_orgaos(
     orgaos: list[dict] | None,

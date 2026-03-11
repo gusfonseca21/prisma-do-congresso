@@ -41,7 +41,6 @@ def autores_proposicoes_urls(
     task_run_name=TasksNames.CAMARA.EXTRACT.AUTORES_PROPOSICOES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_autores_proposicoes_camara(
     proposicoes_ids: list[int] | None,

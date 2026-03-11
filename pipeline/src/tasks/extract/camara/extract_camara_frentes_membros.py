@@ -41,7 +41,6 @@ def frentes_membros_urls(
     task_run_name=TasksNames.CAMARA.EXTRACT.FRENTES_MEMBROS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_frentes_membros_camara(
     frentes_ids: list[str] | None,

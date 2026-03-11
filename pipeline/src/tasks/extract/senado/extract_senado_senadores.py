@@ -31,7 +31,6 @@ def get_ids_senadores(json_exercicio: dict, json_afastados: dict) -> list[int]:
     task_run_name=TasksNames.SENADO.EXTRACT.SENADORES,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 def extract_senadores_senado(
     id_lote: int, use_files: bool, ignore_tasks: list[str]

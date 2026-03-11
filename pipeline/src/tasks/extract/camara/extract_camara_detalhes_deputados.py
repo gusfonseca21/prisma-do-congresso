@@ -41,7 +41,6 @@ def detalhes_deputados_urls(
     task_run_name=TasksNames.CAMARA.EXTRACT.DETALHES_DEPUTADOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_detalhes_deputados_camara(
     deputados_ids: list[int] | None,

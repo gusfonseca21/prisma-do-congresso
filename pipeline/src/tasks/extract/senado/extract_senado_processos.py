@@ -34,7 +34,6 @@ def get_processos_url(start_date: date, end_date: date, logger: Any) -> list[str
     task_run_name=TasksNames.SENADO.EXTRACT.PROCESSOS,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 async def extract_processos_senado(
     start_date: date,

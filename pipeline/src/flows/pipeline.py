@@ -22,6 +22,7 @@ APP_SETTINGS = load_config()
     flow_run_name=FlowsNames.PIPELINE.value,
     description="Onde os outros Flows são chamados e coordenados.",
     log_prints=True,
+    timeout_seconds=APP_SETTINGS.FLOW.TIMEOUT,
 )
 def pipeline(
     start_date: date = datetime.now().date()

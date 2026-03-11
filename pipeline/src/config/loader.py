@@ -19,6 +19,7 @@ class FlowConfig(BaseModel):
     TASKS_RETURN_EXCEPTION: bool
     DATE_LOOKBACK: int
     LOG_DB_LEVEL: int
+    TIMEOUT: int
 
 
 class LoadConfig(BaseModel):
@@ -35,7 +36,6 @@ class TSEConfig(BaseModel):
     OUTPUT_EXTRACT_DIR: str
     TASK_RETRIES: int
     TASK_RETRY_DELAY: int
-    TASK_TIMEOUT: int
     CACHE_POLICY: str
     CACHE_EXPIRATION: int
 
@@ -46,7 +46,6 @@ class CamaraConfig(BaseModel):
     OUTPUT_EXTRACT_DIR: str
     TASK_RETRIES: int
     TASK_RETRY_DELAY: int
-    TASK_TIMEOUT: int
     FETCH_LIMIT: int
 
 
@@ -55,7 +54,6 @@ class SenadoConfig(BaseModel):
     OUTPUT_EXTRACT_DIR: str
     TASK_RETRIES: int
     TASK_RETRY_DELAY: int
-    TASK_TIMEOUT: int
     FETCH_LIMIT: int
 
 

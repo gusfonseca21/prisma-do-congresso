@@ -41,7 +41,6 @@ def votos_votacoes_urls(
     task_run_name=TasksNames.CAMARA.EXTRACT.VOTOS_VOTACOES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_votos_votacoes_camara(
     votacoes_ids: list[str] | None,

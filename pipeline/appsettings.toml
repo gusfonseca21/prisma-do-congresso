@@ -4,6 +4,7 @@ TASKS_RETURN_EXCEPTION = false # Em caso de exceção nas tasks de requisição,
 DATE_LOOKBACK = 3 # Dias
 # DEBUG = 10 | INFO = 20 | WARNING = 30 | ERROR = 40 | CRITICAL = 50
 LOG_DB_LEVEL = 30
+TIMEOUT = 14400 # Timeout da pipeline é 2 Horas
 
 [ALLENDPOINTS]
 FETCH_MAX_RETRIES=10
@@ -17,7 +18,6 @@ BASE_URL = "https://cdn.tse.jus.br/estatistica/sead/odsele/"
 OUTPUT_EXTRACT_DIR = "output/extract/tse"
 TASK_RETRIES = 5
 TASK_RETRY_DELAY = 5 # Segundos
-TASK_TIMEOUT = 3600 # Segundos
 CACHE_POLICY = "INPUTS" # Padrão = INPUTS
 CACHE_EXPIRATION = 90 # Dias
 
@@ -27,7 +27,6 @@ PORTAL_BASE_URL = "https://www.camara.leg.br/"
 OUTPUT_EXTRACT_DIR = "output/extract/camara"
 TASK_RETRIES = 0
 TASK_RETRY_DELAY = 5 # Segundos
-TASK_TIMEOUT = 8000 # Segundos
 FETCH_LIMIT = 10 # Número de conexões abertas ao mesmo tempo
 
 [SENADO]
@@ -35,5 +34,4 @@ REST_BASE_URL = "https://legis.senado.leg.br/dadosabertos/"
 OUTPUT_EXTRACT_DIR = "output/extract/senado"
 TASK_RETRIES = 0
 TASK_RETRY_DELAY = 5 # Segundos
-TASK_TIMEOUT = 8000 # Segundos
 FETCH_LIMIT = 3 # Número de conexões abertas ao mesmo tempo

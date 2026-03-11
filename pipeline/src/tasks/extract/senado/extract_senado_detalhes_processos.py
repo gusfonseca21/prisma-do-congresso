@@ -40,7 +40,6 @@ def get_detalhes_processos_url(
     task_run_name=TasksNames.SENADO.EXTRACT.DETALHES_PROCESSOS,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 async def extract_detalhes_processos_senado(
     ids_processos: list[str], id_lote: int, use_files: bool, ignore_tasks: list[str]

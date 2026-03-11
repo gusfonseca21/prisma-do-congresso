@@ -30,7 +30,6 @@ def get_ids_frentes(jsons: list[dict]) -> list[str]:
     task_run_name=TasksNames.CAMARA.EXTRACT.FRENTES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_frentes_camara(
     legislaturas: dict | None, id_lote: int, ignore_tasks: list[str], use_files: bool

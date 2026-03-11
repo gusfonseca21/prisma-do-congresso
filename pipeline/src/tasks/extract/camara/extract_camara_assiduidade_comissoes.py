@@ -49,7 +49,6 @@ def assiduidade_urls(
     task_run_name=TasksNames.CAMARA.EXTRACT.ASSIDUIDADE_COMISSOES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_assiduidade_comissoes(
     deputados_ids: list[int] | None,

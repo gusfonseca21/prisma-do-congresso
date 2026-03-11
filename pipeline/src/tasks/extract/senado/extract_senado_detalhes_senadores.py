@@ -41,7 +41,6 @@ def detalhes_senadores_urls(
     task_run_name=TasksNames.SENADO.EXTRACT.DETALHES_SENADORES,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 async def extract_detalhes_senadores_senado(
     ids_senadores: list[str] | None,

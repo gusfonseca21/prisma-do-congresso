@@ -13,7 +13,6 @@ APP_SETTINGS = load_config()
     task_run_name=TasksNames.SENADO.EXTRACT.COLEGIADOS,
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.SENADO.TASK_TIMEOUT,
 )
 def extract_colegiados(
     id_lote: int, use_files: bool, ignore_tasks: list[str]

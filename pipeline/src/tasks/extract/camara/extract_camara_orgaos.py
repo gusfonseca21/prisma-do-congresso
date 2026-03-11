@@ -23,7 +23,6 @@ def get_url(start_date: date, end_date: date) -> str:
     task_run_name=TasksNames.CAMARA.EXTRACT.ORGAOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_orgaos(
     start_date: date,

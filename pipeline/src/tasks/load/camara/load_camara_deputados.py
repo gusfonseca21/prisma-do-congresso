@@ -21,7 +21,6 @@ APP_SETTINGS = load_config()
     task_run_name=TasksNames.CAMARA.LOAD.DEPUTADOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def load_camara_deputados(
     id_lote: int,

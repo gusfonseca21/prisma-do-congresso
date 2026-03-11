@@ -29,7 +29,6 @@ def get_partidos_ids(jsons: list[dict]) -> list[int]:
     task_run_name=TasksNames.CAMARA.EXTRACT.PARTIDOS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 async def extract_camara_partidos(
     legislaturas: dict | None, id_lote: int, ignore_tasks: list[str], use_files: bool

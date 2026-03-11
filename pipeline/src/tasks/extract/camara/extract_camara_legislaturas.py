@@ -17,7 +17,6 @@ def get_url() -> str:
     task_run_name=TasksNames.CAMARA.EXTRACT.LEGISLATURAS,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
-    timeout_seconds=APP_SETTINGS.CAMARA.TASK_TIMEOUT,
 )
 def extract_camara_legislaturas(
     id_lote: int, ignore_tasks: list[str], use_files: bool
