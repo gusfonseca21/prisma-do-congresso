@@ -49,8 +49,8 @@ def load_camara_deputados(
     map_partidos: dict[str, int] = {p.sigla: p.id_partido for p in id_sigla_partidos}
 
     ## DEPUTADOS E REDES SOCIAIS
-    for data in deputados:
-        dados = data.get("dados", {})
+    for item in deputados:
+        dados = item.get("dados", {})
         ultimo_status = dados.get("ultimoStatus")
         gabinete = ultimo_status.get("gabinete")
         redes_sociais = dados.get("redeSocial", [])
@@ -104,10 +104,18 @@ def load_camara_deputados(
                 )
             )
 
-    insert_camara_deputados_db(
-        id_lote=id_lote,
-        deputados_data=deputados_data,
-        redes_sociais_data=redes_sociais_data,
-    )
+    if not deputados_data:
+        logger.warning(
+            f"A lista de dados de DEPUTADOS a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.DEPUTADOS} está vazia. A função de inserção será ignorada."
+        )
+    if not redes_sociais_data:
+        logger.warning(
+            f"A lista de dados de REDES SOCIAIS DE DEPUTADOS a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.DEPUTADOS} está vazia. A função de inserção será ignorada."
+        )
+    else:
+        insert_camara_deputados_db(
+            deputados_data=deputados_data,
+            redes_sociais_data=redes_sociais_data,
+        )
 
     return

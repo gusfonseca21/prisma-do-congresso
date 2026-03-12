@@ -39,10 +39,10 @@ def load_camara_legislaturas_mesa(
 
     logger.info("Carregando Legislaturas Mesa da Câmara no Banco de Dados")
 
-    mesa_data: list[CamaraLegislaturasMesaArg] = []
+    data: list[CamaraLegislaturasMesaArg] = []
 
     for item in mesa.get("dados", []):
-        mesa_data.append(
+        data.append(
             CamaraLegislaturasMesaArg(
                 id_lote=id_lote,
                 id_deputado=item.get("id"),
@@ -55,6 +55,11 @@ def load_camara_legislaturas_mesa(
             )
         )
 
-    insert_camara_legislaturas_mesa_db(data=mesa_data)
+    if data:
+        insert_camara_legislaturas_mesa_db(data)
+    else:
+        logger.warning(
+            f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.LEGISLATURAS_MESA} está vazia. A função de inserção será ignorada."
+        )
 
     return

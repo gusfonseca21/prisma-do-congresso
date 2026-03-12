@@ -13,6 +13,13 @@ from database.repository.camara.repository_camara_legislaturas import (
 APP_SETTINGS = load_config()
 
 
+def get_id_bancada(uri: str) -> int:
+    """
+    Como nesse endpoint são retornados tanto as URIs de partidos quanto para outros tipos de "bancadas", precisamos de uma função mais genérica
+    """
+    return int(uri.split("/")[-1])
+
+
 @task(
     task_run_name=TasksNames.CAMARA.LOAD.LEGISLATURAS_LIDERES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
@@ -39,7 +46,7 @@ def load_camara_legislaturas_lideres(
 
     logger.info("Carregando Legislaturas Líderes da Câmara no Banco de Dados")
 
-    lider_data: list[CamaraLegislaturasLideresArg] = []
+    data: list[CamaraLegislaturasLideresArg] = []
 
     for item in lideres:
         for lider in item.get("dados", []):
@@ -51,7 +58,7 @@ def load_camara_legislaturas_lideres(
             if bancada_uri:
                 id_bancada = get_id_bancada(bancada_uri)
 
-            lider_data.append(
+            data.append(
                 CamaraLegislaturasLideresArg(
                     id_lote=id_lote,
                     id_deputado=parlamentar.get("id"),
@@ -68,7 +75,7 @@ def load_camara_legislaturas_lideres(
             )
 
     # Limpa registros duplicados
-    lider_data = list(
+    data = list(
         {
             (
                 lider.id_deputado,
@@ -76,17 +83,15 @@ def load_camara_legislaturas_lideres(
                 lider.data_inicio,
                 lider.bancada_nome,
             ): lider
-            for lider in lider_data
+            for lider in data
         }.values()
     )
 
-    insert_camara_legislaturas_lideres_db(data=lider_data)
+    if data:
+        insert_camara_legislaturas_lideres_db(data)
+    else:
+        logger.warning(
+            f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.LEGISLATURAS_LIDERES} está vazia. A função de inserção será ignorada."
+        )
 
     return
-
-
-def get_id_bancada(uri: str) -> int:
-    """
-    Como nesse endpoint são retornados tanto as URIs de partidos quanto para outros tipos de "bancadas", precisamos de uma função mais genérica
-    """
-    return int(uri.split("/")[-1])

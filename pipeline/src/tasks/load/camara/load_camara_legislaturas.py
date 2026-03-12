@@ -45,6 +45,13 @@ def load_camara_legislaturas(
             )
         )
 
-    insert_camara_legislaturas_db(data)
+    data = []
+
+    if data:
+        insert_camara_legislaturas_db(data)
+    else:
+        logger.warning(
+            f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.LEGISLATURAS} está vazia. A função de inserção será ignorada."
+        )
 
     return

@@ -24,7 +24,7 @@ def load_camara_deputados_mandatos_externos(
     id_lote: int,
     mandatos_externos: list[dict] | None,
     ignore_tasks: list[str],
-    load_deputados: Any,
+    _load_deputados: Any,
 ):
     logger = get_run_logger()
 
@@ -41,7 +41,7 @@ def load_camara_deputados_mandatos_externos(
 
     logger.info("Carregando Mandatos Externos de Deputados da Câmara no Banco de Dados")
 
-    mandatos_externos_data: list[CamaraDeputadosMandatosExternosArg] = []
+    data: list[CamaraDeputadosMandatosExternosArg] = []
 
     ## MANDATOS EXTERNOS
     for me_data in mandatos_externos:
@@ -50,7 +50,7 @@ def load_camara_deputados_mandatos_externos(
 
         mandatos_dados = me_data.get("dados", [])
         for mandato in mandatos_dados:
-            mandatos_externos_data.append(
+            data.append(
                 CamaraDeputadosMandatosExternosArg(
                     id_lote=id_lote,
                     id_deputado=id_deputado,
@@ -66,15 +66,18 @@ def load_camara_deputados_mandatos_externos(
             )
 
     # Limpa registros duplicados
-    mandatos_externos_data = list(
+    data = list(
         {
             (mandato.id_deputado, mandato.cargo, mandato.ano_inicio): mandato
-            for mandato in mandatos_externos_data
+            for mandato in data
         }.values()
     )
 
-    insert_camara_mandatos_externos_deputados_db(
-        mandatos_externos_data=mandatos_externos_data,
-    )
+    if data:
+        insert_camara_mandatos_externos_deputados_db(data)
+    else:
+        logger.warning(
+            f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.DEPUTADOS_MANDATOS_EXTERNOS} está vazia. A função de inserção será ignorada."
+        )
 
     return

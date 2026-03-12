@@ -36,7 +36,7 @@ def load_camara_partidos(
 
     logger.info("Carregando Partidos da Câmara no Banco de Dados")
 
-    partidos_data: list[CamaraPartidosArg] = []
+    data: list[CamaraPartidosArg] = []
     lideres_partidos = []
 
     for lp in partidos:
@@ -56,7 +56,7 @@ def load_camara_partidos(
         if status_data is not None:
             status_data = datetime.fromisoformat(status_data)
 
-        partidos_data.append(
+        data.append(
             CamaraPartidosArg(
                 id_lote=id_lote,
                 id_partido=p.get("id"),
@@ -71,6 +71,11 @@ def load_camara_partidos(
             )
         )
 
-    insert_camara_partidos_db(data=partidos_data)
+    if data:
+        insert_camara_partidos_db(data)
+    else:
+        logger.warning(
+            f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.PARTIDOS} está vazia. A função de inserção será ignorada."
+        )
 
     return lideres_partidos

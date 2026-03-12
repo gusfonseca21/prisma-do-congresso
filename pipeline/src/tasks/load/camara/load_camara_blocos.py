@@ -31,12 +31,12 @@ def load_camara_blocos(
 
     logger.info("Carregando Blocos da Câmara no Banco de Dados")
 
-    blocos_data: list[CamaraBlocosArg] = []
+    data: list[CamaraBlocosArg] = []
 
     for item in blocos:
         blocos_dados = item.get("dados", [])
         for bloco in blocos_dados:
-            blocos_data.append(
+            data.append(
                 CamaraBlocosArg(
                     id_lote=id_lote,
                     id_bloco=bloco.get("id"),
@@ -46,6 +46,11 @@ def load_camara_blocos(
                 )
             )
 
-    insert_camara_blocos_db(data=blocos_data)
+    if data:
+        insert_camara_blocos_db(data)
+    else:
+        logger.warning(
+            f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.BLOCOS} está vazia. A função de inserção será ignorada."
+        )
 
     return

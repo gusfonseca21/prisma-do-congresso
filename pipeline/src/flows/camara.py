@@ -183,7 +183,7 @@ def camara_flow(
                 list[dict], extract_camara_deputados_mandatos_externos_f
             ),
             ignore_tasks=ignore_tasks,
-            load_deputados=load_camara_deputados_f,
+            _load_deputados=load_camara_deputados_f,
         )
     )
     futures.append(load_camara_deputados_mandatos_externos_f)

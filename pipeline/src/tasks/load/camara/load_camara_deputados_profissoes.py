@@ -40,7 +40,7 @@ def load_camara_deputados_profissoes(
 
     logger.info("Carregando Profissões de Deputados da Câmara no Banco de Dados")
 
-    profissoes_data: list[CamaraDeputadosProfissoesArg] = []
+    data: list[CamaraDeputadosProfissoesArg] = []
 
     ## PROFISSÕES
     for p_data in profissoes:
@@ -54,7 +54,7 @@ def load_camara_deputados_profissoes(
             if not titulo:
                 continue
 
-            profissoes_data.append(
+            data.append(
                 CamaraDeputadosProfissoesArg(
                     id_lote=id_lote,
                     id_deputado=id_deputado,
@@ -63,6 +63,12 @@ def load_camara_deputados_profissoes(
                 )
             )
 
-    insert_camara_profissoes_deputados_db(profissoes_data=profissoes_data)
+    if data:
+        insert_camara_profissoes_deputados_db(data)
+
+    else:
+        logger.warning(
+            f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.DEPUTADOS_PROFISSOES} está vazia. A função de inserção será ignorada."
+        )
 
     return

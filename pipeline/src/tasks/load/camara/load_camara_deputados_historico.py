@@ -42,7 +42,7 @@ def load_camara_deputados_historico(
 
     logger.info("Carregando Histórico de Deputados da Câmara no Banco de Dados")
 
-    historico_deputados_data: list[CamaraDeputadosHistoricoArg] = []
+    data: list[CamaraDeputadosHistoricoArg] = []
 
     for h_data in historico_deputados:
         historico_dados = h_data.get("dados", [])
@@ -52,7 +52,7 @@ def load_camara_deputados_historico(
 
             hash = hashlib.md5(pre_hash_content.encode()).hexdigest()
 
-            historico_deputados_data.append(
+            data.append(
                 CamaraDeputadosHistoricoArg(
                     id_lote=id_lote,
                     id_deputado=historico.get("id"),
@@ -69,8 +69,11 @@ def load_camara_deputados_historico(
                 )
             )
 
-    insert_camara_historico_deputados_db(
-        historico_deputados_data=historico_deputados_data
-    )
+    if data:
+        insert_camara_historico_deputados_db(data)
+    else:
+        logger.warning(
+            f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.DEPUTADOS_HISTORICO} está vazia. A função de inserção será ignorada."
+        )
 
     return

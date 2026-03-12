@@ -58,7 +58,7 @@ def load_camara_orgaos(
         insert_camara_orgaos_db(data=data)
     else:
         logger.warning(
-            f"Não foi possível carregar no Banco de Dados os dados da task {TasksNames.CAMARA.LOAD.ORGAOS} pois 'data' está vazio."
+            f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.ORGAOS} está vazia. A função de inserção será ignorada."
         )
 
     return

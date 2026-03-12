@@ -41,7 +41,7 @@ def load_camara_deputados_ocupacoes(
 
     logger.info("Carregando Ocupações de Deputados da Câmara no Banco de Dados")
 
-    ocupacoes_data: list[CamaraDeputadosOcupacoesArg] = []
+    data: list[CamaraDeputadosOcupacoesArg] = []
 
     ## OCUPAÇÕES
     for o_data in ocupacoes:
@@ -54,7 +54,7 @@ def load_camara_deputados_ocupacoes(
             ano_inicio = ocupacao.get("anoInicio", None)
             if not titulo or not ano_inicio:
                 continue
-            ocupacoes_data.append(
+            data.append(
                 CamaraDeputadosOcupacoesArg(
                     id_lote=id_lote,
                     id_deputado=id_deputado,
@@ -68,13 +68,19 @@ def load_camara_deputados_ocupacoes(
             )
 
     # Limpa registros duplicados
-    ocupacoes_data = list(
+    data = list(
         {
             (ocupacao.id_deputado, ocupacao.titulo, ocupacao.ano_inicio): ocupacao
-            for ocupacao in ocupacoes_data
+            for ocupacao in data
         }.values()
     )
 
-    insert_camara_ocupacoes_deputados_db(ocupacoes_data=ocupacoes_data)
+    if data:
+        insert_camara_ocupacoes_deputados_db(data)
+
+    else:
+        logger.warning(
+            f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.DEPUTADOS_OCUPACOES} está vazia. A função de inserção será ignorada."
+        )
 
     return

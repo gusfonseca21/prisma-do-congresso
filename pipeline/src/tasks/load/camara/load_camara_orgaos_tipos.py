@@ -44,6 +44,11 @@ def load_camara_orgaos_tipos(
             )
         )
 
-    insert_camara_tipos_orgaos_db(data=data)
+    if data:
+        insert_camara_tipos_orgaos_db(data)
+    else:
+        logger.warning(
+            f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.ORGAOS_TIPOS} está vazia. A função de inserção será ignorada."
+        )
 
     return

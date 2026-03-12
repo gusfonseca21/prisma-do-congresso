@@ -31,12 +31,12 @@ def load_camara_blocos_partidos(
 
     logger.info("Carregando Partidos de Blocos da Câmara no Banco de Dados")
 
-    blocos_partidos_data: list[CamaraBlocosPartidosArg] = []
+    data: list[CamaraBlocosPartidosArg] = []
 
     for item in partidos_blocos:
-        data = item.get("dados", [])
-        for item in data:
-            blocos_partidos_data.append(
+        dados = item.get("dados", [])
+        for item in dados:
+            data.append(
                 CamaraBlocosPartidosArg(
                     id_lote=id_lote,
                     id_bloco=item.get("id"),
@@ -46,13 +46,15 @@ def load_camara_blocos_partidos(
             )
 
     # Limpa registros duplicados
-    blocos_partidos_data = list(
-        {
-            (partido.id_bloco, partido.sigla): partido
-            for partido in blocos_partidos_data
-        }.values()
+    data = list(
+        {(partido.id_bloco, partido.sigla): partido for partido in data}.values()
     )
 
-    insert_camara_blocos_partidos_db(data=blocos_partidos_data)
+    if data:
+        insert_camara_blocos_partidos_db(data)
+    else:
+        logger.warning(
+            f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.BLOCOS_PARTIDOS} está vazia. A função de inserção será ignorada."
+        )
 
     return
