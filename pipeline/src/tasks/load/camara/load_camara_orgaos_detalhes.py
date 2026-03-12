@@ -7,7 +7,7 @@ from config.loader import load_config
 from config.parameters import TasksNames
 from database.models.camara.camara_orgaos import CamaraOrgaosDetalhesArg
 from database.repository.camara.repository_camara_orgaos import (
-    insert_camara_detalhes_orgaos_db,
+    insert_camara_orgaos_detalhes_db,
 )
 
 APP_SETTINGS = load_config()
@@ -63,7 +63,7 @@ def load_camara_orgaos_detalhes(
         )
 
     if data:
-        insert_camara_detalhes_orgaos_db(data)
+        insert_camara_orgaos_detalhes_db(data)
 
     else:
         logger.warning(

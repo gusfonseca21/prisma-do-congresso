@@ -8,7 +8,7 @@ from config.loader import load_config
 from config.parameters import TasksNames
 from database.models.camara.camara_orgaos import CamaraOrgaosMembrosArg
 from database.repository.camara.repository_camara_orgaos import (
-    insert_camara_membros_orgaos_db,
+    insert_camara_orgaos_membros_db,
 )
 from utils.camara import get_current_legislatura
 from utils.url_utils import get_path_parameter_value
@@ -86,7 +86,7 @@ def load_camara_orgaos_membros(
     data = deduplicate_membros(data, legislaturas)
 
     if data:
-        insert_camara_membros_orgaos_db(data)
+        insert_camara_orgaos_membros_db(data)
 
     else:
         logger.warning(

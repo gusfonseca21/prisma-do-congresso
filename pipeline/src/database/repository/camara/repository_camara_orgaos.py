@@ -20,7 +20,7 @@ camara_orgaos_detalhes = CamaraOrgaosDetalhes.__table__
 camara_orgaos_membros = CamaraOrgaosMembros.__table__
 
 
-def insert_camara_tipos_orgaos_db(data: list[CamaraOrgaosTiposArg]):
+def insert_camara_orgaos_tipos_db(data: list[CamaraOrgaosTiposArg]):
     with get_connection() as conn:
         stmt = (
             insert(camara_orgaos_tipos)
@@ -97,7 +97,7 @@ def insert_camara_orgaos_db(data: list[CamaraOrgaosArg]):
     return
 
 
-def insert_camara_detalhes_orgaos_db(data: list[CamaraOrgaosDetalhesArg]):
+def insert_camara_orgaos_detalhes_db(data: list[CamaraOrgaosDetalhesArg]):
     with get_connection() as conn:
         stmt = (
             insert(camara_orgaos_detalhes)
@@ -137,7 +137,7 @@ def insert_camara_detalhes_orgaos_db(data: list[CamaraOrgaosDetalhesArg]):
     return
 
 
-def insert_camara_membros_orgaos_db(data: list[CamaraOrgaosMembrosArg]):
+def insert_camara_orgaos_membros_db(data: list[CamaraOrgaosMembrosArg]):
     with get_connection() as conn:
         stmt = insert(camara_orgaos_membros).values(
             [

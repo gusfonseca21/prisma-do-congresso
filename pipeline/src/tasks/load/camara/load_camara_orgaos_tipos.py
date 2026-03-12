@@ -4,7 +4,7 @@ from config.loader import load_config
 from config.parameters import TasksNames
 from database.models.camara.camara_orgaos import CamaraOrgaosTiposArg
 from database.repository.camara.repository_camara_orgaos import (
-    insert_camara_tipos_orgaos_db,
+    insert_camara_orgaos_tipos_db,
 )
 
 APP_SETTINGS = load_config()
@@ -45,7 +45,7 @@ def load_camara_orgaos_tipos(
         )
 
     if data:
-        insert_camara_tipos_orgaos_db(data)
+        insert_camara_orgaos_tipos_db(data)
     else:
         logger.warning(
             f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.ORGAOS_TIPOS} está vazia. A função de inserção será ignorada."

@@ -10,7 +10,7 @@ from database.models.camara.camara_deputados import (
     CamaraDeputadosHistoricoArg,
 )
 from database.repository.camara.repository_camara_deputados import (
-    insert_camara_historico_deputados_db,
+    insert_camara_deputados_historico_db,
 )
 
 APP_SETTINGS = load_config()
@@ -70,7 +70,7 @@ def load_camara_deputados_historico(
             )
 
     if data:
-        insert_camara_historico_deputados_db(data)
+        insert_camara_deputados_historico_db(data)
     else:
         logger.warning(
             f"A lista de dados a serem inseridos no banco de dados na task {TasksNames.CAMARA.LOAD.DEPUTADOS_HISTORICO} está vazia. A função de inserção será ignorada."

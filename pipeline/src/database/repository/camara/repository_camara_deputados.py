@@ -130,7 +130,7 @@ def insert_camara_deputados_db(
         )
 
 
-def insert_camara_historico_deputados_db(
+def insert_camara_deputados_historico_db(
     historico_deputados_data: list[CamaraDeputadosHistoricoArg],
 ):
     with get_connection() as conn:
