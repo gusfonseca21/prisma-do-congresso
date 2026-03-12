@@ -20,7 +20,6 @@ APP_SETTINGS = load_config()
 def load_camara_orgaos(
     id_lote: int,
     orgaos: list[dict] | None,
-    _tipos_orgaos_load: None,
     ignore_tasks: list[str],
     _load_tipos_orgaos: Any,
 ):

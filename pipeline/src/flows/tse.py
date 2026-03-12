@@ -5,10 +5,10 @@ from prefect.runtime import flow_run
 
 from config.parameters import FlowsNames
 from tasks.extract.tse import (
-    extract_candidatos,
-    extract_prestacao_contas,
-    extract_redes_sociais,
-    extract_votacao,
+    extract_tse_candidatos,
+    extract_tse_prestacao_conta,
+    extract_tse_redes_sociais,
+    extract_tse_votacao,
 )
 from utils.br_data import BR_UFS, get_election_years
 from utils.logs import save_logs
@@ -35,30 +35,30 @@ def tse_flow(
     futures = []
 
     # EXTRACT CANDIDATOS
-    extract_candidatos_f = [
-        extract_candidatos.with_options(refresh_cache=refresh_cache).submit(
+    extract_tse_candidatos_f = [
+        extract_tse_candidatos.with_options(refresh_cache=refresh_cache).submit(
             year=year,
             id_lote=id_lote,
             ignore_tasks=ignore_tasks,
         )
         for year in elections_years
     ]  # Retorna lista de futures, que quando resolvidos retorna lista de strings
-    futures.extend(extract_candidatos_f)
+    futures.extend(extract_tse_candidatos_f)
 
     # EXTRACT PRESTAÇÃO DE CONTAS
-    extract_prestacao_contas_f = [
-        extract_prestacao_contas.with_options(refresh_cache=refresh_cache).submit(
+    extract_tse_prestacao_conta_f = [
+        extract_tse_prestacao_conta.with_options(refresh_cache=refresh_cache).submit(
             year=year,
             id_lote=id_lote,
             ignore_tasks=ignore_tasks,
         )
         for year in elections_years
     ]
-    futures.extend(extract_prestacao_contas_f)
+    futures.extend(extract_tse_prestacao_conta_f)
 
     # EXTRACT REDES SOCIAIS
-    extract_redes_sociais_f = [
-        extract_redes_sociais.with_options(refresh_cache=refresh_cache).submit(
+    extract_tse_redes_sociais_f = [
+        extract_tse_redes_sociais.with_options(refresh_cache=refresh_cache).submit(
             year=year,
             uf=uf,
             id_lote=id_lote,
@@ -68,18 +68,18 @@ def tse_flow(
         for uf in BR_UFS
         if not (uf == "DF" and year == 2018)
     ]
-    futures.extend(extract_redes_sociais_f)
+    futures.extend(extract_tse_redes_sociais_f)
 
     # EXTRACT VOTACAO
-    extract_votacao_f = [
-        extract_votacao.with_options(refresh_cache=refresh_cache).submit(
+    extract_tse_votacao_f = [
+        extract_tse_votacao.with_options(refresh_cache=refresh_cache).submit(
             year,
             id_lote,
             ignore_tasks=ignore_tasks,
         )
         for year in elections_years
     ]
-    futures.extend(extract_votacao_f)
+    futures.extend(extract_tse_votacao_f)
 
     # Results só é necessário para os úlitmos resultados das últimas tasks, que não são chamadas por nenhuma outra task, para finalizar o processo corretamente.
     for future in futures:

@@ -11,7 +11,7 @@ APP_SETTINGS = load_config()
 
 
 def cache_by_year(_ctx, params):
-    return f"extract_candidatos:{params['year']}"
+    return f"extract_tse_votacao:{params['year']}"
 
 
 @task(
@@ -26,7 +26,7 @@ def cache_by_year(_ctx, params):
     log_prints=True,
     persist_result=True,
 )
-def extract_votacao(year: int, id_lote: int, ignore_tasks: list[str]) -> str | None:
+def extract_tse_votacao(year: int, id_lote: int, ignore_tasks: list[str]) -> str | None:
     logger = get_run_logger()
 
     if TasksNames.TSE.EXTRACT.VOTACAO in ignore_tasks:

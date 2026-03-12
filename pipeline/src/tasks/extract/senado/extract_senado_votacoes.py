@@ -28,7 +28,7 @@ def get_votacoes_urls(start_date: date, end_date: date) -> list[str] | None:
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
 )
-async def extract_votacoes_senado(
+async def extract_senado_votacoes(
     start_date: date,
     end_date: date,
     id_lote: int,

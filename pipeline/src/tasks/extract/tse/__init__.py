@@ -1,11 +1,11 @@
-from .extract_tse_candidatos import extract_candidatos
-from .extract_tse_prestacao_contas import extract_prestacao_contas
-from .extract_tse_redes_sociais import extract_redes_sociais
-from .extract_tse_votacao import extract_votacao
+from .extract_tse_candidatos import extract_tse_candidatos
+from .extract_tse_prestacao_contas import extract_tse_prestacao_conta
+from .extract_tse_redes_sociais import extract_tse_redes_sociais
+from .extract_tse_votacao import extract_tse_votacao
 
 __all__ = [
-    "extract_candidatos",
-    "extract_prestacao_contas",
-    "extract_redes_sociais",
-    "extract_votacao",
+    "extract_tse_candidatos",
+    "extract_tse_prestacao_conta",
+    "extract_tse_redes_sociais",
+    "extract_tse_votacao",
 ]

@@ -20,7 +20,7 @@ def get_ids_proposicoes(jsons: list[dict]) -> list[int]:
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
 )
-async def extract_proposicoes_camara(
+async def extract_camara_proposicoes(
     start_date: date,
     end_date: date,
     id_lote: int,

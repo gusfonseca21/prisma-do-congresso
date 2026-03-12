@@ -35,7 +35,7 @@ def get_processos_url(start_date: date, end_date: date, logger: Any) -> list[str
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
 )
-async def extract_processos_senado(
+async def extract_senado_processos(
     start_date: date,
     end_date: date,
     id_lote: int,

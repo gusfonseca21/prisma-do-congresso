@@ -15,22 +15,22 @@ from utils.io import load_ndjson, save_ndjson
 APP_SETTINGS = load_config()
 
 
-def frentes_membros_urls(
+def frentes_detalhes_urls(
     frentes_ids: list[str], logger: Logger | LoggingAdapter
 ) -> UrlsResult:
     urls = set()
     not_downloaded_urls = verify_not_downloaded_urls_in_task_db(
-        TasksNames.CAMARA.EXTRACT.FRENTES_MEMBROS
+        TasksNames.CAMARA.EXTRACT.FRENTES_DETALHES
     )
 
     if not_downloaded_urls:
         logger.warning(
-            f"A Tasks {TasksNames.CAMARA.EXTRACT.FRENTES_MEMBROS} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
+            f"A Tasks {TasksNames.CAMARA.EXTRACT.FRENTES_DETALHES} possio URLs não baixadas nos lotes anteriores. Elas tentarão ser baixadas agora."
         )
         urls.update([error.url for error in not_downloaded_urls])
 
     for id in frentes_ids:
-        urls.add(f"{APP_SETTINGS.CAMARA.REST_BASE_URL}frentes/{id}/membros")
+        urls.add(f"{APP_SETTINGS.CAMARA.REST_BASE_URL}frentes/{id}")
 
     return UrlsResult(
         urls_to_download=list(urls), not_downloaded_urls=not_downloaded_urls
@@ -38,11 +38,11 @@ def frentes_membros_urls(
 
 
 @task(
-    task_run_name=TasksNames.CAMARA.EXTRACT.FRENTES_MEMBROS,
+    task_run_name=TasksNames.CAMARA.EXTRACT.FRENTES_DETALHES,
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
 )
-async def extract_camara_frentes_membros(
+async def extract_camara_frentes_detalhes(
     frentes_ids: list[str] | None,
     id_lote: int,
     ignore_tasks: list[str],
@@ -50,24 +50,24 @@ async def extract_camara_frentes_membros(
 ) -> list[dict] | None:
     logger = get_run_logger()
 
-    if TasksNames.CAMARA.EXTRACT.FRENTES_MEMBROS in ignore_tasks:
+    if not frentes_ids:
         logger.warning(
-            f"A Task {TasksNames.CAMARA.EXTRACT.FRENTES_MEMBROS} foi ignorada"
+            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.FRENTES_DETALHES}' pois o argumento do parâmetro 'frentes_ids' é nulo"
         )
         return
     if use_files:
         logger.warning(
-            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.FRENTES_MEMBROS} irá retornar os dados à partir do arquivo em disco."
+            f"O parâmetro 'use_files' é verdadeiro, a Task {TasksNames.CAMARA.EXTRACT.FRENTES_DETALHES} irá retornar os dados à partir do arquivo em disco."
         )
-        return load_ndjson(ExtractOutDir.CAMARA.FRENTES_MEMBROS)
-    if not frentes_ids:
+        return load_ndjson(ExtractOutDir.CAMARA.FRENTES_DETALHES)
+    if TasksNames.CAMARA.EXTRACT.FRENTES_DETALHES in ignore_tasks:
         logger.warning(
-            f"Não foi possível executar a task '{TasksNames.CAMARA.EXTRACT.FRENTES_MEMBROS}' pois o argumento do parâmetro 'frentes_ids' é nulo"
+            f"A Task {TasksNames.CAMARA.EXTRACT.FRENTES_DETALHES} foi ignorada"
         )
         return
 
-    urls = frentes_membros_urls(frentes_ids, logger)
-    logger.info(f"Câmara: buscando Membros de {len(urls)} Frentes")
+    urls = frentes_detalhes_urls(frentes_ids, logger)
+    logger.info(f"Câmara: buscando Detalhes de {len(urls)} Frentes")
 
     jsons = await fetch_many_jsons(
         urls=urls["urls_to_download"],
@@ -76,10 +76,10 @@ async def extract_camara_frentes_membros(
         follow_pagination=True,
         max_retries=APP_SETTINGS.ALLENDPOINTS.FETCH_MAX_RETRIES,
         validate_results=True,
-        task=TasksNames.CAMARA.EXTRACT.FRENTES_MEMBROS,
+        task=TasksNames.CAMARA.EXTRACT.FRENTES_DETALHES,
         id_lote=id_lote,
     )
 
-    save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.FRENTES_MEMBROS))
+    save_ndjson(cast(list[dict], jsons), Path(ExtractOutDir.CAMARA.FRENTES_DETALHES))
 
     return cast(list[dict], jsons)

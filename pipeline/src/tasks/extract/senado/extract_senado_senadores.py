@@ -32,7 +32,7 @@ def get_ids_senadores(json_exercicio: dict, json_afastados: dict) -> list[int]:
     retries=APP_SETTINGS.SENADO.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.SENADO.TASK_RETRY_DELAY,
 )
-def extract_senadores_senado(
+def extract_senado_senadores(
     id_lote: int, use_files: bool, ignore_tasks: list[str]
 ) -> list[int] | None:
     logger = get_run_logger()

@@ -24,63 +24,67 @@ class TasksNames:
         class EXTRACT:
             LEGISLATURAS = "extract_camara_legislaturas"
             PARTIDOS = "extract_camara_partidos"
-            DETALHES_PARTIDOS = "extract_camara_detalhes_partidos"
+            PARTIDOS_DETALHES = "extract_camara_partidos_detalhes"
             DEPUTADOS = "extract_camara_deputados"
-            DETALHES_DEPUTADOS = "extract_camara_detalhes_deputados"
-            HISTORICO_DEPUTADOS = "extract_camara_historico_deputados"
-            MANDATOS_EXTERNOS_DEPUTADOS = "extract_camara_mandatos_externos_deputados"
-            OCUPACOES_DEPUTADOS = "extract_camara_ocupacoes_deputados"
-            PROFISSOES_DEPUTADOS = "extract_camara_profissoes_deputados"
+            DEPUTADOS_DETALHES = "extract_camara_deputados_detalhes"
+            DEPUTADOS_HISTORICO = "extract_camara_deputados_historico"
+            DEPUTADOS_MANDATOS_EXTERNOS = "extract_camara_deputados_mandatos_externos"
+            DEPUTADOS_OCUPACOES = "extract_camara_deputados_ocupacoes"
+            DEPUTADOS_PROFISSOES = "extract_camara_deputados_profissoes"
             LEGISLATURAS_LIDERES = "extract_camara_legislaturas_lideres"
             LEGISLATURAS_MESA = "extract_camara_legislaturas_mesa"
             BLOCOS = "extract_camara_blocos"
-            PARTIDOS_BLOCOS = "extract_camara_partidos_blocos"
-            TIPOS_ORGAOS = "extract_tipos_orgaos"
+            BLOCOS_PARTIDOS = "extract_camara_blocos_partidos"
+            ORGAOS_TIPOS = "extract_camara_orgaos_tipos"
             ORGAOS = "extract_camara_orgaos"
-            DETALHES_ORGAOS = "extract_camara_detalhes_orgaos"
-            MEMBROS_ORGAOS = "extract_camara_membros_orgaos"
+            ORGAOS_DETALHES = "extract_camara_orgaos_detalhes"
+            ORGAOS_MEMBROS = "extract_camara_orgaos_membros"
             EVENTOS = "extract_camara_eventos"
-            ASSIDUIDADE_PLENARIO = "extract_camara_assiduidade_plenario"
-            ASSIDUIDADE_COMISSOES = "extract_camara_assiduidade_comissoes"
+            DEPUTADOS_ASSIDUIDADE_PLENARIO = (
+                "extract_camara_deputados_assiduidade_plenario"
+            )
+            DEPUTADOS_ASSIDUIDADE_COMISSOES = (
+                "extract_camara_deputados_assiduidade_comissoes"
+            )
             FRENTES = "extract_camara_frentes"
-            DETALHES_FRENTES = "extract_camara_detalhes_frentes"
+            FRENTES_DETALHES = "extract_camara_frentes_detalhes"
             FRENTES_MEMBROS = "extract_camara_frentes_membros"
-            DISCURSOS_DEPUTADOS = "extract_camara_discursos_deputados"
+            DEPUTADOS_DISCURSOS = "extract_camara_deputados_discursos"
             PROPOSICOES = "extract_camara_proposicoes"
-            DETALHES_PROPOSICOES = "extract_camara_detalhes_proposicoes"
-            AUTORES_PROPOSICOES = "extract_camara_autores_proposicoes"
-            DESPESAS_DEPUTADOS = "extract_camara_despesas_deputados"
+            PROPOSICOES_DETALHES = "extract_camara_proposicoes_detalhes"
+            PROPOSICOES_AUTORES = "extract_camara_proposicoes_autores"
+            DEPUTADOS_DESPESAS = "extract_camara_deputados_despesas"
             VOTACOES = "extract_camara_votacoes"
-            DETALHES_VOTACOES = "extract_camara_detalhes_votacoes"
-            ORIENTACOES_VOTACOES = "extract_camara_orientacoes_votacoes"
-            VOTOS_VOTACOES = "extract_camara_votos_votacoes"
+            VOTACOES_DETALHES = "extract_camara_votacoes_detalhes"
+            VOTACOES_ORIENTACOES = "extract_camara_votacoes_orientacoes"
+            VOTACOES_VOTOS = "extract_camara_votacoes_votos"
 
         class LOAD:
             LEGISLATURAS = "load_camara_legislaturas"
             PARTIDOS = "load_camara_partidos"
             DEPUTADOS = "load_camara_deputados"
-            HISTORICO_DEPUTADOS = "load_camara_historico_deputados"
-            MANDATOS_EXTERNOS_DEPUTADOS = "load_camara_mantados_externos_deputados"
-            OCUPACOES_DEPUTADOS = "load_camara_ocupacoes_deputados"
-            PROFISSOES_DEPUTADOS = "load_camara_profissoes_deputados"
+            DEPUTADOS_HISTORICO = "load_camara_deputados_historico"
+            DEPUTADOS_MANDATOS_EXTERNOS = "load_camara_deputados_mandatos_externos"
+            DEPUTADOS_OCUPACOES = "load_camara_deputados_ocupacoes"
+            DEPUTADOS_PROFISSOES = "load_camara_deputados_profissoes"
             LEGISLATURAS_LIDERES = "load_camara_legislaturas_lideres"
             LEGISLATURAS_MESA = "load_camara_legislaturas_mesa"
             BLOCOS = "load_camara_blocos"
-            PARTIDOS_BLOCOS = "load_camara_partidos_blocos"
-            TIPOS_ORGAOS = "load_camara_tipos_orgaos"
+            BLOCOS_PARTIDOS = "load_camara_blocos_partidos"
+            ORGAOS_TIPOS = "load_camara_orgaos_tipos"
             ORGAOS = "load_camara_orgaos"
-            DETALHES_ORGAOS = "load_camara_detalhes_orgaos"
-            MEMBROS_ORGAOS = "load_camara_membros_orgaos"
+            ORGAOS_DETALHES = "load_camara_orgaos_detalhes"
+            ORGAOS_MEMBROS = "load_camara_orgaos_membros"
 
     class SENADO:
         class EXTRACT:
             COLEGIADOS = "extract_senado_colegiados"
             SENADORES = "extract_senado_senadores"
-            DETALHES_SENADORES = "extract_senado_detalhes_senadores"
-            DISCURSOS_SENADORES = "extract_senado_discursos_senadores"
-            DESPESAS_SENADORES = "extract_senado_despesas_senadores"
+            SENADORES_DETALHES = "extract_senado_senadores_detalhes"
+            SENADORES_DISCURSOS = "extract_senado_senadores_discursos"
+            SENADORES_DESPESAS = "extract_senado_despesas_senadores"
             PROCESSOS = "extract_senado_processos"
-            DETALHES_PROCESSOS = "extract_senado_detalhes_processos"
+            PROCESSOS_DETALHES = "extract_senado_processos_detalhes"
             VOTACOES = "extract_senado_votacoes"
 
 
@@ -101,22 +105,22 @@ class ExtractOutDir:
     class CAMARA:
         LEGISLATURAS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/legislaturas.json"
         PARTIDOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/partidos.ndjson"
-        DETALHES_PARTIDOS = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/detalhes_partidos.ndjson"
+        PARTIDOS_DETALHES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/partidos_detalhes.ndjson"
         )
         DEPUTADOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/deputados.json"
-        DETALHES_DEPUTADOS = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/detalhes_deputados.ndjson"
+        DEPUTADOS_DETALHES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/deputados_detalhes.ndjson"
         )
-        HISTORICO_DEPUTADOS = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/historico_deputados.ndjson"
+        DEPUTADOS_HISTORICO = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/deputados_historico.ndjson"
         )
-        MANDATOS_EXTERNOS_DEPUTADOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/mandatos_externos_deputados.ndjson"
-        OCUPACOES_DEPUTADOS = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/ocupacoes_deputados.ndjson"
+        DEPUTADOS_MANDATOS_EXTERNOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/deputados_mandatos_externos.ndjson"
+        DEPUTADOS_OCUPACOES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/deputados_ocupacoes.ndjson"
         )
-        PROFISSOES_DEPUTADOS = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/profissoes_deputados.ndjson"
+        DEPUTADOS_PROFISSOES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/deputados_profissoes.ndjson"
         )
         LEGISLATURAS_LIDERES = (
             f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/legislaturas_lideres.ndjson"
@@ -125,51 +129,49 @@ class ExtractOutDir:
             f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/legislaturas_mesa.json"
         )
         BLOCOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/blocos.ndjson"
-        PARTIDOS_BLOCOS = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/partidos_blocos.ndjson"
+        BLOCOS_PARTIDOS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/blocos_partidos.ndjson"
         )
         EVENTOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/eventos.ndjson"
-        TIPOS_ORGAOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/tipos_orgaos.json"
+        ORGAOS_TIPOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/orgaos_tipos.json"
         ORGAOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/orgaos.ndjson"
-        DETALHES_ORGAOS = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/detalhes_orgaos.ndjson"
+        ORGAOS_DETALHES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/orgaos_detalhes.ndjson"
         )
-        MEMBROS_ORGAOS = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/membros_orgaos.ndjson"
+        ORGAOS_MEMBROS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/orgaos_membros.ndjson"
         )
-        ASSIDUIDADE_PLENARIO = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/assiduidade_plenario.zip"
-        )
-        ASSIDUIDADE_COMISSOES = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/assiduidade_comissoes.zip"
-        )
+        DEPUTADOS_ASSIDUIDADE_PLENARIO = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/deputados_assiduidade_plenario.zip"
+        DEPUTADOS_ASSIDUIDADE_COMISSOES = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/deputados_assiduidade_comissoes.zip"
         FRENTES = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/frentes.ndjson"
         FRENTES_MEMBROS = (
             f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/frentes_membros.ndjson"
         )
-        DETALHES_FRENTES = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/detalhes_frentes.ndjson"
+        FRENTES_DETALHES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/frentes_detalhes.ndjson"
         )
-        DISCURSOS = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/discursos.ndjson"
+        DEPUTADOS_DISCURSOS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/deputados_discursos.ndjson"
+        )
         PROPOSICOES = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/proposicoes.ndjson"
-        DETALHES_PROPOSICOES = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/detalhes_proposicoes.ndjson"
+        PROPOSICOES_DETALHES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/proposicoes_detalhes.ndjson"
         )
-        AUTORES_PROPOSICOES = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/autores_proposicoes.ndjson"
+        PROPOSICOES_AUTORES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/proposicoes_autores.ndjson"
         )
         VOTACOES = f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/votacoes.ndjson"
-        DETALHES_VOTACOES = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/detalhes_votacoes.ndjson"
+        VOTACOES_DETALHES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/votacoes_detalhes.ndjson"
         )
-        ORIENTACOES_VOTACOES = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/orientacoes_votacoes.ndjson"
+        VOTACOES_ORIENTACOES = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/votacoes_orientacoes.ndjson"
         )
-        VOTOS_VOTACOES = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/votos_votacoes.ndjson"
+        VOTACOES_VOTOS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/votacoes_votos.ndjson"
         )
-        DESPESAS_DEPUTADOS = (
-            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/despesas_deputados.ndjson"
+        DEPUTADOS_DESPESAS = (
+            f"{APP_SETTINGS.CAMARA.OUTPUT_EXTRACT_DIR}/deputados_despesas.ndjson"
         )
 
     class SENADO:
@@ -180,17 +182,17 @@ class ExtractOutDir:
         SENADORES_AFASTADOS = (
             f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/senadores_afastados.json"
         )
-        DETALHES_SENADORES = (
-            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/detalhes_senadores.ndjson"
+        SENADORES_DETALHES = (
+            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/senadores_detalhes.ndjson"
         )
-        DISCURSOS_SENADORES = (
-            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/discursos_senadores.ndjson"
+        SENADORES_DISCURSOS = (
+            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/senadores_discursos.ndjson"
         )
-        DESPESAS_SENADORES = (
-            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/despesas_senadores.ndjson"
+        SENADORES_DESPESAS = (
+            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/senadores_despesas.ndjson"
         )
         PROCESSOS = f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/processos.json"
-        DETALHES_PROCESSOS = (
-            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/detalhes_processos.ndjson"
+        PROCESSOS_DETALHES = (
+            f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/processos_detalhes.ndjson"
         )
         VOTACOES = f"{APP_SETTINGS.SENADO.OUTPUT_EXTRACT_DIR}/votacoes.ndjson"

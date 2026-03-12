@@ -45,7 +45,7 @@ def get_ids_votacoes(jsons: list[dict]) -> list[str]:
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
 )
-async def extract_votacoes_camara(
+async def extract_camara_votacoes(
     start_date: date,
     end_date: date,
     id_lote: int,

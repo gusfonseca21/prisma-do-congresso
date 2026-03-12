@@ -5,14 +5,14 @@ from prefect.runtime import flow_run
 
 from config.parameters import FlowsNames
 from tasks.extract.senado import (
-    extract_colegiados,
-    extract_despesas_senado,
-    extract_detalhes_processos_senado,
-    extract_detalhes_senadores_senado,
-    extract_discursos_senado,
-    extract_processos_senado,
-    extract_senadores_senado,
-    extract_votacoes_senado,
+    extract_senado_colegiados,
+    extract_senado_processos,
+    extract_senado_processos_detalhes,
+    extract_senado_senadores,
+    extract_senado_senadores_despesas,
+    extract_senado_senadores_detalhes,
+    extract_senado_senadores_discursos,
+    extract_senado_votacoes,
 )
 from utils.logs import save_logs
 
@@ -32,79 +32,79 @@ def senado_flow(
     futures = []
 
     ## COLEGIADOS
-    extract_colegiados_senado_f = extract_colegiados.submit(
+    extract_senado_colegiados_f = extract_senado_colegiados.submit(
         id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
-    futures.append(extract_colegiados_senado_f)
+    futures.append(extract_senado_colegiados_f)
 
     ## SENADORES
-    extract_senadores_senado_f = extract_senadores_senado.submit(
+    extract_senado_senadores_f = extract_senado_senadores.submit(
         id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
-    extract_senadores_senado_f.result()
+    extract_senado_senadores_f.result()
 
     ## DETALHES SENADORES
-    extract_detalhes_senadores_senado_f = extract_detalhes_senadores_senado.submit(
-        ids_senadores=extract_senadores_senado_f,  # type: ignore
+    extract_senado_senadores_detalhes_f = extract_senado_senadores_detalhes.submit(
+        ids_senadores=extract_senado_senadores_f,  # type: ignore
         id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
-    extract_detalhes_senadores_senado_f.result()  # type: ignore
+    extract_senado_senadores_detalhes_f.result()  # type: ignore
 
     ## DISCURSOS SENADORES
-    extract_discursos_senado_f = extract_discursos_senado.submit(
-        ids_senadores=extract_senadores_senado_f,  # type: ignore
+    extract_senado_senadores_discursos_f = extract_senado_senadores_discursos.submit(
+        ids_senadores=extract_senado_senadores_f,  # type: ignore
         start_date=start_date,
         end_date=end_date,
         id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
-    extract_discursos_senado_f.result()  # type: ignore
+    extract_senado_senadores_discursos_f.result()  # type: ignore
 
     ## DESPESAS SENADORES
-    extract_despesas_senado_f = extract_despesas_senado.submit(
+    extract_senado_senadores_despesas_f = extract_senado_senadores_despesas.submit(
         start_date=start_date,
         end_date=end_date,
         id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
-    futures.append(extract_despesas_senado_f)
+    futures.append(extract_senado_senadores_despesas_f)
 
     ## PROCESSOS SENADO
-    extract_processos_senado_f = extract_processos_senado.submit(
+    extract_senado_processos_f = extract_senado_processos.submit(
         start_date=start_date,
         end_date=end_date,
         id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
-    extract_processos_senado_f.result()  # type: ignore
+    extract_senado_processos_f.result()  # type: ignore
 
     ## DETALHES PROCESSOS
-    extract_detalhes_processos_senado_f = extract_detalhes_processos_senado.submit(
-        ids_processos=extract_processos_senado_f,  # type: ignore
+    extract_senado_processos_detalhes_f = extract_senado_processos_detalhes.submit(
+        ids_processos=extract_senado_processos_f,  # type: ignore
         id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
-    extract_detalhes_processos_senado_f.result()  # type: ignore
+    extract_senado_processos_detalhes_f.result()  # type: ignore
 
     ## VOTACOES
-    extract_votacoes_senado_f = extract_votacoes_senado.submit(
+    extract_senado_votacoes_f = extract_senado_votacoes.submit(
         start_date=start_date,
         end_date=end_date,
         id_lote=id_lote,
         use_files=use_files,
         ignore_tasks=ignore_tasks,
     )
-    futures.append(extract_votacoes_senado_f)
+    futures.append(extract_senado_votacoes_f)
 
     # Para finalizar o Flow corretamente na GUI do servidor, é preciso resolver os futures dos endpoints que não foram passados para outras tasks.
     for future in futures:

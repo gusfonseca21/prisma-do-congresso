@@ -11,7 +11,7 @@ APP_SETTINGS = load_config()
 
 
 def cache_by_year(_ctx, params):
-    return f"extract_candidatos:{params['year']}"
+    return f"extract_tse_redes_sociais:{params['year']}"
 
 
 @task(
@@ -26,7 +26,7 @@ def cache_by_year(_ctx, params):
     log_prints=True,
     persist_result=True,
 )
-def extract_redes_sociais(
+def extract_tse_redes_sociais(
     year: int, uf: str, id_lote: int, ignore_tasks: list[str]
 ) -> str | None:
     logger = get_run_logger()

@@ -30,7 +30,7 @@ def get_ids_deputados(json: dict) -> list[int]:
     retries=APP_SETTINGS.CAMARA.TASK_RETRIES,
     retry_delay_seconds=APP_SETTINGS.CAMARA.TASK_RETRY_DELAY,
 )
-def extract_deputados_camara(
+def extract_camara_deputados(
     legislaturas: dict | None, id_lote: int, ignore_tasks: list[str], use_files: bool
 ) -> list[int] | None:
     logger = get_run_logger()

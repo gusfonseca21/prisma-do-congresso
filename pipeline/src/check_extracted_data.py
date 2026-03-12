@@ -5,7 +5,7 @@ from utils.io import load_ndjson
 
 
 def start():
-    jsons = load_ndjson(ExtractOutDir.CAMARA.MEMBROS_ORGAOS)
+    jsons = load_ndjson(ExtractOutDir.CAMARA.ORGAOS_MEMBROS)
 
     lista_membros = []
     for orgao in jsons:
