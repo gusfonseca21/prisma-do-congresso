@@ -39,22 +39,7 @@ class CamaraOrgaosArg(BaseModel):
     id_tipo_orgao: int
     nome_publicacao: str | None
     nome_resumido: str | None
-
-
-class CamaraOrgaosDetalhesArg(BaseModel):
-    """
-    id_lote: int
-    id_orgao: int
-    data_inicio: datetime.date
-    data_instalacao: datetime.date | None
-    data_fim: datetime.date | None
-    data_fim_original: datetime.date | None
-    url_website: str | None
-    """
-
-    id_lote: int
-    id_orgao: int
-    data_inicio: datetime.datetime
+    data_inicio: datetime.datetime | None
     data_instalacao: datetime.datetime | None
     data_fim: datetime.datetime | None
     data_fim_original: datetime.datetime | None
@@ -103,15 +88,7 @@ class CamaraOrgaos(Base, BaseMixin):
     )
     nome_publicacao = sa.Column(sa.Text, nullable=True)
     nome_resumido = sa.Column(sa.Text, nullable=True)
-
-
-class CamaraOrgaosDetalhes(Base, BaseMixin):
-    __tablename__ = "camara_orgaos_detalhes"
-
-    id_orgao = sa.Column(
-        sa.Integer, sa.ForeignKey("camara_orgaos.id_orgao"), nullable=False, unique=True
-    )
-    data_inicio = sa.Column(sa.DateTime(timezone=True), nullable=False)
+    data_inicio = sa.Column(sa.DateTime(timezone=True), nullable=True)
     data_instalacao = sa.Column(sa.DateTime(timezone=True), nullable=True)
     data_fim = sa.Column(sa.DateTime(timezone=True), nullable=True)
     data_fim_original = sa.Column(sa.DateTime(timezone=True), nullable=True)

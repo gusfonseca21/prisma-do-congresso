@@ -51,7 +51,6 @@ from tasks.load.camara import (
     load_camara_legislaturas_lideres,
     load_camara_legislaturas_mesa,
     load_camara_orgaos,
-    load_camara_orgaos_detalhes,
     load_camara_orgaos_membros,
     load_camara_orgaos_tipos,
     load_camara_partidos,
@@ -83,7 +82,6 @@ def camara_flow(
         ignore_tasks=ignore_tasks,
         use_files=use_files,
     )
-    # futures.append(extract_camara_legislaturas_f)
 
     ## LOAD LEGISLATURA
     load_camara_legislaturas_f = load_camara_legislaturas.submit(
@@ -318,10 +316,19 @@ def camara_flow(
     )
     futures.append(extract_camara_orgaos_f)
 
+    ## EXTRACT DETALHES ÓRGÃOS
+    extract_camara_orgaos_detalhes_f = extract_camara_orgaos_detalhes.submit(
+        orgaos=extract_camara_orgaos_f,  # type: ignore
+        id_lote=id_lote,
+        ignore_tasks=ignore_tasks,
+        use_files=use_files,
+    )
+    extract_camara_orgaos_detalhes_f.result()  # type: ignore
+
     ## LOAD ORGAOS
     load_camara_orgaos_f = load_camara_orgaos.submit(
         id_lote=id_lote,
-        orgaos=extract_camara_orgaos_f,  # type: ignore
+        orgaos=extract_camara_orgaos_detalhes_f,  # type: ignore
         _load_tipos_orgaos=load_camara_orgaos_tipos_f,  # type: ignore
         ignore_tasks=ignore_tasks,
     )
@@ -348,24 +355,6 @@ def camara_flow(
         _load_deputados=load_camara_deputados_f,
     )
     futures.append(load_camara_orgaos_membros_f)
-
-    ## EXTRACT DETALHES ÓRGÃOS
-    extract_camara_orgaos_detalhes_f = extract_camara_orgaos_detalhes.submit(
-        orgaos=extract_camara_orgaos_f,  # type: ignore
-        id_lote=id_lote,
-        ignore_tasks=ignore_tasks,
-        use_files=use_files,
-    )
-    extract_camara_orgaos_detalhes_f.result()  # type: ignore
-
-    ## LOAD DETALHES ÓRGÃOS
-    load_camara_orgaos_detalhes_f = load_camara_orgaos_detalhes.submit(
-        detalhes_orgaos=extract_camara_orgaos_detalhes_f,  # type: ignore
-        id_lote=id_lote,
-        ignore_tasks=ignore_tasks,
-        _load_orgaos=load_camara_orgaos_f,
-    )
-    futures.append(load_camara_orgaos_detalhes_f)
 
     ## EXTRACT EVENTOS
     extract_camara_eventos_f = extract_camara_eventos.submit(

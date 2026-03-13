@@ -41,6 +41,8 @@ def get_orgaos_ids(orgaos: list[dict]) -> list[int]:
         d = item.get("dados", [])
         for orgao in d:
             ids.add((orgao.get("id")))
+    MISSING_ORGAO = 100950  # Órgão não retornado pelo endpoint /orgaos
+    ids.add(MISSING_ORGAO)
     return list(ids)
 
 

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: fc659e5e74de
+Revision ID: e91f1736650e
 Revises: 
-Create Date: 2026-03-11 17:58:20.581751
+Create Date: 2026-03-13 11:11:47.984905
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'fc659e5e74de'
+revision: str = 'e91f1736650e'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -123,6 +123,11 @@ def upgrade() -> None:
     sa.Column('id_tipo_orgao', sa.Integer(), nullable=False),
     sa.Column('nome_publicacao', sa.Text(), nullable=True),
     sa.Column('nome_resumido', sa.Text(), nullable=True),
+    sa.Column('data_inicio', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('data_instalacao', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('data_fim', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('data_fim_original', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('url_website', sa.Text(), nullable=True),
     sa.Column('id_lote', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), sa.Identity(always=False, start=1, cycle=False), nullable=False),
     sa.ForeignKeyConstraint(['id_lote'], ['lote.id'], name=op.f('fk_camara_orgaos_id_lote')),
@@ -183,20 +188,6 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['id_partido'], ['camara_partidos.id_partido'], name=op.f('fk_camara_deputados_id_partido')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_camara_deputados')),
     sa.UniqueConstraint('id_deputado', name=op.f('uq_camara_deputados_id_deputado'))
-    )
-    op.create_table('camara_orgaos_detalhes',
-    sa.Column('id_orgao', sa.Integer(), nullable=False),
-    sa.Column('data_inicio', sa.DateTime(timezone=True), nullable=False),
-    sa.Column('data_instalacao', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('data_fim', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('data_fim_original', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('url_website', sa.Text(), nullable=True),
-    sa.Column('id_lote', sa.Integer(), nullable=False),
-    sa.Column('id', sa.Integer(), sa.Identity(always=False, start=1, cycle=False), nullable=False),
-    sa.ForeignKeyConstraint(['id_lote'], ['lote.id'], name=op.f('fk_camara_orgaos_detalhes_id_lote')),
-    sa.ForeignKeyConstraint(['id_orgao'], ['camara_orgaos.id_orgao'], name=op.f('fk_camara_orgaos_detalhes_id_orgao')),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk_camara_orgaos_detalhes')),
-    sa.UniqueConstraint('id_orgao', name=op.f('uq_camara_orgaos_detalhes_id_orgao'))
     )
     op.create_table('camara_deputados_historico',
     sa.Column('id_deputado', sa.Integer(), nullable=False),
@@ -330,7 +321,6 @@ def downgrade() -> None:
     op.drop_table('camara_deputados_ocupacoes')
     op.drop_table('camara_deputados_mandatos_externos')
     op.drop_table('camara_deputados_historico')
-    op.drop_table('camara_orgaos_detalhes')
     op.drop_table('camara_deputados')
     op.drop_table('camara_partidos')
     op.drop_table('camara_orgaos')

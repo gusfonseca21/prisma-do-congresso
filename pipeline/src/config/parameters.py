@@ -73,7 +73,6 @@ class TasksNames:
             BLOCOS_PARTIDOS = "load_camara_blocos_partidos"
             ORGAOS_TIPOS = "load_camara_orgaos_tipos"
             ORGAOS = "load_camara_orgaos"
-            ORGAOS_DETALHES = "load_camara_orgaos_detalhes"
             ORGAOS_MEMBROS = "load_camara_orgaos_membros"
 
     class SENADO:

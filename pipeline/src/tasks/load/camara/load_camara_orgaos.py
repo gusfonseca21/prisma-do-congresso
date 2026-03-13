@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 
 from prefect import get_run_logger, task
@@ -34,25 +35,41 @@ def load_camara_orgaos(
         )
         return
 
-    logger.info("Carregando Tipos de Órgãos no Banco de Dados")
+    logger.info("Carregando Órgãos no Banco de Dados")
 
     data: list[CamaraOrgaosArg] = []
 
     for item in orgaos:
-        d = item.get("dados", [])
-        for orgao in d:
-            data.append(
-                CamaraOrgaosArg(
-                    id_lote=id_lote,
-                    id_orgao=orgao.get("id"),
-                    sigla=orgao.get("sigla"),
-                    nome=orgao.get("nome"),
-                    apelido=orgao.get("apelido"),
-                    id_tipo_orgao=orgao.get("codTipoOrgao"),
-                    nome_publicacao=orgao.get("nomePublicacao"),
-                    nome_resumido=orgao.get("nomeResumido"),
-                )
+        orgao = item.get("dados", [])
+
+        data_inicio = orgao.get("dataInicio")
+        data_instalacao = orgao.get("dataInstalacao")
+        data_fim = orgao.get("dataFim")
+        data_fim_original = orgao.get("dataFimOriginal")
+
+        data.append(
+            CamaraOrgaosArg(
+                id_lote=id_lote,
+                id_orgao=orgao.get("id"),
+                sigla=orgao.get("sigla"),
+                nome=orgao.get("nome"),
+                apelido=orgao.get("apelido"),
+                id_tipo_orgao=orgao.get("codTipoOrgao"),
+                nome_publicacao=orgao.get("nomePublicacao"),
+                nome_resumido=orgao.get("nomeResumido"),
+                data_inicio=datetime.fromisoformat(data_inicio)
+                if data_inicio
+                else None,
+                data_instalacao=datetime.fromisoformat(data_instalacao)
+                if data_instalacao
+                else None,
+                data_fim=datetime.fromisoformat(data_fim) if data_fim else None,
+                data_fim_original=datetime.fromisoformat(data_fim_original)
+                if data_fim_original
+                else None,
+                url_website=orgao.get("urlWebsite"),
             )
+        )
 
     if data:
         insert_camara_orgaos_db(data=data)

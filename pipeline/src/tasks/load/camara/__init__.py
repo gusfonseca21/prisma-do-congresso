@@ -11,7 +11,6 @@ from .load_camara_legislaturas import load_camara_legislaturas
 from .load_camara_legislaturas_lideres import load_camara_legislaturas_lideres
 from .load_camara_legislaturas_mesa import load_camara_legislaturas_mesa
 from .load_camara_orgaos import load_camara_orgaos
-from .load_camara_orgaos_detalhes import load_camara_orgaos_detalhes
 from .load_camara_orgaos_membros import load_camara_orgaos_membros
 from .load_camara_orgaos_tipos import load_camara_orgaos_tipos
 from .load_camara_partidos import load_camara_partidos
@@ -30,6 +29,5 @@ __all__ = [
     "load_camara_blocos_partidos",
     "load_camara_orgaos_tipos",
     "load_camara_orgaos",
-    "load_camara_orgaos_detalhes",
     "load_camara_orgaos_membros",
 ]

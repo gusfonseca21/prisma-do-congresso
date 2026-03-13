@@ -20,8 +20,6 @@ from .camara_legislaturas import CamaraLegislaturas, CamaraLegislaturasArg
 from .camara_orgaos import (
     CamaraOrgaos,
     CamaraOrgaosArg,
-    CamaraOrgaosDetalhes,
-    CamaraOrgaosDetalhesArg,
     CamaraOrgaosMembros,
     CamaraOrgaosMembrosArg,
     CamaraOrgaosTipos,
@@ -50,8 +48,6 @@ __all__ = [
     "CamaraOrgaosTiposArg",
     "CamaraOrgaos",
     "CamaraOrgaosArg",
-    "CamaraOrgaosDetalhes",
-    "CamaraOrgaosDetalhesArg",
     "CamaraOrgaosMembros",
     "CamaraOrgaosMembrosArg",
 ]

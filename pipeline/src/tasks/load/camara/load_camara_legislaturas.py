@@ -45,8 +45,6 @@ def load_camara_legislaturas(
             )
         )
 
-    data = []
-
     if data:
         insert_camara_legislaturas_db(data)
     else:
