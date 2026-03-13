@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: e91f1736650e
+Revision ID: d3dbd204d120
 Revises: 
-Create Date: 2026-03-13 11:11:47.984905
+Create Date: 2026-03-13 16:05:23.196482
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'e91f1736650e'
+revision: str = 'd3dbd204d120'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -45,6 +45,22 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['id_lote'], ['lote.id'], name=op.f('fk_camara_blocos_partidos_id_lote')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_camara_blocos_partidos')),
     sa.UniqueConstraint('sigla', name=op.f('uq_camara_blocos_partidos_sigla'))
+    )
+    op.create_table('camara_eventos',
+    sa.Column('id_evento', sa.Integer(), nullable=False),
+    sa.Column('data_hora_inicio', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('data_hora_fim', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('situacao', sa.Text(), nullable=False),
+    sa.Column('descricao_tipo', sa.Text(), nullable=False),
+    sa.Column('descricao', sa.Text(), nullable=False),
+    sa.Column('local_externo', sa.Text(), nullable=True),
+    sa.Column('local_nome', sa.Text(), nullable=True),
+    sa.Column('url_registro', sa.Text(), nullable=True),
+    sa.Column('id_lote', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), sa.Identity(always=False, start=1, cycle=False), nullable=False),
+    sa.ForeignKeyConstraint(['id_lote'], ['lote.id'], name=op.f('fk_camara_eventos_id_lote')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_camara_eventos')),
+    sa.UniqueConstraint('id_evento', name=op.f('uq_camara_eventos_id_evento'))
     )
     op.create_table('camara_legislaturas',
     sa.Column('id_legislatura', sa.Integer(), nullable=False),
@@ -123,7 +139,7 @@ def upgrade() -> None:
     sa.Column('id_tipo_orgao', sa.Integer(), nullable=False),
     sa.Column('nome_publicacao', sa.Text(), nullable=True),
     sa.Column('nome_resumido', sa.Text(), nullable=True),
-    sa.Column('data_inicio', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('data_inicio', sa.DateTime(timezone=True), nullable=True),
     sa.Column('data_instalacao', sa.DateTime(timezone=True), nullable=True),
     sa.Column('data_fim', sa.DateTime(timezone=True), nullable=True),
     sa.Column('data_fim_original', sa.DateTime(timezone=True), nullable=True),
@@ -188,6 +204,17 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['id_partido'], ['camara_partidos.id_partido'], name=op.f('fk_camara_deputados_id_partido')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_camara_deputados')),
     sa.UniqueConstraint('id_deputado', name=op.f('uq_camara_deputados_id_deputado'))
+    )
+    op.create_table('camara_eventos_orgaos',
+    sa.Column('id_evento', sa.Integer(), nullable=False),
+    sa.Column('id_orgao', sa.Integer(), nullable=False),
+    sa.Column('id_lote', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), sa.Identity(always=False, start=1, cycle=False), nullable=False),
+    sa.ForeignKeyConstraint(['id_evento'], ['camara_eventos.id_evento'], name=op.f('fk_camara_eventos_orgaos_id_evento')),
+    sa.ForeignKeyConstraint(['id_lote'], ['lote.id'], name=op.f('fk_camara_eventos_orgaos_id_lote')),
+    sa.ForeignKeyConstraint(['id_orgao'], ['camara_orgaos.id_orgao'], name=op.f('fk_camara_eventos_orgaos_id_orgao')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_camara_eventos_orgaos')),
+    sa.UniqueConstraint('id_evento', 'id_orgao', name='uq_eventos_orgaos')
     )
     op.create_table('camara_deputados_historico',
     sa.Column('id_deputado', sa.Integer(), nullable=False),
@@ -321,6 +348,7 @@ def downgrade() -> None:
     op.drop_table('camara_deputados_ocupacoes')
     op.drop_table('camara_deputados_mandatos_externos')
     op.drop_table('camara_deputados_historico')
+    op.drop_table('camara_eventos_orgaos')
     op.drop_table('camara_deputados')
     op.drop_table('camara_partidos')
     op.drop_table('camara_orgaos')
@@ -330,6 +358,7 @@ def downgrade() -> None:
     op.drop_table('erros_extract')
     op.drop_table('camara_orgaos_tipos')
     op.drop_table('camara_legislaturas')
+    op.drop_table('camara_eventos')
     op.drop_table('camara_blocos_partidos')
     op.drop_table('lote')
     # ### end Alembic commands ###

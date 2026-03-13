@@ -158,8 +158,6 @@ def insert_camara_deputados_historico_db(
             .on_conflict_do_nothing(index_elements=["hash"])
         )
 
-        stmt_historico = stmt_historico
-
         result = conn.execute(stmt_historico)
 
         total = len(historico_deputados_data)
