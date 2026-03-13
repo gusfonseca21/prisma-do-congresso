@@ -71,7 +71,9 @@ def insert_camara_blocos_partidos_db(
             set_={
                 "id_bloco": stmt.excluded.id_bloco,
             },
-            where=stmt.excluded.id_bloco != camara_blocos_partidos.c.id_bloco,
+            where=stmt.excluded.id_bloco.is_distinct_from(
+                camara_blocos_partidos.c.id_bloco
+            ),
         )
 
         stmt = stmt.returning(camara_blocos_partidos.c.id, sa.text("xmax"))
